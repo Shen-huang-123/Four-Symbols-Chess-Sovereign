@@ -1,0 +1,30 @@
+# Android / Gradle generated data
+.gradle/
+**/.gradle/
+**/build/
+**/build-v*/
+**/.idea/
+**/.cxx/
+*.iml
+**/local.properties
+**/captures/
+
+# Local signing keys and environment files
+*.jks
+*.keystore
+.env
+.env.*
+!*.example
+
+# Keep only current install package in the repository
+安装包/历史版本/
+
+# Keep written reports; exclude temporary AVDs, screenshots, logs and source backups
+源码/四象棋尊/验证/*
+!源码/四象棋尊/验证/*.md
+!源码/四象棋尊/验证/VerifyPlayerFlow.ps1
+
+# Editor / OS metadata
+.DS_Store
+Thumbs.db
+*.log
