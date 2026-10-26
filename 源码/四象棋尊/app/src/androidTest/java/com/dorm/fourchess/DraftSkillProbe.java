@@ -17,9 +17,9 @@ public final class DraftSkillProbe extends Instrumentation {
     private int[] xy(int o,int x,int y){return square(o,x-5,18-y);}
     private void piece(StringBuilder s,int owner,char type,int[] p,boolean sealed){s.append(owner).append(',').append(type).append(',').append(p[0]).append(',').append(p[1]).append(',').append(sealed?1:0).append(';');}
     private String fixture(int owner,int skill){
-        StringBuilder s=new StringBuilder(owner+",-1,-1,-1,-1,K3,0,0,0,0,0,0");
+        StringBuilder s=new StringBuilder(owner+",-1,-1,-1,-1,K4,0,0,0,0,0,0");
         for(int o=0;o<4;o++){s.append(',').append(skill);int n=1;for(int slot=1;slot<4;slot++){while(n==skill)n++;s.append(',').append(n++);}}
-        s.append('|');for(int o=0;o<4;o++)piece(s,o,'J',square(o,4,0),false);
+        for(int i=0;i<16;i++)s.append(",1");s.append(",0,0,12345");s.append('|');for(int o=0;o<4;o++)piece(s,o,'J',square(o,4,0),false);
         piece(s,owner,'C',xy(owner,9,9),false);piece(s,owner,'M',xy(owner,10,9),false);piece(s,owner,'P',xy(owner,8,9),true);
         int enemy=(owner+1)%4;piece(s,enemy,'C',xy(owner,10,10),false);piece(s,enemy,'M',xy(owner,11,10),false);piece(s,enemy,'B',xy(owner,9,11),false);return s.toString();
     }
@@ -41,12 +41,45 @@ public final class DraftSkillProbe extends Instrumentation {
         }return new int[][]{from,to};
     }
     private boolean cast(FourChessView b,int o,int id,int[][] a){return b.trySkill(o,id,a[0][0],a[0][1],a[1][0],a[1][1]);}
+    private void knight(FourChessView b,int owner,boolean[] away){
+        int[] from=square(owner,away[owner]?2:1,away[owner]?2:0),to=square(owner,away[owner]?1:2,away[owner]?0:2);
+        check(b.tryNetworkMove(owner,from[0],from[1],to[0],to[1]),"cycle legal horse action side "+owner);away[owner]=!away[owner];
+    }
+    private void cycles()throws Exception{
+        FourChessView b=new FourChessView(getTargetContext()),replica=new FourChessView(getTargetContext());b.setSkillMode(true);b.newGame();
+        int[][] hands=(int[][])field(b,"skillHands"),charges=(int[][])field(b,"skillCharges");int old=hands[0][0];hands[0][0]=29;
+        // Only the first player's pass card is fixed; retain other random cards without duplicates in that hand.
+        for(int i=1;i<4;i++)if(hands[0][i]==29)hands[0][i]=old;charges[0][29]=3;
+        boolean[] away=new boolean[4];
+        for(int round=0;round<3;round++){
+            int before=b.skillRemaining(0,29);check(b.trySkill(0,29,5,15,5,15),"multi-charge pass succeeds "+round);check(b.skillRemaining(0,29)==before-1,"success consumes exactly one charge "+round);
+            for(int o=1;o<4;o++)knight(b,o,away);check(b.skillRounds()==round+1,"four actions equal one completed round "+round);
+        }
+        check(b.skillUsed(0,29)&&!b.beginSkill(29),"zero-charge skill cannot activate");
+        String exhausted=b.exportState();replica.importState(exhausted);check(exhausted.equals(replica.exportState()),"remaining charges and round progress synchronize");
+        check(!b.trySkill(0,29,5,15,5,15)&&exhausted.equals(b.exportState()),"zero-charge cast changes no state");
+        for(int round=3;round<9;round++)for(int o=0;o<4;o++)knight(b,o,away);
+        check(b.skillGeneration()==0&&b.skillRounds()==9,"nine full rounds do not redraw");
+        for(int o=0;o<3;o++)knight(b,o,away);
+        String boundary=b.exportState();check(b.skillGeneration()==0,"39 actions do not redraw");
+        knight(b,3,away);String next=b.exportState();check(b.skillGeneration()==1&&b.skillRounds()==10,"40th action redraws exactly once");
+        java.util.Set<Integer> unique=new java.util.HashSet<>();for(int o=0;o<4;o++)for(int id:b.skillHand(o)){check(unique.add(id),"renewed hands globally unique");check(b.skillRemaining(o,id)>=1&&b.skillRemaining(o,id)<=3,"renewed charges range");}
+        replica.importState(next);check(next.equals(replica.exportState()),"refreshed deal round trips exactly");
+        check(b.undoSteps(1)&&boundary.equals(b.exportState()),"undo across redraw restores old hand charges and round");away[3]=!away[3];knight(b,3,away);check(next.equals(b.exportState()),"replaying same redraw cannot reroll cards or charges");
+        String[] parts=next.split("\\|",2),header=parts[0].split(",");
+        for(String value:new String[]{"-1","4"}){String[] bad=header.clone();bad[28]=value;b.importState(String.join(",",bad)+"|"+parts[1]);check(next.equals(b.exportState()),"invalid remaining count rejected "+value);}
+        String[] bad=header.clone();bad[45]="16";b.importState(String.join(",",bad)+"|"+parts[1]);check(next.equals(b.exportState()),"invalid round mask rejected");
+        // Three surviving players form a round without waiting for an eliminated seat.
+        StringBuilder three=new StringBuilder();for(String piece:parts[1].split(";"))if(!piece.startsWith("3,")&&!piece.isEmpty())three.append(piece).append(';');
+        header[0]="2";header[44]="19";header[45]="3";b.importState(String.join(",",header)+"|"+three);boolean[] home=new boolean[4];knight(b,2,home);check(b.skillRounds()==20&&b.skillGeneration()==2&&b.currentTurn()==0,"eliminated player does not block tenth-round refresh");
+    }
     private void runChecks()throws Exception{
+        cycles();
         FourChessView b=new FourChessView(getTargetContext()),copy=new FourChessView(getTargetContext());b.setSkillMode(true);
         Set<String> deals=new HashSet<>();Set<Integer> seen=new HashSet<>();
         for(int round=0;round<100;round++){
             b.newGame();Set<Integer> unique=new HashSet<>();
-            for(int o=0;o<4;o++){int[] hand=b.skillHand(o);check(hand.length==4,"four cards round "+round+" side "+o);for(int id:hand){check(id>=1&&id<=30&&unique.add(id),"valid globally unique deal "+round+" id "+id);seen.add(id);}int original=hand[0];hand[0]=0;check(b.skillHand(o)[0]==original,"hand accessor defensive copy "+round+" side "+o);}
+            for(int o=0;o<4;o++){int[] hand=b.skillHand(o);check(hand.length==4,"four cards round "+round+" side "+o);for(int id:hand){check(id>=1&&id<=30&&unique.add(id),"valid globally unique deal "+round+" id "+id);seen.add(id);check(b.skillRemaining(o,id)>=1&&b.skillRemaining(o,id)<=3,"random charges in range");}int original=hand[0];hand[0]=0;check(b.skillHand(o)[0]==original,"hand accessor defensive copy "+round+" side "+o);}
             String state=b.exportState();deals.add(state);copy.importState(state);check(copy.exportState().equals(state),"all hands synchronize round "+round);
             b.cancelSkill();check(b.exportState().equals(state),"cancel never rerolls round "+round);
         }
@@ -79,7 +112,7 @@ public final class DraftSkillProbe extends Instrumentation {
         bad=header.clone();bad[13]=bad[12];b.importState(String.join(",",bad)+"|"+parts[1]);check(valid.equals(b.exportState()),"duplicate card rejected atomically");
         bad=header.clone();bad[6]=Integer.toString(1<<29);b.importState(String.join(",",bad)+"|"+parts[1]);check(valid.equals(b.exportState()),"unowned spent mask rejected atomically");
         b.importState(valid+"0,B,9,9,0;");check(valid.equals(b.exportState()),"duplicate square rejected atomically");
-        b.setSkillMode(false);b.newGame();String normal=b.exportState();check(!normal.contains("K3")&&!b.beginSkill(6)&&!b.trySkill(0,6,5,15,6,14),"ordinary mode never deals or casts skills");
+        b.setSkillMode(false);b.newGame();String normal=b.exportState();check(!normal.contains("K4")&&!b.beginSkill(6)&&!b.trySkill(0,6,5,15,6,14),"ordinary mode never deals or casts skills");
         copy.importState(normal);check(copy.exportState().equals(normal),"ordinary protocol unchanged");
     }
     @Override public void onStart(){Bundle result=new Bundle();try{final Throwable[] error={null};runOnMainSync(()->{try{runChecks();}catch(Throwable e){error[0]=e;}});if(error[0]!=null)throw new AssertionError(error[0]);log.append("DRAFT COMPLETE\n");result.putString("stream",log.toString());finish(Activity.RESULT_OK,result);}catch(Throwable e){result.putString("stream",log+"FAIL "+android.util.Log.getStackTraceString(e));finish(Activity.RESULT_CANCELED,result);}}

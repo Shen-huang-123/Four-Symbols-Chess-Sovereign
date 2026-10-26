@@ -26,7 +26,7 @@ public class FourChessView extends View {
         Piece copy() { Piece q=new Piece(owner,type,x,y);q.sealed=sealed;return q; }
     }
     static class Snapshot {
-        final List<Piece> pieces;final int turn,fx,fy,tx,ty;int[] skillUse;int[][] hands;int skill,actor;
+        final List<Piece> pieces;final int turn,fx,fy,tx,ty;int[] skillUse;int[][] hands,remaining;int rounds,roundMask;long seed;int skill,actor;
         Snapshot(List<Piece> p,int t,int fx,int fy,int tx,int ty){pieces=p;turn=t;this.fx=fx;this.fy=fy;this.tx=tx;this.ty=ty;}
     }
 
@@ -34,6 +34,7 @@ public class FourChessView extends View {
     private final List<Snapshot> history = new ArrayList<>(); private final boolean[] alive = new boolean[4];
     private StatusListener listener; private MoveRequester requester; private MoveObserver moveObserver; private Piece selected; private List<int[]> moves = new ArrayList<>();
     private final int[][] skillHands=new int[4][SkillRules.HAND_SIZE];
+    private final int[][] skillCharges=new int[4][SkillRules.COUNT+1];private int completedRounds,roundMask;private long dealSeed;
     private boolean skillMode;private final int[] skillUse=new int[4];private int pendingSkill,lastSkill,lastActor;private Piece skillSource;private SkillRequester skillRequester;
     private int turn=0, localPlayer=-1,lastFx=-1,lastFy=-1,lastTx=-1,lastTy=-1; private float cell,cellX,cellY,ox,oy;private final GameSound sounds=new GameSound();private boolean soundEnabled=true;
     private float rejectX=-1,rejectY=-1;private long rejectUntil;
@@ -62,7 +63,7 @@ public class FourChessView extends View {
     boolean isPlayerAlive(int owner){return alive[owner];}
     void setLocalPlayer(int player){localPlayer=player;selected=null;moves.clear();invalidate();announce();}
     String ownerName(int owner){return names[owner];}
-    void newGame(){ dealSkills();java.util.Arrays.fill(skillUse,0);pendingSkill=lastSkill=lastActor=0;skillSource=null;pieces.clear(); history.clear(); selected=null; turn=0;lastFx=lastFy=lastTx=lastTy=-1; for(int i=0;i<4;i++)alive[i]=true;
+    void newGame(){ completedRounds=roundMask=0;dealSeed=new java.security.SecureRandom().nextLong();dealSkills();java.util.Arrays.fill(skillUse,0);pendingSkill=lastSkill=lastActor=0;skillSource=null;pieces.clear(); history.clear(); selected=null; turn=0;lastFx=lastFy=lastTx=lastTy=-1; for(int i=0;i<4;i++)alive[i]=true;
         addSide(0); addSide(1); addSide(2); addSide(3); invalidate(); announce(); }
     private void addSide(int o) {
         char[] back={'C','M','X','S','J','S','X','M','C'};
@@ -213,13 +214,25 @@ public class FourChessView extends View {
     int lastSkillActor(){return lastActor;}
     private void dealSkills(){
         java.util.List<Integer> deck=new ArrayList<>();for(int id=1;id<=SkillRules.COUNT;id++)deck.add(id);
-        java.util.Collections.shuffle(deck,new java.security.SecureRandom());
-        for(int owner=0;owner<4;owner++)for(int slot=0;slot<SkillRules.HAND_SIZE;slot++)skillHands[owner][slot]=skillMode?deck.get(slot*4+owner):0;
+        java.util.Random random=new java.util.Random(dealSeed^((long)(completedRounds/10)*0x9e3779b97f4a7c15L));java.util.Collections.shuffle(deck,random);
+        java.util.Arrays.fill(skillUse,0);
+        for(int owner=0;owner<4;owner++){java.util.Arrays.fill(skillCharges[owner],0);for(int slot=0;slot<SkillRules.HAND_SIZE;slot++){int id=skillMode?deck.get(slot*4+owner):0;skillHands[owner][slot]=id;if(id>0)skillCharges[owner][id]=1+random.nextInt(3);}}
     }
     int skillViewer(){return localPlayer>=0&&localPlayer<4?localPlayer:turn;}
     int[] skillHand(int owner){return owner>=0&&owner<4?skillHands[owner].clone():new int[0];}
     boolean hasSkill(int owner,int id){if(owner<0||owner>3||id<1||id>SkillRules.COUNT)return false;for(int held:skillHands[owner])if(held==id)return true;return false;}
-    boolean skillUsed(int owner,int id){return !hasSkill(owner,id)||(skillUse[owner]&(1<<(id-1)))!=0;}
+    int skillRemaining(int owner,int id){return hasSkill(owner,id)?skillCharges[owner][id]:0;}
+    boolean skillUsed(int owner,int id){return skillRemaining(owner,id)==0;}
+    int skillGeneration(){return completedRounds/10;}
+    int skillRounds(){return completedRounds;}
+    int selectedSkill(){return pendingSkill;}
+    boolean skillAvailable(int id){
+        if(!skillMode||!canAct()||skillUsed(turn,id))return false;
+        for(int y=0;y<19;y++)for(int x=0;x<19;x++)if(validCell(x,y)){
+            if(!SkillRules.twoStep(id)){if(skillLegal(id,x,y,x,y))return true;}
+            else {Piece q=pieceAt(x,y);if(id==30?enemySkillPiece(q):ownSkillPiece(q))for(int ty=0;ty<19;ty++)for(int tx=0;tx<19;tx++)if(skillLegal(id,x,y,tx,ty))return true;}
+        }return false;
+    }
     boolean canAct(){int count=0;for(boolean a:alive)if(a)count++;return count>1&&alive[turn]&&(localPlayer<0||localPlayer==turn);}
     boolean beginSkill(int id){
         if(!skillMode||!canAct()||skillUsed(turn,id))return false;
@@ -291,7 +304,7 @@ public class FourChessView extends View {
         int live=0;for(boolean a:alive)if(a)live++;
         if(!skillMode||live<2||owner!=turn||!alive[owner]||skillUsed(owner,id)||!skillLegal(id,sx,sy,tx,ty))return false;
         Piece source=pieceAt(sx,sy),target=pieceAt(tx,ty);
-        save();skillUse[owner]|=1<<(id-1);lastSkill=id;lastActor=owner;lastFx=sx;lastFy=sy;lastTx=tx;lastTy=ty;
+        save();if(--skillCharges[owner][id]==0)skillUse[owner]|=1<<(id-1);lastSkill=id;lastActor=owner;lastFx=sx;lastFy=sy;lastTx=tx;lastTy=ty;
         char restored=SkillRules.restoreType(id);
         if(restored!=0)pieces.add(new Piece(owner,restored,tx,ty));
         else if(id==4||id==25){for(Piece q:pieces)if(q.type!='J'&&q.owner!=owner&&(id==4?q==target:Math.max(Math.abs(q.x-tx),Math.abs(q.y-ty))<=1))q.sealed=true;}
@@ -342,25 +355,26 @@ public class FourChessView extends View {
     boolean tryNetworkMove(int owner,int sx,int sy,int tx,int ty){if(owner!=turn)return false;Piece q=pieceAt(sx,sy);if(q==null||q.owner!=owner)return false;selected=q;moves=legalMoves(q);if(!containsMove(tx,ty)){selected=null;moves.clear();return false;}moveSelected(tx,ty);return true;}
     String exportState(){
         StringBuilder b=new StringBuilder().append(turn).append(',').append(lastFx).append(',').append(lastFy).append(',').append(lastTx).append(',').append(lastTy);
-        if(skillMode){b.append(",K3");for(int used:skillUse)b.append(',').append(used);b.append(',').append(lastSkill).append(',').append(lastActor);for(int[] hand:skillHands)for(int held:hand)b.append(',').append(held);}
+        if(skillMode){b.append(",K4");for(int used:skillUse)b.append(',').append(used);b.append(',').append(lastSkill).append(',').append(lastActor);for(int[] hand:skillHands)for(int held:hand)b.append(',').append(held);for(int owner=0;owner<4;owner++)for(int id:skillHands[owner])b.append(',').append(skillCharges[owner][id]);b.append(',').append(completedRounds).append(',').append(roundMask).append(',').append(dealSeed);}
         b.append('|');for(Piece q:pieces){b.append(q.owner).append(',').append(q.type).append(',').append(q.x).append(',').append(q.y);if(skillMode)b.append(',').append(q.sealed?1:0);b.append(';');}return b.toString();
     }
     void importState(String state){try{
         String[] top=state.split("\\|",2),h=top[0].split(",");int newTurn=Integer.parseInt(h[0]);if(newTurn<0||newTurn>3)return;
-        boolean variant=h.length==12+4*SkillRules.HAND_SIZE&&"K3".equals(h[5]);if(!variant&&h.length!=5)return;
-        int[] uses=new int[4];int[][] hands=new int[4][SkillRules.HAND_SIZE];
+        boolean variant=h.length==15+8*SkillRules.HAND_SIZE&&"K4".equals(h[5]);if(!variant&&h.length!=5)return;
+        int[] uses=new int[4];int[][] hands=new int[4][SkillRules.HAND_SIZE],charges=new int[4][SkillRules.COUNT+1];int rounds=0,mask=0;long seed=0;
         if(variant)for(int owner=0;owner<4;owner++){int heldMask=0;for(int slot=0;slot<SkillRules.HAND_SIZE;slot++){int id=Integer.parseInt(h[12+owner*SkillRules.HAND_SIZE+slot]);if(id<1||id>SkillRules.COUNT||(heldMask&(1<<(id-1)))!=0)return;hands[owner][slot]=id;heldMask|=1<<(id-1);}uses[owner]=Integer.parseInt(h[6+owner]);if((uses[owner]&~heldMask)!=0)return;}
+        if(variant){for(int owner=0;owner<4;owner++)for(int slot=0;slot<SkillRules.HAND_SIZE;slot++){int id=hands[owner][slot],n=Integer.parseInt(h[28+owner*4+slot]);if(n<0||n>3||((uses[owner]&(1<<(id-1)))!=0)!=(n==0))return;charges[owner][id]=n;}rounds=Integer.parseInt(h[44]);mask=Integer.parseInt(h[45]);seed=Long.parseLong(h[46]);if(rounds<0||rounds>1000000||mask<0||mask>15)return;}
         int action=variant?Integer.parseInt(h[10]):0,actor=variant?Integer.parseInt(h[11]):0;
         if(action<0||action>SkillRules.COUNT||actor<0||actor>3)return;
         int fx=Integer.parseInt(h[1]),fy=Integer.parseInt(h[2]),tx=Integer.parseInt(h[3]),ty=Integer.parseInt(h[4]);
         List<Piece> incoming=new ArrayList<>();boolean[][] occupied=new boolean[19][19];
         if(top.length>1)for(String item:top[1].split(";")){if(item.isEmpty())continue;String[] a=item.split(",");int o=Integer.parseInt(a[0]),x=Integer.parseInt(a[2]),y=Integer.parseInt(a[3]);char type=a[1].charAt(0);if(o<0||o>3||!validCell(x,y)||occupied[x][y]||"CMXSJPB".indexOf(type)<0)return;occupied[x][y]=true;Piece q=new Piece(o,type,x,y);q.sealed=variant&&a.length>4&&"1".equals(a[4]);if(q.type=='J'&&q.sealed)return;incoming.add(q);}
-        turn=newTurn;lastFx=fx;lastFy=fy;lastTx=tx;lastTy=ty;skillMode=variant;System.arraycopy(uses,0,skillUse,0,4);for(int owner=0;owner<4;owner++)System.arraycopy(hands[owner],0,skillHands[owner],0,SkillRules.HAND_SIZE);lastSkill=action;lastActor=actor;
+        turn=newTurn;lastFx=fx;lastFy=fy;lastTx=tx;lastTy=ty;skillMode=variant;System.arraycopy(uses,0,skillUse,0,4);for(int owner=0;owner<4;owner++)System.arraycopy(hands[owner],0,skillHands[owner],0,SkillRules.HAND_SIZE);for(int owner=0;owner<4;owner++)System.arraycopy(charges[owner],0,skillCharges[owner],0,SkillRules.COUNT+1);completedRounds=rounds;roundMask=mask;dealSeed=seed;lastSkill=action;lastActor=actor;
         pieces.clear();pieces.addAll(incoming);for(int i=0;i<4;i++)alive[i]=false;for(Piece q:pieces)if(q.type=='J')alive[q.owner]=true;selected=null;pendingSkill=0;skillSource=null;moves.clear();invalidate();announce();tone(GameSound.MOVE);
     }catch(Exception ignored){}}
     private void eliminate(int owner){alive[owner]=false;for(int i=pieces.size()-1;i>=0;i--)if(pieces.get(i).owner==owner)pieces.remove(i);}
-    private void nextTurn(){if(skillMode)for(Piece q:pieces)if(q.owner==turn)q.sealed=false;int count=0;for(boolean a:alive)if(a)count++;if(count<=1)return;do{turn=(turn+1)%4;}while(!alive[turn]);}
-    private void save(){List<Piece> copy=new ArrayList<>();for(Piece q:pieces)copy.add(q.copy());Snapshot snapshot=new Snapshot(copy,turn,lastFx,lastFy,lastTx,lastTy);snapshot.skillUse=skillUse.clone();snapshot.hands=new int[4][];for(int i=0;i<4;i++)snapshot.hands[i]=skillHands[i].clone();snapshot.skill=lastSkill;snapshot.actor=lastActor;history.add(snapshot);}
+    private void nextTurn(){if(skillMode)for(Piece q:pieces)if(q.owner==turn)q.sealed=false;int count=0;for(boolean a:alive)if(a)count++;if(count<=1)return;if(skillMode){roundMask|=1<<turn;int liveMask=0;for(int i=0;i<4;i++)if(alive[i])liveMask|=1<<i;if((roundMask&liveMask)==liveMask){completedRounds++;roundMask=0;if(completedRounds%10==0)dealSkills();}}do{turn=(turn+1)%4;}while(!alive[turn]);}
+    private void save(){List<Piece> copy=new ArrayList<>();for(Piece q:pieces)copy.add(q.copy());Snapshot snapshot=new Snapshot(copy,turn,lastFx,lastFy,lastTx,lastTy);snapshot.skillUse=skillUse.clone();snapshot.hands=new int[4][];for(int i=0;i<4;i++)snapshot.hands[i]=skillHands[i].clone();snapshot.remaining=new int[4][];for(int i=0;i<4;i++)snapshot.remaining[i]=skillCharges[i].clone();snapshot.seed=dealSeed;snapshot.rounds=completedRounds;snapshot.roundMask=roundMask;snapshot.skill=lastSkill;snapshot.actor=lastActor;history.add(snapshot);}
     int undoCount(){return history.size();}
     void undo(){undoSteps(1);}
     boolean undoSteps(int count){
@@ -368,7 +382,7 @@ public class FourChessView extends View {
         Snapshot s=history.get(history.size()-count);
         for(int i=0;i<count;i++)history.remove(history.size()-1);
         pieces.clear();for(Piece q:s.pieces)pieces.add(q.copy());turn=s.turn;
-        lastFx=s.fx;lastFy=s.fy;lastTx=s.tx;lastTy=s.ty;System.arraycopy(s.skillUse,0,skillUse,0,4);for(int i=0;i<4;i++)System.arraycopy(s.hands[i],0,skillHands[i],0,SkillRules.HAND_SIZE);lastSkill=s.skill;lastActor=s.actor;pendingSkill=0;skillSource=null;
+        lastFx=s.fx;lastFy=s.fy;lastTx=s.tx;lastTy=s.ty;System.arraycopy(s.skillUse,0,skillUse,0,4);for(int i=0;i<4;i++)System.arraycopy(s.hands[i],0,skillHands[i],0,SkillRules.HAND_SIZE);for(int i=0;i<4;i++)System.arraycopy(s.remaining[i],0,skillCharges[i],0,SkillRules.COUNT+1);dealSeed=s.seed;completedRounds=s.rounds;roundMask=s.roundMask;lastSkill=s.skill;lastActor=s.actor;pendingSkill=0;skillSource=null;
         for(int i=0;i<4;i++)alive[i]=false;for(Piece q:pieces)if(q.type=='J')alive[q.owner]=true;
         selected=null;moves.clear();rejectUntil=0;invalidate();announce();return true;
     }

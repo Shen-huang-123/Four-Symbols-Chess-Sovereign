@@ -2,7 +2,7 @@
 
 四人象棋 Android 游戏，支持同屏对局、局域网联机、自定义昵称、棋谱、悔棋和音效，采用国风二次元主题。
 
-- [下载最新版 Release](https://github.com/Shen-huang-123/Four-Symbols-Chess-Sovereign/releases/latest) · [全部版本发布记录](发布/版本记录.md) · [仓库中的 v4.4 APK](安装包/最新版/四象棋尊-v4.4.apk)。
+- [下载最新版 Release](https://github.com/Shen-huang-123/Four-Symbols-Chess-Sovereign/releases/latest) · [全部版本发布记录](发布/版本记录.md) · [仓库中的 v4.5 APK](安装包/最新版/四象棋尊-v4.5.apk)。
 - Android Studio 打开 `源码/四象棋尊`；需要 Android SDK 35。构建命令在下方。
 - 仓库保留完整源码、当前安装包及书面说明，生成缓存、历史安装包和临时验收截图未纳入版本管理。
 
@@ -14,8 +14,8 @@
 
 ## 当前版本
 
-- 应用版本：4.4.0
-- 当前安装包：`安装包/最新版/四象棋尊-v4.4.apk`
+- 应用版本：4.5.0
+- 当前安装包：`安装包/最新版/四象棋尊-v4.5.apk`
 - 包名：`com.dorm.fourchess`
 - 最低系统：Android 6.0（API 23）
 - 目标系统：Android 15（API 35）
@@ -57,7 +57,14 @@
 
 当前工程将构建文件输出到：
 
-`app/build-v44/outputs/apk/debug/app-debug.apk`
+`app/build-v45/outputs/apk/debug/app-debug.apk`
+
+## v4.5 紧凑技能与周期抽牌
+
+- 竖屏两列两行技能卡，单行名称、简短说明和真实次数角标，支持选中与禁用状态。
+- 每张随机1～3次，存活各方各行动一遍算一回合，每10回合替换为新4张。
+- 悔棋恢复次数和抽牌进度，重走同节点不会刷牌；技能联机要求全员v4.5。
+- 8126项模拟器检查通过；[修改文件、尺寸与测试报告](源码/四象棋尊/验证/v4.5-紧凑技能与周期抽牌验收.md)。
 
 ## v4.4 四技能与手机布局
 

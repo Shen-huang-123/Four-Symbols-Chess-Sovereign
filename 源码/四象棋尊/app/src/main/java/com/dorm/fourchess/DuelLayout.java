@@ -19,7 +19,7 @@ final class DuelLayout extends ViewGroup {
         int w=MeasureSpec.getSize(widthSpec),h=MeasureSpec.getSize(heightSpec);
         float density=getResources().getDisplayMetrics().density,wdp=w/density,hdp=h/density;
         layoutMode=wdp>=840&&hdp>=600?WIDE:w>h?PHONE_LANDSCAPE:PHONE_PORTRAIT;
-        boolean wide=layoutMode==WIDE,portrait=layoutMode==PHONE_PORTRAIT;hasSkills=((FourChessView)getChildAt(1)).isSkillMode();SkillRackView rack=(SkillRackView)getChildAt(4);rack.setVisibility(hasSkills?VISIBLE:GONE);rack.setStacked(!portrait&&!wide&&hdp>=300);rackHeight=hasSkills?dp(portrait||wide?80:150):0;
+        boolean wide=layoutMode==WIDE,portrait=layoutMode==PHONE_PORTRAIT;hasSkills=((FourChessView)getChildAt(1)).isSkillMode();SkillRackView rack=(SkillRackView)getChildAt(4);rack.setVisibility(hasSkills?VISIBLE:GONE);rack.setStacked(portrait||(!wide&&hdp>=300));rackHeight=hasSkills?dp(portrait?104:wide?54:116):0;
         gap=dp(wide?8:4);headerHeight=0;hudTop=gap;
         ((FactionStripView)getChildAt(0)).setColumns(portrait?2:4);((FourChessView)getChildAt(1)).setCompactUi(!wide);
         getChildAt(2).setVisibility(wide?View.VISIBLE:View.GONE);getChildAt(3).setVisibility(wide?View.GONE:View.VISIBLE);
