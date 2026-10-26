@@ -10,6 +10,13 @@ final class SkillCardPainter {
     private final float density,scaled;
     SkillCardPainter(android.content.Context context){density=context.getResources().getDisplayMetrics().density;scaled=context.getResources().getDisplayMetrics().scaledDensity;}
     private float dp(float n){return n*density;}
+    RectF emblemBounds(RectF r){
+        float pad=Math.min(dp(10),r.width()*.055f),h=r.height();
+        float badgeH=Math.min(dp(16),h*.22f),badgeY=r.top+pad+badgeH/2;
+        float top=r.width()>h*1.4f?r.top+pad:badgeY+badgeH*.65f+dp(2),bottom=r.top+h*.51f;
+        float size=Math.min(r.width()*.43f,Math.max(dp(12),bottom-top)),cy=(top+bottom)/2;
+        return new RectF(r.centerX()-size/2,cy-size/2,r.centerX()+size/2,cy+size/2);
+    }
     private int muted(int color,boolean disabled){return disabled?BattleSkin.blend(color,0xff27353c,.68f):color;}
     private void text(Canvas c,String value,float x,float y,float size,float width,int color,Paint.Align align){
         p.setShader(null);p.setStyle(Paint.Style.FILL);p.setTypeface(GameDesign.EMPHASIS);p.setTextSize(size);p.setColor(color);p.setTextAlign(align);
@@ -51,9 +58,7 @@ final class SkillCardPainter {
         float titleSize=Math.min((compact?15:18)*scaled,Math.min(h*(compact?.23f:.12f),w*.17f));
         float titleY=r.top+h*(compact?.46f:.61f);
         if(!compact){
-            // Wide cards can use the otherwise empty centre beside the corner badges.
-            float top=w>h*1.4f?r.top+pad:badgeY+badgeH*.65f+dp(2),bottom=r.top+h*.51f,size=Math.min(w*.43f,Math.max(dp(12),bottom-top));
-            float cy=(top+bottom)/2;emblem.draw(c,new RectF(r.centerX()-size/2,cy-size/2,r.centerX()+size/2,cy+size/2),id,t,disabled);
+            emblem.draw(c,emblemBounds(r),id,t,disabled);
         }
         text(c,SkillRules.name(id),r.centerX(),titleY,titleSize,w-pad*2,title,Paint.Align.CENTER);
         float descTop=titleY+titleSize*.65f,descBottom=r.bottom-(compact?dp(4):Math.max(dp(17),h*.13f));

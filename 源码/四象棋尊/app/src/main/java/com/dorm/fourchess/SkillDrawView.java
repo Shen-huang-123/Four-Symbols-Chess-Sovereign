@@ -11,6 +11,8 @@ final class SkillDrawView extends View {
     interface Listener {void onCard(int id,boolean visible);void onComplete();}
     private final int[] hand,charges;private final SkillCardPainter cardPainter;
     private final long[] flips={-1,-1,-1,-1};
+    private final SkillCardEffects effects=new SkillCardEffects();
+    private long selectedAt=-1;
     private final RectF[] cards={new RectF(),new RectF(),new RectF(),new RectF()};
     private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
     private Listener listener;private int selected=-1,down=-1,focused=-1;private boolean completed;
@@ -27,17 +29,19 @@ final class SkillDrawView extends View {
     }
     private float progress(int i){return flips[i]<0?0:!motion()?1:Math.max(0,Math.min(1,(SystemClock.uptimeMillis()-flips[i])/320f));}
     boolean allRevealed(){for(int i=0;i<4;i++)if(flips[i]<0||progress(i)<1)return false;return true;}
-    void revealAll(boolean animated){long now=SystemClock.uptimeMillis();for(int i=0;i<4;i++)if(flips[i]<0||!animated)flips[i]=animated&&motion()?now+i*90:now-1000;selected=0;announceForAccessibility(animated?"正在揭晓四张技能":"已揭晓四张技能");finishIfReady();invalidate();}
-    void reveal(int index){if(index<0||index>=4)return;selected=index;if(flips[index]<0){flips[index]=motion()?SystemClock.uptimeMillis():SystemClock.uptimeMillis()-1000;performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);}if(listener!=null)listener.onCard(hand[index],progress(index)>=.5f);finishIfReady();invalidate();}
+    void revealAll(boolean animated){long now=SystemClock.uptimeMillis();for(int i=0;i<4;i++)if(flips[i]<0||!animated)flips[i]=animated&&motion()?now+i*90:now-10000;selected=0;selectedAt=-1;announceForAccessibility(animated?"正在揭晓四张技能":"已揭晓四张技能");finishIfReady();invalidate();}
+    void reveal(int index){if(index<0||index>=4)return;selected=index;boolean hidden=flips[index]<0;selectedAt=!hidden&&motion()?SystemClock.uptimeMillis():-1;if(hidden){flips[index]=motion()?SystemClock.uptimeMillis():SystemClock.uptimeMillis()-10000;performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);}if(listener!=null)listener.onCard(hand[index],progress(index)>=.5f);finishIfReady();invalidate();}
     private void finishIfReady(){if(!completed&&allRevealed()){completed=true;if(listener!=null)listener.onComplete();announceForAccessibility("四张技能已揭晓，可以进入对局");}if(selected>=0&&listener!=null&&progress(selected)>=1)listener.onCard(hand[selected],true);}
     private void label(Canvas c,String text,float x,float y,float size,int color){p.setShader(null);p.setStyle(Paint.Style.FILL);p.setColor(color);p.setTypeface(GameDesign.EMPHASIS);p.setTextAlign(Paint.Align.CENTER);p.setTextSize(size);c.drawText(text,x,y-(p.ascent()+p.descent())/2,p);}
     @Override protected void onDraw(Canvas c){super.onDraw(c);boolean moving=false;
         for(int i=0;i<4;i++){
-            RectF r=cards[i];float t=progress(i),age=flips[i]<0?9999:SystemClock.uptimeMillis()-flips[i];boolean face=flips[i]>=0&&t>=.5f;
-            boolean active=flips[i]>=0&&age<820&&motion();moving|=active;
-            int ink=face?SkillCardTheme.forSkill(hand[i]).edge:GameDesign.GOLD;
+            RectF r=cards[i];float t=progress(i);long now=SystemClock.uptimeMillis(),age=flips[i]<0?-10000:now-flips[i],revealAge=age-160,selectAge=selectedAt>=0&&selected==i?now-selectedAt:-1;boolean face=flips[i]>=0&&t>=.5f;
+            boolean revealFx=motion()&&effects.active(hand[i],revealAge,false),selectFx=motion()&&effects.active(hand[i],selectAge,true);
+            moving|=motion()&&flips[i]>=0&&(t<1||revealFx||selectFx);
             c.save();float sx=flips[i]<0?1:Math.max(.035f,Math.abs((float)Math.cos(t*Math.PI)));c.scale(sx,1,r.centerX(),r.centerY());float radius=Math.min(dp(8),r.height()*.08f);
-            if(face){cardPainter.draw(c,r,hand[i],charges[i],selected==i,charges[i]==0,charges[i]==0?"已用尽":"",false,0);}
+            if(face){cardPainter.draw(c,r,hand[i],charges[i],selected==i,charges[i]==0,charges[i]==0?"已用尽":"",false,0);
+                if(charges[i]>0&&(selectFx||revealFx))effects.draw(c,cardPainter.emblemBounds(r),hand[i],selectFx?selectAge:revealAge,selectFx);
+            }
             else{
                 p.setStyle(Paint.Style.FILL);p.setColor(0xff1b2b36);c.drawRoundRect(r,radius,radius,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.8f));p.setColor(GameDesign.EDGE);c.drawRoundRect(r,radius,radius,p);float seal=Math.min(r.width(),r.height())*.19f;c.drawCircle(r.centerX(),r.centerY(),seal,p);p.setStyle(Paint.Style.FILL);
                 label(c,"四 象 秘 卷",r.centerX(),r.top+r.height()*.16f,Math.min(sp(10),r.height()*.12f),GameDesign.SECONDARY);label(c,"秘",r.centerX(),r.centerY(),Math.min(sp(32),r.height()*.27f),GameDesign.GOLD);label(c,"点击揭晓",r.centerX(),r.top+r.height()*.85f,Math.min(sp(10),r.height()*.12f),GameDesign.SECONDARY);

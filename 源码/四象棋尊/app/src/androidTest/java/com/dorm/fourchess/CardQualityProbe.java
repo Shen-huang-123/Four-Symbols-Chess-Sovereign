@@ -24,6 +24,7 @@ public final class CardQualityProbe extends Instrumentation {
         try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),name))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
     }
     private void run()throws Exception{
+        verifyEffects();
         int[] totals=new int[3];for(int id=1;id<=30;id++){SkillCardTheme t=SkillCardTheme.forSkill(id);check(t!=null,"all skill IDs have a shared quality theme "+id);totals[t.pattern]++;}
         check(totals[0]==6&&totals[1]==10&&totals[2]==14,"mapping retains original six legendary ten rare fourteen common skills");check(SkillCardTheme.forSkill(29)==SkillCardTheme.COMMON&&SkillCardTheme.label(29).contains("整活"),"weak entertainment identity retained");
         for(SkillCardTheme t:new SkillCardTheme[]{SkillCardTheme.LEGENDARY,SkillCardTheme.RARE,SkillCardTheme.COMMON})for(int bg:new int[]{t.deep,t.middle,t.light}){check(contrast(t.title,bg)>=4.5,"title contrast >=4.5 "+t.key);check(contrast(t.body,bg)>=4.5,"description contrast >=4.5 "+t.key);}
@@ -47,6 +48,30 @@ public final class CardQualityProbe extends Instrumentation {
         SkillDrawView draw=new SkillDrawView(getTargetContext(),new int[]{6,7,1,29},new int[]{3,2,1,0});float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(420*d),h=Math.round(390*d);draw.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));draw.layout(0,0,w,h);draw.revealAll(false);
         check(draw.allRevealed(),"skip preserves fully revealed card presentation");String node=draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();check(node.contains("传说")&&node.contains("剩余3次")&&node.contains("天遁"),"revealed quality name and actual charges accessible");check(draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(2).getContentDescription().toString().contains("稀有"),"rare presentation uses shared label");
         Bitmap b=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);draw.draw(new Canvas(b));try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-reveal.png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
+    }
+    private void verifyEffects()throws Exception{
+        SkillCardEffects fx=new SkillCardEffects();SkillCardPainter painter=new SkillCardPainter(getTargetContext());
+        check(SkillCardEffects.duration(6,false)>SkillCardEffects.duration(7,false)&&SkillCardEffects.duration(7,false)>SkillCardEffects.duration(1,false),"reveal quality has progressively richer finite duration");
+        check(SkillCardEffects.duration(6,true)>SkillCardEffects.duration(7,true)&&SkillCardEffects.duration(7,true)>SkillCardEffects.duration(1,true),"selection quality has progressively richer finite duration");
+        float d=getTargetContext().getResources().getDisplayMetrics().density;
+        Bitmap sheet=Bitmap.createBitmap(Math.round(600*d),Math.round(540*d),Bitmap.Config.ARGB_8888);Canvas gallery=new Canvas(sheet);gallery.drawColor(GameDesign.NIGHT);
+        for(int row=0;row<3;row++){
+            int id=new int[]{1,7,6}[row];java.util.HashSet<Integer> hashes=new java.util.HashSet<>();
+            for(int frame=0;frame<3;frame++){
+                int w=192,h=240;RectF r=new RectF(2,2,w-2,h-2),field=painter.emblemBounds(r);
+                Bitmap overlay=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas layer=new Canvas(overlay);
+                long age=Math.round(SkillCardEffects.duration(id,false)*new float[]{.2f,.5f,.8f}[frame]);fx.draw(layer,field,id,age,false);
+                int[] pixels=new int[w*h];overlay.getPixels(pixels,0,w,0,0,w,h);check(hashes.add(java.util.Arrays.hashCode(pixels)),"effect changes between reveal frames "+id+"/"+frame);
+                boolean clean=true;int lit=0;for(int y=0;y<h;y++)for(int x=0;x<w;x++){if(Color.alpha(pixels[y*w+x])>0){lit++;if(x<Math.floor(field.left)||x>=Math.ceil(field.right)||y<Math.floor(field.top)||y>=Math.ceil(field.bottom))clean=false;}}
+                check(clean&&lit>0,"effect stays inside illustration and never covers copy "+id+"/"+frame);overlay.recycle();
+                RectF cell=new RectF((frame*200+5)*d,(row*180+5)*d,(frame*200+195)*d,(row*180+175)*d);painter.draw(gallery,cell,id,2,true,false,"",false,0);fx.draw(gallery,painter.emblemBounds(cell),id,age,false);
+            }
+            for(boolean select:new boolean[]{false,true}){
+                check(!SkillCardEffects.active(id,-1,select)&&!SkillCardEffects.active(id,SkillCardEffects.duration(id,select),select),"no default or expired animation "+id+"/"+select);
+                Bitmap empty=Bitmap.createBitmap(100,100,Bitmap.Config.ARGB_8888);fx.draw(new Canvas(empty),new RectF(10,10,90,90),id,SkillCardEffects.duration(id,select),select);int[] pixels=new int[10000];empty.getPixels(pixels,0,100,0,0,100,100);boolean clear=true;for(int pixel:pixels)if(pixel!=0)clear=false;check(clear,"expired effect draws nothing "+id+"/"+select);empty.recycle();
+            }
+        }
+        try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-effects.png"))){sheet.compress(Bitmap.CompressFormat.PNG,100,out);}sheet.recycle();
     }
     @Override public void onStart(){Bundle result=new Bundle();try{final Throwable[] error={null};runOnMainSync(()->{try{run();}catch(Throwable e){error[0]=e;}});if(error[0]!=null)throw new AssertionError(error[0]);log.append("QUALITY COMPLETE\n");result.putString("stream",log.toString());finish(Activity.RESULT_OK,result);}catch(Throwable e){result.putString("stream",log+"FAIL "+android.util.Log.getStackTraceString(e));finish(Activity.RESULT_CANCELED,result);}}
 }
