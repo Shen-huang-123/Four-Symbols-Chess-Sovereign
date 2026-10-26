@@ -37,10 +37,10 @@ final class CompactControlsLayout extends ViewGroup {
     }
     @Override protected void onDraw(Canvas c){
         super.onDraw(c);float d=getResources().getDisplayMetrics().density,w=getWidth();
-        p.setStyle(Paint.Style.FILL);p.setColor(0xa3182a38);c.drawRoundRect(d,0,w-d,stateHeight,stateHeight*.5f,stateHeight*.5f,p);
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(d*.6f);p.setColor(0x888e805f);c.drawRoundRect(d,0,w-d,stateHeight,stateHeight*.5f,stateHeight*.5f,p);
-        p.setStyle(Paint.Style.FILL);p.setColor(0x88152331);RectF tray=new RectF(d,actionsTop-d,w-d,getHeight()-hintHeight);c.drawRoundRect(tray,dp(20),dp(20),p);
-        p.setColor(0x448a816e);p.setStyle(Paint.Style.STROKE);c.drawRoundRect(tray,dp(20),dp(20),p);p.setStyle(Paint.Style.FILL);
+        p.setStyle(Paint.Style.FILL);p.setColor(GameDesign.PANEL);c.drawRoundRect(d,0,w-d,stateHeight,stateHeight*.5f,stateHeight*.5f,p);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(d*GameDesign.STROKE);p.setColor(GameDesign.EDGE);c.drawRoundRect(d,0,w-d,stateHeight,stateHeight*.5f,stateHeight*.5f,p);
+        p.setStyle(Paint.Style.FILL);p.setColor(GameDesign.PANEL_QUIET);RectF tray=new RectF(d,actionsTop-d,w-d,getHeight()-hintHeight);c.drawRoundRect(tray,dp(GameDesign.RADIUS_PANEL),dp(GameDesign.RADIUS_PANEL),p);
+        p.setColor(GameDesign.EDGE_QUIET);p.setStyle(Paint.Style.STROKE);c.drawRoundRect(tray,dp(GameDesign.RADIUS_PANEL),dp(GameDesign.RADIUS_PANEL),p);p.setStyle(Paint.Style.FILL);
     }
     @Override protected LayoutParams generateDefaultLayoutParams(){return new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);}
 }

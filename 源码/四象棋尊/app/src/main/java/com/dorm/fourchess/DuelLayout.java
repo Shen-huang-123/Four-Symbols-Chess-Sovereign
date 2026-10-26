@@ -53,9 +53,9 @@ final class DuelLayout extends ViewGroup {
     @Override protected void onDraw(Canvas c){
         super.onDraw(c);float d=getResources().getDisplayMetrics().density,w=getWidth(),h=getHeight();
         if(layoutMode==PHONE_PORTRAIT){
-            if(headerHeight>=dp(24)){p.setTypeface(Typeface.create("serif",Typeface.BOLD));p.setTextSize(Math.min(dp(24),headerHeight*.52f));p.setTextAlign(Paint.Align.CENTER);p.setColor(0xffead6ad);c.drawText("四 象 棋 尊",w/2,hudTop*.64f,p);}
+            if(headerHeight>=dp(24)){p.setTypeface(GameDesign.TITLE);p.setTextSize(Math.min(dp(24),headerHeight*.52f));p.setTextAlign(Paint.Align.CENTER);p.setColor(GameDesign.GOLD_BRIGHT);c.drawText("四 象 棋 尊",w/2,hudTop*.64f,p);}
             float foot=controlsTop+controlsHeight+dp(24);
-            if(h-foot>dp(40)){p.setTextAlign(Paint.Align.CENTER);p.setTypeface(Typeface.create("serif",Typeface.NORMAL));p.setTextSize(dp(12));p.setColor(0xffc2b49a);c.drawText("四方落子 · 棋会天下",w/2,foot,p);p.setStrokeWidth(d*.6f);p.setColor(0x667e8f97);c.drawLine(w*.18f,foot-dp(4),w*.30f,foot-dp(4),p);c.drawLine(w*.70f,foot-dp(4),w*.82f,foot-dp(4),p);}
+            if(h-foot>dp(40)){p.setTextAlign(Paint.Align.CENTER);p.setTypeface(Typeface.create("serif",Typeface.NORMAL));p.setTextSize(dp(12));p.setColor(GameDesign.SECONDARY);c.drawText("四方落子 · 棋会天下",w/2,foot,p);p.setStrokeWidth(d*.6f);p.setColor(0x667e8f97);c.drawLine(w*.18f,foot-dp(4),w*.30f,foot-dp(4),p);c.drawLine(w*.70f,foot-dp(4),w*.82f,foot-dp(4),p);}
         }
         // Sparse foreground petals only in scenery; never cross HUD, controls or board view.
         if(android.os.Build.VERSION.SDK_INT>=26&&!android.animation.ValueAnimator.areAnimatorsEnabled())return;

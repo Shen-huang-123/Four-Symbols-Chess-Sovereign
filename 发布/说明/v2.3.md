@@ -1,0 +1,24 @@
+# 四象棋尊 v2.3 · 对局页精修
+
+- 顶部玩家栏压缩为 42～56 dp，自适应可用高度；统一圆形头像、昵称、方位、颜色及本手已用时间。退场玩家显示“已退场”。
+- 右栏改为深棕外框、纸色状态面板、独立滚动棋谱、底部 2×2 操作按钮。棋谱最新一步编号并高亮；没有棋步时悔棋按钮禁用。
+- 更正显示名称：红（南）、绿（西）、蓝（北）、金（东）；不改变内部 owner 顺序或协议。
+- 棋盘纵向间距 `cellY=(可用高度-2×insetY)/18.9`；横向间距 `cellX=min((可用宽度-2×insetX)/18.9, cellY×1.55)`。inset 为对应尺寸的 1.5%，最少 2 dp；绘制中心居中，触摸使用同一组 cellX/cellY/ox/oy 逆变换。
+- `gridSpacing=min(cellX,cellY)`；大字直径 `0.84×gridSpacing`、标准 `0.70×gridSpacing`。目标字号分别为 `0.65×gridSpacing` 和 `0.552×gridSpacing`，按汉字真实笔画边界限制在直径的 71% 内并居中。
+- 放大档选中圈、吃子目标圈和最近一步标记随尺寸调整；四方宫线补齐。边角山形线稿与花瓣不进入有效棋面。
+- 实际修改：`MainActivity.java`、`FourChessView.java`、`FactionStripView.java`、`app/build.gradle`；新增 `DuelLayout.java`、`ActionGlyph.java` 和 `app/src/androidTest/java/com/dorm/fourchess/DuelUiProbe.java`。复用已有头像，无需新增素材。
+- Android 15 模拟器在 960×540、1280×720、2400×1080 三组横屏下通过运行检查：全部 261 点坐标往返与边界、四方真实触摸选子/合法落点/落子/回合、最新棋谱、四步撤回与记录同步、悔棋启用状态、大字/标准切换及四按钮显示范围。每组 22 项检查通过；截图和日志位于 `源码/四象棋尊/验证/`。
+- JVM 的 16 项规则与悔棋回归检查通过。没有连接物理手机；本轮未做多机联机或实际扬声器听感验收。
+- 设备检查：先构建并安装 `assembleDebug assembleDebugAndroidTest` 的两个 APK，再运行 `adb shell am instrument -w com.dorm.fourchess.test/com.dorm.fourchess.DuelUiProbe`。
+
+## 安装与校验
+
+- APK：`四象棋尊-v2.3.apk`
+- 包名：`com.dorm.fourchess`
+- APK 内版本：`2.3.0`（versionCode `23`）
+- SHA256：`8cff8e5a122bfdae6ec3234233a344f210671b68e4f5cbe45b2f177cb066a418`
+- 本版为历史版本归档；推荐使用 v4.3。
+
+## 历史源码说明
+
+本地保留了该版本 APK，但没有可验证的完整源码快照。本标签仅保存发布说明与校验文件；GitHub 自动生成的 Source code 压缩包是归档元数据，不包含该版本游戏源码。完整源码请查看 v3.3 或最新版 v4.3。

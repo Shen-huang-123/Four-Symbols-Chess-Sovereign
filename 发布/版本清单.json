@@ -1,0 +1,572 @@
+[
+  {
+    "tag": "v0.5",
+    "title": "四象棋尊 v0.5 · 早期安装包归档",
+    "apk": "安装包/历史版本/四方将-v0.5.apk",
+    "size": 29823,
+    "sha256": "e71c7e0251ea9d578b3fba10994343ba9116b1edf78bb13152c6bb4e0e49640e",
+    "manifest": {
+      "versionCode": 5,
+      "versionName": "0.5.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v0.5.md",
+    "checksum": "发布/说明/SHA256SUMS-v0.5.txt"
+  },
+  {
+    "tag": "v0.6",
+    "title": "四象棋尊 v0.6 · 早期安装包归档",
+    "apk": "安装包/历史版本/四方将-v0.6.apk",
+    "size": 31523,
+    "sha256": "dafbc0c7174b5d96acaf5d86c238043cbb04afae6d2903ccd12ed41feb16cb4d",
+    "manifest": {
+      "versionCode": 6,
+      "versionName": "0.6.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v0.6.md",
+    "checksum": "发布/说明/SHA256SUMS-v0.6.txt"
+  },
+  {
+    "tag": "v0.7",
+    "title": "四象棋尊 v0.7 · 早期安装包归档",
+    "apk": "安装包/历史版本/四方将-v0.7.apk",
+    "size": 3257662,
+    "sha256": "f6016633e7fa2d68044fd6f490d5e65d0c4c89cb634ba025cffb057e9924ee49",
+    "manifest": {
+      "versionCode": 7,
+      "versionName": "0.7.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v0.7.md",
+    "checksum": "发布/说明/SHA256SUMS-v0.7.txt"
+  },
+  {
+    "tag": "v0.8",
+    "title": "四象棋尊 v0.8 · 早期安装包归档",
+    "apk": "安装包/历史版本/四方将-v0.8.apk",
+    "size": 3257957,
+    "sha256": "913ef72faffb1a7f3a03776440377d4ea6634fc10e83a9f5cced2a1322e327d1",
+    "manifest": {
+      "versionCode": 8,
+      "versionName": "0.8.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v0.8.md",
+    "checksum": "发布/说明/SHA256SUMS-v0.8.txt"
+  },
+  {
+    "tag": "v0.9",
+    "title": "四象棋尊 v0.9 · 早期安装包归档",
+    "apk": "安装包/历史版本/四象棋尊-v0.9.apk",
+    "size": 6118157,
+    "sha256": "a4472e046e64d60438d35d5e83e509e65a4c61430a4bedb51840546e745579c9",
+    "manifest": {
+      "versionCode": 9,
+      "versionName": "0.9.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v0.9.md",
+    "checksum": "发布/说明/SHA256SUMS-v0.9.txt"
+  },
+  {
+    "tag": "v1.0",
+    "title": "四象棋尊 v1.0 · 早期安装包归档",
+    "apk": "安装包/历史版本/四象棋尊-v1.0.apk",
+    "size": 6120925,
+    "sha256": "e23843899fe4465d0f1e75dbc1676746dcb2658a1233ecef6091f0a0610e3009",
+    "manifest": {
+      "versionCode": 10,
+      "versionName": "1.0.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.0.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.0.txt"
+  },
+  {
+    "tag": "v1.1",
+    "title": "四象棋尊 v1.1 · 早期安装包归档",
+    "apk": "安装包/历史版本/四象棋尊-v1.1.apk",
+    "size": 6122605,
+    "sha256": "4aaffbd11098aa4aab3eb7ac6acada06816063b8c34bc2d6216f33bada2bd0f8",
+    "manifest": {
+      "versionCode": 11,
+      "versionName": "1.1.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.1.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.1.txt"
+  },
+  {
+    "tag": "v1.2",
+    "title": "四象棋尊 v1.2 · 早期安装包归档",
+    "apk": "安装包/历史版本/四象棋尊-v1.2.apk",
+    "size": 6122868,
+    "sha256": "4048f22b71a72d0eee7e111476b2360f4ca2944eb5aae515ff506f3e9be3e980",
+    "manifest": {
+      "versionCode": 12,
+      "versionName": "1.2.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.2.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.2.txt"
+  },
+  {
+    "tag": "v1.3",
+    "title": "四象棋尊 v1.3 · 早期安装包归档",
+    "apk": "安装包/历史版本/四象棋尊-v1.3.apk",
+    "size": 6124505,
+    "sha256": "a2661c4876b85b83eb58fd464097440b59a2eb241eea1dda79bf04c81d0dd4dd",
+    "manifest": {
+      "versionCode": 13,
+      "versionName": "1.3.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.3.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.3.txt"
+  },
+  {
+    "tag": "v1.4",
+    "title": "四象棋尊 v1.4 · 早期安装包归档",
+    "apk": "安装包/历史版本/四象棋尊-v1.4.apk",
+    "size": 6125338,
+    "sha256": "fe525355e3225766180e8b4b213b93768301ff6844696ef0fb3704dd684c6ea3",
+    "manifest": {
+      "versionCode": 14,
+      "versionName": "1.4.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.4.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.4.txt"
+  },
+  {
+    "tag": "v1.5",
+    "title": "四象棋尊 v1.5 · 早期安装包归档",
+    "apk": "安装包/历史版本/四象棋尊-v1.5.apk",
+    "size": 6125147,
+    "sha256": "7c80d753292bb0fe0074187f1617af9cd6a3a6d2acb097d208ee354ca902d52f",
+    "manifest": {
+      "versionCode": 15,
+      "versionName": "1.5.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.5.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.5.txt"
+  },
+  {
+    "tag": "v1.6",
+    "title": "四象棋尊 v1.6 · 早期安装包归档",
+    "apk": "安装包/历史版本/四象棋尊-v1.6.apk",
+    "size": 6125410,
+    "sha256": "e6f7505264103c7a90353b965e9cb727b91c243df5e6821ac3ea0d14ba5aae9b",
+    "manifest": {
+      "versionCode": 16,
+      "versionName": "1.6.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.6.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.6.txt"
+  },
+  {
+    "tag": "v1.7",
+    "title": "四象棋尊 v1.7 · 精修",
+    "apk": "安装包/历史版本/四象棋尊-v1.7.apk",
+    "size": 6157408,
+    "sha256": "89966c1af731bb45500eaf034d84e4f5269bbef51b721c2f2f809f50e3e48456",
+    "manifest": {
+      "versionCode": 17,
+      "versionName": "1.7.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.7.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.7.txt"
+  },
+  {
+    "tag": "v1.8",
+    "title": "四象棋尊 v1.8 · 可读性与棋谱",
+    "apk": "安装包/历史版本/四象棋尊-v1.8.apk",
+    "size": 6127284,
+    "sha256": "d34b939fa8ee001be10937ad0f78cffaf461f8be9288c36245701bb4358c3ada",
+    "manifest": {
+      "versionCode": 18,
+      "versionName": "1.8.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.8.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.8.txt"
+  },
+  {
+    "tag": "v1.9",
+    "title": "四象棋尊 v1.9 · 哑光棋室风格",
+    "apk": "安装包/历史版本/四象棋尊-v1.9.apk",
+    "size": 6126769,
+    "sha256": "99f38947a69c5c1fdb231f2d79d426c1450a712c9ed496ad66516d0932ef0d86",
+    "manifest": {
+      "versionCode": 19,
+      "versionName": "1.9.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v1.9.md",
+    "checksum": "发布/说明/SHA256SUMS-v1.9.txt"
+  },
+  {
+    "tag": "v2.0",
+    "title": "四象棋尊 v2.0 · 模式页与悔棋",
+    "apk": "安装包/历史版本/四象棋尊-v2.0.apk",
+    "size": 6129572,
+    "sha256": "944559bbbf49f5dd25f2e92c2800f1bf8000c99bcce91ffecc012652aed5757a",
+    "manifest": {
+      "versionCode": 20,
+      "versionName": "2.0.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.0.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.0.txt"
+  },
+  {
+    "tag": "v2.1",
+    "title": "四象棋尊 v2.1 · 柔和半透明模式按钮",
+    "apk": "安装包/历史版本/四象棋尊-v2.1.apk",
+    "size": 6129796,
+    "sha256": "b541e570285c0cad16d6070fdc52004f5e2ff7f6c7428794f429d1ef9545b192",
+    "manifest": {
+      "versionCode": 21,
+      "versionName": "2.1.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.1.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.1.txt"
+  },
+  {
+    "tag": "v2.2",
+    "title": "四象棋尊 v2.2 · 模式选择动效",
+    "apk": "安装包/历史版本/四象棋尊-v2.2.apk",
+    "size": 6131566,
+    "sha256": "e4b1d3fdaad2722b5fa504bf65d0feb70a4d8b5c7f6a19dbef73f4f878be2976",
+    "manifest": {
+      "versionCode": 22,
+      "versionName": "2.2.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.2.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.2.txt"
+  },
+  {
+    "tag": "v2.3",
+    "title": "四象棋尊 v2.3 · 对局页精修",
+    "apk": "安装包/历史版本/四象棋尊-v2.3.apk",
+    "size": 6174832,
+    "sha256": "8cff8e5a122bfdae6ec3234233a344f210671b68e4f5cbe45b2f177cb066a418",
+    "manifest": {
+      "versionCode": 23,
+      "versionName": "2.3.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.3.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.3.txt"
+  },
+  {
+    "tag": "v2.4",
+    "title": "四象棋尊 v2.4 · 棋盘交互与细节",
+    "apk": "安装包/历史版本/四象棋尊-v2.4.apk",
+    "size": 6182944,
+    "sha256": "7b7e1dc56bd478d74572341a87e5ba52e75191fe83cdf84da7164bbe974d8e7e",
+    "manifest": {
+      "versionCode": 24,
+      "versionName": "2.4.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.4.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.4.txt"
+  },
+  {
+    "tag": "v2.5",
+    "title": "四象棋尊 v2.5 · 历史策略游戏风格",
+    "apk": "安装包/历史版本/四象棋尊-v2.5.apk",
+    "size": 6190304,
+    "sha256": "fb3964d17ea27dc3471ae238a93ff27cc9ffa99a1db883f8d7ae08ab6e2cede9",
+    "manifest": {
+      "versionCode": 25,
+      "versionName": "2.5.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.5.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.5.txt"
+  },
+  {
+    "tag": "v2.6",
+    "title": "四象棋尊 v2.6 · 荣耀 WIN 横屏适配",
+    "apk": "安装包/历史版本/四象棋尊-v2.6.apk",
+    "size": 6190988,
+    "sha256": "ef3957be1095801341dc9db6f0b16100c50fa0719bfa2517d9a79fe420a6803b",
+    "manifest": {
+      "versionCode": 26,
+      "versionName": "2.6.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.6.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.6.txt"
+  },
+  {
+    "tag": "v2.7",
+    "title": "四象棋尊 v2.7 · 真正的手机响应式布局",
+    "apk": "安装包/历史版本/四象棋尊-v2.7.apk",
+    "size": 6201807,
+    "sha256": "3cd016d6930a8f7d68457c14bc251bf847add2b07e7eed01f241dfb94555ce6e",
+    "manifest": {
+      "versionCode": 27,
+      "versionName": "2.7.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.7.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.7.txt"
+  },
+  {
+    "tag": "v2.8",
+    "title": "四象棋尊 v2.8 · 国风场景与手机对局界面重构",
+    "apk": "安装包/历史版本/四象棋尊-v2.8.apk",
+    "size": 6215322,
+    "sha256": "1be14642987cd3c72519cb3889344048fd43f232d84a033133d5db4bc3996b20",
+    "manifest": {
+      "versionCode": 28,
+      "versionName": "2.8.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.8.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.8.txt"
+  },
+  {
+    "tag": "v2.9",
+    "title": "四象棋尊 v2.9 · 模式选择页独立重构",
+    "apk": "安装包/历史版本/四象棋尊-v2.9.apk",
+    "size": 6159518,
+    "sha256": "ed331cc0390046143a0dadcbf2ecaaafcf28eca57aba45b95f620d0d9e531fca",
+    "manifest": {
+      "versionCode": 29,
+      "versionName": "2.9.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v2.9.md",
+    "checksum": "发布/说明/SHA256SUMS-v2.9.txt"
+  },
+  {
+    "tag": "v3.0",
+    "title": "四象棋尊 v3.0 · 顶部安全区缺块修复",
+    "apk": "安装包/历史版本/四象棋尊-v3.0.apk",
+    "size": 6224578,
+    "sha256": "f0e0d38622623d74207e2ff00bb65155098c513287021295e2d5754eb94fd0b1",
+    "manifest": {
+      "versionCode": 30,
+      "versionName": "3.0.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v3.0.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.0.txt"
+  },
+  {
+    "tag": "v3.1",
+    "title": "四象棋尊 v3.1 · 移除模式页返回按钮",
+    "apk": "安装包/历史版本/四象棋尊-v3.1.apk",
+    "size": 6159440,
+    "sha256": "c45c0b1b0893d93a2d214c92fe6843aac41e1076c23e6acedc21d6265a48e3ae",
+    "manifest": {
+      "versionCode": 31,
+      "versionName": "3.1.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v3.1.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.1.txt"
+  },
+  {
+    "tag": "v3.2",
+    "title": "四象棋尊 v3.2 · 对局退出与玩家昵称",
+    "apk": "安装包/历史版本/四象棋尊-v3.2.apk",
+    "size": 6240269,
+    "sha256": "d9742e55165b69e38f60b05f1292390a24bb98e47566dbf9a26e8b49985b688f",
+    "manifest": {
+      "versionCode": 32,
+      "versionName": "3.2.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v3.2.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.2.txt"
+  },
+  {
+    "tag": "v3.3",
+    "title": "四象棋尊 v3.3 · 模式页随机主题",
+    "apk": "安装包/历史版本/四象棋尊-v3.3.apk",
+    "size": 6168906,
+    "sha256": "615bac34f00140def88751aa390de1093eccd5318a91f6d7bfeb78ad0a375759",
+    "manifest": {
+      "versionCode": 33,
+      "versionName": "3.3.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "完整源码",
+    "notes": "发布/说明/v3.3.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.3.txt"
+  },
+  {
+    "tag": "v3.4",
+    "title": "四象棋尊 v3.4 · 界面细节精修",
+    "apk": "安装包/历史版本/四象棋尊-v3.4.apk",
+    "size": 6246742,
+    "sha256": "53150afcedd0e49cba0f0c59e2685b700e53aa2c132504c5517c596fe86f1656",
+    "manifest": {
+      "versionCode": 34,
+      "versionName": "3.4.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v3.4.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.4.txt"
+  },
+  {
+    "tag": "v3.5",
+    "title": "四象棋尊 v3.5 · 对局界面精修",
+    "apk": "安装包/历史版本/四象棋尊-v3.5.apk",
+    "size": 6248439,
+    "sha256": "27510c74c14bd78cf2bfb334404fa713406d7817d1f7b793496430fd5e32c47b",
+    "manifest": {
+      "versionCode": 35,
+      "versionName": "3.5.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v3.5.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.5.txt"
+  },
+  {
+    "tag": "v3.6",
+    "title": "四象棋尊 v3.6 · 模式页与输入体验",
+    "apk": "安装包/历史版本/四象棋尊-v3.6.apk",
+    "size": 6249026,
+    "sha256": "ca99aa5a64af16a96189bc4f34b1c3293e5feedea699f202230d6487a9269aa3",
+    "manifest": {
+      "versionCode": 36,
+      "versionName": "3.6.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v3.6.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.6.txt"
+  },
+  {
+    "tag": "v3.7",
+    "title": "四象棋尊 v3.7 · 棋盘交互反馈",
+    "apk": "安装包/历史版本/四象棋尊-v3.7.apk",
+    "size": 6253506,
+    "sha256": "d389842ceacf1872702939a0679d0a50c6ed53ac4c7029d87d7e961f4d419db4",
+    "manifest": {
+      "versionCode": 37,
+      "versionName": "3.7.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v3.7.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.7.txt"
+  },
+  {
+    "tag": "v3.8",
+    "title": "四象棋尊 v3.8 · 动态视觉反馈",
+    "apk": "安装包/历史版本/四象棋尊-v3.8.apk",
+    "size": 6256934,
+    "sha256": "b17ca1a2ebf1891a3b26202fed0a0505430ec9040bb80fbee4bae00756fe2061",
+    "manifest": {
+      "versionCode": 38,
+      "versionName": "3.8.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v3.8.md",
+    "checksum": "发布/说明/SHA256SUMS-v3.8.txt"
+  },
+  {
+    "tag": "v4.0",
+    "title": "四象棋尊 v4.0 · 普通对局 / 四象秘术",
+    "apk": "安装包/历史版本/四象棋尊-v4.0.apk",
+    "size": 6272312,
+    "sha256": "9100700c5532ff19f1e429d221bf83c99ea0ff91eea21ae841e2eee6444716b8",
+    "manifest": {
+      "versionCode": 40,
+      "versionName": "4.0.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v4.0.md",
+    "checksum": "发布/说明/SHA256SUMS-v4.0.txt"
+  },
+  {
+    "tag": "v4.1",
+    "title": "四象棋尊 v4.1 · 统一 UI 设计系统",
+    "apk": "安装包/历史版本/四象棋尊-v4.1.apk",
+    "size": 6275963,
+    "sha256": "f5d863b807fd250d76ed6696665d05a2b99fafacdbf0cd78c6e172001d36cdd2",
+    "manifest": {
+      "versionCode": 41,
+      "versionName": "4.1.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v4.1.md",
+    "checksum": "发布/说明/SHA256SUMS-v4.1.txt"
+  },
+  {
+    "tag": "v4.2",
+    "title": "四象棋尊 v4.2 · 随机五技能",
+    "apk": "安装包/历史版本/四象棋尊-v4.2.apk",
+    "size": 6283668,
+    "sha256": "5237e6a2d41d22323378ee214a1296740bbda76cc494f68b38117cf4b125dcec",
+    "manifest": {
+      "versionCode": 42,
+      "versionName": "4.2.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "仅安装包与归档说明",
+    "notes": "发布/说明/v4.2.md",
+    "checksum": "发布/说明/SHA256SUMS-v4.2.txt"
+  },
+  {
+    "tag": "v4.3",
+    "title": "四象棋尊 v4.3 · 秘卷翻牌揭晓",
+    "apk": "安装包/最新版/四象棋尊-v4.3.apk",
+    "size": 6295317,
+    "sha256": "7137469d671fc1f54733c42572cf4c9acbe1d9c54a02a8ddc47557644535c84c",
+    "manifest": {
+      "versionCode": 43,
+      "versionName": "4.3.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "完整源码",
+    "notes": "发布/说明/v4.3.md",
+    "checksum": "发布/说明/SHA256SUMS-v4.3.txt"
+  }
+]

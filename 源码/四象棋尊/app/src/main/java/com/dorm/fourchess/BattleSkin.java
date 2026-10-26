@@ -3,7 +3,7 @@ package com.dorm.fourchess;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
 
-/** Original code-drawn lacquer, bronze frames and scenery. */
+/** Shared translucent ink panels and quiet scenery, backed by GameDesign tokens. */
 final class BattleSkin {
     static int blend(int a,int b,float t){return Color.rgb((int)(Color.red(a)*(1-t)+Color.red(b)*t),(int)(Color.green(a)*(1-t)+Color.green(b)*t),(int)(Color.blue(a)*(1-t)+Color.blue(b)*t));}
     static Path cut(RectF r,float corner){
@@ -20,20 +20,24 @@ final class BattleSkin {
         @Override protected boolean onStateChange(int[] state){boolean nextEnabled=false,nextPressed=false;for(int s:state){if(s==android.R.attr.state_enabled)nextEnabled=true;if(s==android.R.attr.state_pressed||s==android.R.attr.state_focused)nextPressed=true;}boolean changed=enabled!=nextEnabled||pressed!=nextPressed;enabled=nextEnabled;pressed=nextPressed;if(changed)invalidateSelf();return changed;}
         @Override public void draw(Canvas canvas){
             Rect b=getBounds();if(b.isEmpty())return;float u=unit;
-            RectF outer=new RectF(b.left+u,b.top+u,b.right-u,b.bottom-u);Path shape=cut(outer,7*u);
-            int fill=!enabled?blend(base,0xff1d201e,.6f):pressed?blend(base,0xff0d1110,.25f):base;
-            paint.setStyle(Paint.Style.FILL);paint.setShader(new LinearGradient(0,b.top,0,b.bottom,blend(fill,0xffc5ae77,.045f),blend(fill,0xff060908,.13f),Shader.TileMode.CLAMP));paint.setAlpha(alpha);canvas.drawPath(shape,paint);paint.setShader(null);
-            canvas.save();canvas.clipPath(shape);paint.setColor(0x075e674f);paint.setAlpha(alpha*7/255);paint.setStrokeWidth(u*.5f);
-            for(float y=b.top+5*u;y<b.bottom;y+=9*u)canvas.drawLine(b.left,y,b.right,y,paint);canvas.restore();
-            int border=!enabled?0xff4b493b:pressed?0xffdbc081:edge;
-            paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(u);paint.setColor(border);paint.setAlpha(alpha);canvas.drawPath(shape,paint);
-            RectF inner=new RectF(outer);inner.inset(3*u,3*u);paint.setColor(blend(border,fill,.58f));paint.setAlpha(alpha);paint.setStrokeWidth(u*.6f);canvas.drawPath(cut(inner,5*u),paint);
-            paint.setColor(!enabled?0xff5f5945:0xffac9360);paint.setAlpha(alpha);paint.setStrokeWidth(u);
-            float length=Math.min(8*u,outer.height()*.2f);
-            for(int corner=0;corner<4;corner++){float x=corner%2==0?outer.left:outer.right,y=corner<2?outer.top:outer.bottom;float dx=corner%2==0?1:-1,dy=corner<2?1:-1;canvas.drawLine(x+dx*9*u,y+dy*2*u,x+dx*(9*u+length),y+dy*2*u,paint);canvas.drawLine(x+dx*2*u,y+dy*9*u,x+dx*2*u,y+dy*(9*u+length),paint);}
-            if(ornament&&outer.width()>120*u){float cx=outer.centerX(),cy=outer.top+u*2;paint.setStyle(Paint.Style.FILL);Path seal=new Path();seal.moveTo(cx,cy-2*u);seal.lineTo(cx+4*u,cy+2*u);seal.lineTo(cx,cy+6*u);seal.lineTo(cx-4*u,cy+2*u);seal.close();canvas.drawPath(seal,paint);}
-            paint.setStyle(Paint.Style.FILL);
+            RectF r=new RectF(b.left+u,b.top+u,b.right-u,b.bottom-u);
+            float radius=Math.min(GameDesign.RADIUS_PANEL*u,r.height()*.23f);
+            int tint=blend(GameDesign.PANEL,base,.18f);
+            int fill=pressed?blend(tint,GameDesign.PANEL_RAISED,.65f):tint;
+            paint.setStyle(Paint.Style.FILL);paint.setShader(null);
+            paint.setColor(GameDesign.SHADOW);paint.setAlpha(alpha*64/255);
+            canvas.drawRoundRect(r.left,r.top+2*u,r.right,r.bottom+2*u,radius,radius,paint);
+            paint.setShader(new LinearGradient(0,r.top,0,r.bottom,GameDesign.alpha(fill,enabled?235:170),GameDesign.alpha(GameDesign.NIGHT,enabled?218:150),Shader.TileMode.CLAMP));
+            paint.setAlpha(alpha);canvas.drawRoundRect(r,radius,radius,paint);paint.setShader(null);
+            paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(GameDesign.STROKE*u);
+            paint.setColor(!enabled?GameDesign.EDGE_QUIET:pressed?GameDesign.GOLD_BRIGHT:GameDesign.EDGE);paint.setAlpha(alpha);
+            canvas.drawRoundRect(r,radius,radius,paint);
+            paint.setColor(GameDesign.alpha(GameDesign.GOLD,ornament?85:40));paint.setAlpha(alpha*(ornament?85:40)/255);
+            canvas.drawLine(r.left+radius,r.top+2*u,r.right-radius,r.top+2*u,paint);
+            if(ornament&&r.width()>120*u){float cx=r.centerX(),cy=r.top+2*u;paint.setStyle(Paint.Style.FILL);paint.setColor(GameDesign.GOLD);paint.setAlpha(alpha*160/255);Path seal=new Path();seal.moveTo(cx,cy-2*u);seal.lineTo(cx+3*u,cy+u);seal.lineTo(cx,cy+4*u);seal.lineTo(cx-3*u,cy+u);seal.close();canvas.drawPath(seal,paint);}
+            paint.setStyle(Paint.Style.FILL);paint.setAlpha(255);
         }
+
         @Override public void setAlpha(int value){alpha=value;invalidateSelf();}
         @Override public void setColorFilter(ColorFilter filter){paint.setColorFilter(filter);invalidateSelf();}
         @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
@@ -42,14 +46,14 @@ final class BattleSkin {
         private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Path[] ridges=new Path[3];private Shader sky;private int alpha=255;
         @Override protected void onBoundsChange(Rect bounds){
-            float w=bounds.width(),h=bounds.height();sky=new LinearGradient(0,0,w,h,new int[]{0xff353934,0xff242b2b,0xff1b211f},null,Shader.TileMode.CLAMP);
+            float w=bounds.width(),h=bounds.height();sky=new LinearGradient(0,0,w,h,new int[]{GameDesign.INK_TEAL,GameDesign.NIGHT,0xff142530},null,Shader.TileMode.CLAMP);
             for(int layer=0;layer<3;layer++){Path ridge=new Path();float base=h*(.22f+layer*.22f);ridge.moveTo(0,h);ridge.lineTo(0,base+h*.08f);
                 for(int i=0;i<7;i++){float x=i*w/6f;ridge.cubicTo(x+w*.04f,base-h*(.1f+(i%2)*.05f),x+w*.11f,base+h*.07f,x+w/6f,base+h*((i+layer)%3)*.045f);}ridge.lineTo(w,h);ridge.close();ridges[layer]=ridge;}
         }
         @Override public void draw(Canvas canvas){
             Rect b=getBounds();float w=b.width(),h=b.height();if(w<=0||h<=0)return;
             paint.setStyle(Paint.Style.FILL);paint.setAlpha(alpha);paint.setShader(sky);canvas.drawRect(b,paint);paint.setShader(null);
-            int[] mist={0xff41483f,0xff333d37,0xff242e2b};for(int i=0;i<3;i++){paint.setColor(mist[i]);paint.setAlpha(alpha);canvas.drawPath(ridges[i],paint);}
+            int[] mist={0xff2b414a,0xff223842,0xff192d36};for(int i=0;i<3;i++){paint.setColor(mist[i]);paint.setAlpha(alpha);canvas.drawPath(ridges[i],paint);}
             fortress(canvas,w*.02f,h*.28f,h*.24f);fortress(canvas,w*.76f,h*.73f,h*.23f);
             paint.setColor(0x207c8064);paint.setAlpha(alpha*32/255);paint.setStrokeWidth(Math.max(1,h*.0014f));
             for(int i=0;i<7;i++)canvas.drawLine(0,h*(.68f+i*.05f),w,h*(.72f+i*.05f),paint);

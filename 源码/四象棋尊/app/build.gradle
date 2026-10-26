@@ -8,13 +8,13 @@ android {
         applicationId 'com.dorm.fourchess'
         minSdk 23
         targetSdk 35
-        versionCode 33
-        versionName '3.3.0'
+        versionCode 43
+        versionName '4.3.0'
         testInstrumentationRunner 'com.dorm.fourchess.PlayerFlowProbe'
     }
 }
 
-layout.buildDirectory = file('build-v33')
+layout.buildDirectory = file('build-v43')
 
 
 

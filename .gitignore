@@ -28,3 +28,6 @@
 .DS_Store
 Thumbs.db
 *.log
+!源码/四象棋尊/验证/VerifySkillMode.ps1
+!源码/四象棋尊/验证/VerifyDraftSkills.ps1
+!源码/四象棋尊/验证/VerifySkillReveal.ps1

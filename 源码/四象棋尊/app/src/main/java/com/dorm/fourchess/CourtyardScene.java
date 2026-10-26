@@ -19,7 +19,7 @@ final class CourtyardScene extends Drawable {
     private void fill(Canvas c,int color,float l,float t,float r,float b){p.setShader(null);p.setColor(color);p.setStyle(Paint.Style.FILL);c.drawRect(l,t,r,b,p);}
     private void glow(Canvas c,float x,float y,float radius,int color){p.setStyle(Paint.Style.FILL);p.setShader(new RadialGradient(x,y,radius,color,0x00000000,Shader.TileMode.CLAMP));c.drawCircle(x,y,radius,p);p.setShader(null);}
     private void paintScene(Canvas c,float w,float h){
-        p.setShader(new LinearGradient(0,0,w*.45f,h,new int[]{0xff172738,0xff273946,0xff39343a,0xff202c37},new float[]{0,.42f,.77f,1},Shader.TileMode.CLAMP));c.drawRect(0,0,w,h,p);p.setShader(null);
+        p.setShader(new LinearGradient(0,0,w*.45f,h,new int[]{GameDesign.NIGHT,0xff243b49,GameDesign.INK_TEAL,0xff192c37},new float[]{0,.42f,.77f,1},Shader.TileMode.CLAMP));c.drawRect(0,0,w,h,p);p.setShader(null);
         glow(c,w*.74f,h*.13f,w*.46f,0x306b91b2);p.setColor(0xffc7d5d6);c.drawCircle(w*.74f,h*.13f,w*.055f,p);p.setColor(0x1887a3b2);c.drawCircle(w*.725f,h*.122f,w*.013f,p);
         java.util.Random random=new java.util.Random(827);
         for(int i=0;i<46;i++){p.setColor(0x779fb8ca);c.drawCircle(random.nextFloat()*w,random.nextFloat()*h*.50f,Math.max(.5f,w*.001f),p);}

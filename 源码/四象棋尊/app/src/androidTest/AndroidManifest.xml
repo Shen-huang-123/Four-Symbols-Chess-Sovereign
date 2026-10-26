@@ -1,3 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <instrumentation android:name="com.dorm.fourchess.ModeUiProbe" android:targetPackage="com.dorm.fourchess" />
+    <instrumentation android:name="com.dorm.fourchess.SkillModeProbe" android:targetPackage="com.dorm.fourchess" />
+    <instrumentation android:name="com.dorm.fourchess.DraftSkillProbe" android:targetPackage="com.dorm.fourchess" />
+    <instrumentation android:name="com.dorm.fourchess.SkillRevealProbe" android:targetPackage="com.dorm.fourchess" />
 </manifest>
