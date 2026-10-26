@@ -1,0 +1,19 @@
+# 四象棋尊 v4.2 · 随机五技能
+
+秘术模式现有30种强弱不同的技能，开局每人随机5张，同局不重复，每张一局一次。支持完整目标提示、取消、悔棋恢复、房主校验和手牌同步；普通模式规则不变。
+
+- [30种技能及发牌规则](https://github.com/Shen-huang-123/Four-Symbols-Chess-Sovereign/blob/main/%E6%BA%90%E7%A0%81/%E5%9B%9B%E8%B1%A1%E6%A3%8B%E5%B0%8A/%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83/%E7%A7%98%E6%9C%AF%E6%8A%80%E8%83%BD%E6%89%8B%E5%86%8C.md)
+- [v4.2 验收与修改清单](https://github.com/Shen-huang-123/Four-Symbols-Chess-Sovereign/blob/main/%E6%BA%90%E7%A0%81/%E5%9B%9B%E8%B1%A1%E6%A3%8B%E5%B0%8A/%E9%AA%8C%E8%AF%81/v4.2-%E9%9A%8F%E6%9C%BA%E4%BA%94%E6%8A%80%E8%83%BD%E9%AA%8C%E6%94%B6.md)
+- 技能房间请所有玩家使用v4.2及以上。
+
+## 安装与校验
+
+- APK：`四象棋尊-v4.2.apk`
+- 包名：`com.dorm.fourchess`
+- APK 内版本：`4.2.0`（versionCode `42`）
+- SHA256：`5237e6a2d41d22323378ee214a1296740bbda76cc494f68b38117cf4b125dcec`
+- 本版为历史版本归档；推荐使用 v4.3。
+
+## 历史源码说明
+
+本地保留了该版本 APK，但没有可验证的完整源码快照。本标签仅保存发布说明与校验文件；GitHub 自动生成的 Source code 压缩包是归档元数据，不包含该版本游戏源码。完整源码请查看 v3.3 或最新版 v4.3。
