@@ -17,7 +17,7 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "Shen-huang-123/Four-Symbols-Chess-Sovereign"
 BASE = "https://api.github.com/repos/" + REPO
-LATEST = "v4.3"
+LATEST = "v4.4"
 ORIGINAL = "98063f1c1304c2ffedee94f3558814c4d4db3bed"
 HEADERS = {}
 
@@ -49,7 +49,7 @@ def request(url, method="GET", data=None, binary=False):
 
 def inventory():
     items = json.loads((ROOT / "发布/版本清单.json").read_text(encoding="utf-8"))
-    assert len(items) == 38 and len({row["tag"] for row in items}) == 38
+    assert len(items) >= 38 and len({row["tag"] for row in items}) == len(items)
     for row in items:
         path = ROOT / row["apk"]
         assert path.is_file() and path.stat().st_size == row["size"], path
@@ -87,6 +87,10 @@ def prepare_tags(items, head):
                 assert git("rev-parse", target + ":" + code) == git("rev-parse", head + ":" + code), "Latest game source differs; publish a new version"
         elif tag == "v3.3":
             target = ORIGINAL
+        elif tag in existing and row["source"] == "完整源码":
+            # Preserve earlier verified full-source release snapshots.
+            tags.append(tag)
+            continue
         elif tag in existing:
             # Resuming a previous upload: validate the historical metadata instead of rewriting tags.
             content = subprocess.run(["git", "show", tag + ":README.md"], cwd=ROOT, capture_output=True, check=True).stdout

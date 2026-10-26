@@ -28,8 +28,8 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private TextView timer, moveLog;
     private LinearLayout stateBox;
     private Button undoButton,phoneUndo,phoneSound,historyButton,modeButton,phoneModeButton;
-    private AlertDialog skillDialog,drawDialog;
-    private SkillDrawView drawView;private final boolean[] handRevealed=new boolean[4];private String drawDetail="";
+    private AlertDialog skillDialog,drawDialog,skillCardDialog;
+    private SkillRackView skillRack;private SkillDrawView drawView;private final boolean[] handRevealed=new boolean[4];private String drawDetail="";
     private TextView compactState,dialogMoves;
     private CompactControlsLayout mobileControls;
     private AlertDialog historyDialog;
@@ -79,6 +79,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         phoneMode.setOnClickListener(v->mode.performClick());phoneRules.setOnClickListener(v->rules.performClick());phoneUndo.setOnClickListener(v->undo.performClick());phoneSound.setOnClickListener(v->sound.performClick());historyButton.setOnClickListener(v->showHistory());
         for(Button action:new Button[]{phoneMode,phoneRules,phoneUndo,phoneSound,historyButton,phoneExit}){action.setPadding(dp(3),0,dp(3),0);mobileControls.addView(action);}
         TextView rotateHint=text("长按放大棋盘 · 横竖屏自适应",10,GameDesign.MUTED);rotateHint.setSingleLine();fitText(rotateHint,8,10);mobileControls.addView(rotateHint);
+        skillRack=new SkillRackView(this);skillRack.setListener(this::showSkillCard);duel.addView(skillRack);
         screen.addView(gameUi,new FrameLayout.LayoutParams(-1,-1));
         modePage=new ModeSelectView(this);modePage.setListener(new ModeSelectView.Listener(){
             public void onLocal(){showNamesDialog(false);}
@@ -145,7 +146,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     }
     private void refreshClock(){timer.setText(String.format(java.util.Locale.CHINA,"本手 %02d:%02d",turnSeconds/60,turnSeconds%60));playerStrip.setActivePlayer(board.currentTurn(),turnSeconds);if(compactState!=null)compactState.setText(status.getText()+(getResources().getConfiguration().orientation==android.content.res.Configuration.ORIENTATION_PORTRAIT?" · ":"\n")+String.format(java.util.Locale.CHINA,"%02d:%02d",turnSeconds/60,turnSeconds%60));}
     private void updateHud(){
-        updateSkillEntry();
+        updateSkillEntry();if(skillRack!=null)skillRack.bind(board,handRevealed[board.skillViewer()]);
         int[] tints=GameDesign.factionLights();
         status.setTextColor(tints[board.currentTurn()]);timer.setTextColor(GameDesign.GOLD_BRIGHT);stateBox.setBackground(frame(GameDesign.PANEL_RAISED,GameDesign.EDGE,false));
         for(int i=0;i<4;i++)playerStrip.setAlive(i,board.isPlayerAlive(i));
@@ -205,14 +206,14 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         entryDialog=new AlertDialog.Builder(this).setTitle(title).setView(scroll).setPositiveButton(confirm,(dialog,which)->accepted.run()).setNegativeButton("取消",null).create();
         GameDialogStyle.title(entryDialog,title);entryDialog.setOnDismissListener(dialog->{entryDialog=null;screen.post(this::maybeShowSkillDraw);});entryDialog.show();GameDialogStyle.apply(entryDialog,content);
     }
-    private void startMatch(String[] names){if(drawDialog!=null)drawDialog.dismiss();java.util.Arrays.fill(handRevealed,false);closeNetwork();board.setSkillMode(modePage.usesSkills());board.newGame();clearMoves();board.setLocalPlayer(-1);playerStrip.setPlayerNames(names);matchActive=true;hideModePage();screen.post(()->{if(network==null)maybeShowSkillDraw();});}
+    private void startMatch(String[] names){if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();java.util.Arrays.fill(handRevealed,false);closeNetwork();board.setSkillMode(modePage.usesSkills());board.newGame();clearMoves();board.setLocalPlayer(-1);playerStrip.setPlayerNames(names);matchActive=true;hideModePage();screen.post(()->{if(network==null)maybeShowSkillDraw();});}
     private void showNamesDialog(boolean hostMode){
         LinearLayout content=entryContent();EditText[] names=new EditText[hostMode?1:4];String[] sides={"南 · 红方昵称","西 · 绿方昵称","北 · 蓝方昵称","东 · 金方昵称"};
         for(int i=0;i<names.length;i++){String label=hostMode?"我的昵称（最多12个字）":sides[i]+"（最多12个字）";TextView heading=text(label,12,0xff736450);heading.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);content.addView(heading,new LinearLayout.LayoutParams(-1,dp(28)));names[i]=nameInput(label,playerPrefs().getString(hostMode?"nickname":"local_"+i,hostMode?"棋友":PlayerNames.DEFAULTS[i]));content.addView(names[i],new LinearLayout.LayoutParams(-1,dp(48)));}
         presentEntry((modePage.usesSkills()?"四象秘术 · ":"普通对局 · ")+(hostMode?"创建房间":"四位棋友"),content,hostMode?"创建房间":"开始对局",()->{
             android.content.SharedPreferences.Editor saved=playerPrefs().edit();String[] values=new String[4];
             if(hostMode){String nickname=PlayerNames.clean(names[0].getText().toString(),"棋友");saved.putString("nickname",nickname).apply();values=new String[]{nickname,"待加入","待加入","待加入"};startMatch(values);host();}
-            else{for(int i=0;i<4;i++){values[i]=PlayerNames.clean(names[i].getText().toString(),PlayerNames.DEFAULTS[i]);saved.putString("local_"+i,values[i]);}saved.apply();startMatch(values);networkStatus.setText(board.isSkillMode()?"四象秘术 · 每人随机5张，各限一次":"普通对局 · 四人轮流操作");}
+            else{for(int i=0;i<4;i++){values[i]=PlayerNames.clean(names[i].getText().toString(),PlayerNames.DEFAULTS[i]);saved.putString("local_"+i,values[i]);}saved.apply();startMatch(values);networkStatus.setText(board.isSkillMode()?"四象秘术 · 每人随机4张，各限一次":"普通对局 · 四人轮流操作");}
         });
     }
     private NetworkManager newNetwork(String nickname){
@@ -245,10 +246,10 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         exitDialog=new AlertDialog.Builder(this).setTitle("退出当前对局？").setMessage(message).setNegativeButton("继续对局",null).setPositiveButton("退出对局",(dialog,which)->exitToLobby()).create();GameDialogStyle.title(exitDialog,"退出当前对局？");exitDialog.setOnDismissListener(dialog->exitDialog=null);exitDialog.show();GameDialogStyle.apply(exitDialog,null);
     }
     private void exitToLobby(){
-        if(drawDialog!=null)drawDialog.dismiss();if(skillDialog!=null)skillDialog.dismiss();if(historyDialog!=null)historyDialog.dismiss();if(entryDialog!=null)entryDialog.dismiss();if(connectionDialog!=null)connectionDialog.dismiss();closeNetwork();matchActive=false;board.newGame();board.setLocalPlayer(-1);clearMoves();showModePage();
+        if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();if(skillDialog!=null)skillDialog.dismiss();if(historyDialog!=null)historyDialog.dismiss();if(entryDialog!=null)entryDialog.dismiss();if(connectionDialog!=null)connectionDialog.dismiss();closeNetwork();matchActive=false;board.newGame();board.setLocalPlayer(-1);clearMoves();showModePage();
     }
     private void connectionLost(String reason){
-        if(drawDialog!=null)drawDialog.dismiss();closeNetwork();matchActive=false;board.setLocalPlayer(9);networkStatus.setText(reason);
+        if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();closeNetwork();matchActive=false;board.setLocalPlayer(9);networkStatus.setText(reason);
         if(connectionDialog==null){connectionDialog=new AlertDialog.Builder(this).setTitle("房间连接已结束").setMessage(reason).setPositiveButton("返回大厅",(dialog,which)->exitToLobby()).setCancelable(false).create();GameDialogStyle.title(connectionDialog,"房间连接已结束");connectionDialog.setOnDismissListener(dialog->connectionDialog=null);connectionDialog.show();GameDialogStyle.apply(connectionDialog,null);}
     }
     private void updateSkillEntry(){
@@ -267,12 +268,12 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         TextView detail=text("点击秘卷逐张翻开 · 也可全部揭晓",12,GameDesign.SECONDARY);detail.setTag("skill_draw_detail");detail.setGravity(Gravity.CENTER);detail.setMaxLines(3);detail.setEllipsize(android.text.TextUtils.TruncateAt.END);detail.setPadding(dp(4),dp(4),dp(4),dp(4));content.addView(detail,new LinearLayout.LayoutParams(-1,dp(getResources().getConfiguration().fontScale>1.2f?72:58)));
         drawDialog=new AlertDialog.Builder(this).setView(content).setPositiveButton("进入对局",null).setNeutralButton("全部揭晓",null).setNegativeButton("跳过动画",null).create();
         final AlertDialog shown=drawDialog;
-        GameDialogStyle.title(shown,board.ownerName(owner)+" · 五卷定机缘");
+        GameDialogStyle.title(shown,board.ownerName(owner)+" · 四卷定机缘");
         drawView.setListener(new SkillDrawView.Listener(){
             public void onCard(int id,boolean visible){String next=visible?"【"+SkillRules.tier(id)+"】"+SkillRules.name(id)+" · "+SkillRules.DETAILS[id-1]:"秘卷开启中…";if(!next.equals(drawDetail)){drawDetail=next;detail.setText(next);detail.setTextColor(visible?SkillRules.tierColor(id):GameDesign.SECONDARY);}}
             public void onComplete(){if(shown.getButton(-1)!=null)shown.getButton(-1).setEnabled(true);}
         });
-        shown.setOnDismissListener(d->{handRevealed[owner]=true;if(drawDialog==shown){drawDialog=null;drawView=null;}drawDetail="";});
+        shown.setOnDismissListener(d->{handRevealed[owner]=true;if(drawDialog==shown){drawDialog=null;drawView=null;}drawDetail="";updateHud();});
         shown.show();GameDialogStyle.apply(shown,null);shown.getButton(-1).setEnabled(false);
         shown.getButton(-3).setOnClickListener(v->{if(drawView!=null)drawView.revealAll(true);});shown.getButton(-2).setOnClickListener(v->{if(drawView!=null)drawView.revealAll(false);});
         sizeDrawDialog();
@@ -290,6 +291,15 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         int artHeight=Math.min(dp(w<h?560:230),available);drawView.setLayoutParams(new LinearLayout.LayoutParams(-1,artHeight));
         window.setLayout(Math.min(dp(900),Math.max(dp(180),w-dp(16))),android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+    private void showSkillCard(int slot){
+        if(!board.isSkillMode())return;int owner=board.skillViewer();if(!handRevealed[owner]){maybeShowSkillDraw();return;}
+        int[] hand=board.skillHand(owner);if(slot<0||slot>=hand.length)return;int id=hand[slot];
+        if(skillCardDialog!=null)return;AlertDialog info=new AlertDialog.Builder(this).setMessage(SkillRules.DETAILS[id-1]+"\n\n"+(board.skillUsed(owner,id)?"本局已使用":"每局一次 · 施放占用本回合"))
+            .setPositiveButton("施放技能",(d,w)->{if(!board.beginSkill(id))toast("当前无法施放：请检查回合、次数与合法目标");updateHud();})
+            .setNegativeButton("返回",null).setNeutralButton("取消瞄准",(d,w)->{board.cancelSkill();updateHud();}).create();
+        skillCardDialog=info;info.setOnDismissListener(d->skillCardDialog=null);GameDialogStyle.title(info,SkillRules.tier(id)+" · "+SkillRules.name(id));info.show();GameDialogStyle.apply(info,null);
+        info.getButton(-1).setEnabled(board.canAct()&&board.currentTurn()==owner&&!board.skillUsed(owner,id));
+    }
     private void showSkillOptions(){
         if(!board.isSkillMode())return;
         if(!handRevealed[board.skillViewer()]){maybeShowSkillDraw();return;}
@@ -298,10 +308,10 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,items){
             @Override public android.view.View getView(int position,android.view.View convert,android.view.ViewGroup parent){TextView row=(TextView)super.getView(position,convert,parent);row.setSingleLine(false);row.setTextSize(14);row.setTextColor(board.skillUsed(owner,hand[position])?GameDesign.DISABLED:SkillRules.tierColor(hand[position]));row.setPadding(dp(20),dp(12),dp(20),dp(12));row.setMinHeight(dp(64));return row;}
         };
-        skillDialog=new AlertDialog.Builder(this).setTitle(board.ownerName(owner)+" · 开局手牌 5/30")
+        skillDialog=new AlertDialog.Builder(this).setTitle(board.ownerName(owner)+" · 开局手牌 4/30")
             .setAdapter(adapter,(d,which)->{if(board.currentTurn()!=owner||!board.canAct()){toast("可以查看手牌，请等待你的回合再施放");return;}if(!board.beginSkill(hand[which]))toast("该技能已用完、没有合法目标或已不在你的回合");})
             .setNegativeButton("取消瞄准",(d,w)->board.cancelSkill()).setNeutralButton("技能说明",(d,w)->showSkillGuide()).create();
-        GameDialogStyle.title(skillDialog,board.ownerName(owner)+" · 开局手牌 5/30");skillDialog.setOnDismissListener(d->skillDialog=null);skillDialog.show();GameDialogStyle.apply(skillDialog,null);
+        GameDialogStyle.title(skillDialog,board.ownerName(owner)+" · 开局手牌 4/30");skillDialog.setOnDismissListener(d->skillDialog=null);skillDialog.show();GameDialogStyle.apply(skillDialog,null);
     }
     private void showSkillGuide(){AlertDialog guide=new AlertDialog.Builder(this).setTitle("四象秘术 · 技能规则").setMessage(SkillRules.guide()).setPositiveButton("明白了",null).create();GameDialogStyle.title(guide,"四象秘术 · 技能规则");guide.show();GameDialogStyle.apply(guide,null);}
     private void showRules(){if(board.isSkillMode()){showSkillGuide();return;}AlertDialog rules=new AlertDialog.Builder(this).setTitle("四象棋尊规则").setMessage("红（南）→ 绿（西）→ 蓝（北）→ 金（东）依次行动。点击棋子后，亮点就是可走位置。\n\n主将被吃后，该方棋子全部退出；最后存活的一方获胜。炮吃子需隔一个棋子，马有蹩马腿，象不能离开本方区域。\n\n局域网：一人创建房间，其余三人输入房主显示的地址加入。建议由房主开启手机热点。") .setPositiveButton("开始下棋",null).create();GameDialogStyle.title(rules,"四象棋尊规则");rules.show();GameDialogStyle.apply(rules,null);}
@@ -312,7 +322,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     @Override public void onState(String state){runOnUiThread(()->{String before=board.exportState();board.importState(state);String after=board.exportState();if(!before.equals(after)){try{String[] header=after.split("\\|",2)[0].split(",");int sx=Integer.parseInt(header[1]),sy=Integer.parseInt(header[2]),tx=Integer.parseInt(header[3]),ty=Integer.parseInt(header[4]);if(board.isSkillMode()&&board.lastSkill()>0){recordMove(board.skillLog());}else if(sx>=0){recordMove("联机落子 "+(char)('A'+sx)+(19-sy)+" → "+(char)('A'+tx)+(19-ty));}else clearMoves();}catch(RuntimeException ignored){}}screen.post(this::maybeShowSkillDraw);});}
     @Override public void onHostMove(int owner,int sx,int sy,int tx,int ty){runOnUiThread(()->{if(board.tryNetworkMove(owner,sx,sy,tx,ty)&&network!=null)network.broadcast(board.exportState());});}
     @Override public void onHostSkill(int owner,int skill,int sx,int sy,int tx,int ty){runOnUiThread(()->{if(board.trySkill(owner,skill,sx,sy,tx,ty)&&network!=null)network.broadcast(board.exportState());});}
-    @Override public void onDestroy(){if(drawDialog!=null)drawDialog.dismiss();clockHandler.removeCallbacks(clockTick);closeNetwork();super.onDestroy();}
+    @Override public void onDestroy(){if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();clockHandler.removeCallbacks(clockTick);closeNetwork();super.onDestroy();}
     private final Runnable clockTick=new Runnable(){@Override public void run(){if(matchActive){turnSeconds++;refreshClock();}clockHandler.postDelayed(this,1000);}};
     private int dp(int n){return(int)(n*getResources().getDisplayMetrics().density+.5f);}
 }

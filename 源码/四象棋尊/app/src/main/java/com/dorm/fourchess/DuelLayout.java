@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 /** Safe-window geometry with an uninterrupted phone battle stack and scene beneath it. */
 final class DuelLayout extends ViewGroup {
     static final int PHONE_LANDSCAPE=0,PHONE_PORTRAIT=1,WIDE=2;
+    private int rackLeft,rackTop,rackWidth,rackHeight;private boolean hasSkills;
     private int layoutMode,hudHeight,hudTop,headerHeight,sidebarWidth,gap,boardLeft,boardTop,boardSide,controlsLeft,controlsTop,controlsWidth,controlsHeight;
     private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
     DuelLayout(Context context){super(context);setWillNotDraw(false);}
@@ -18,7 +19,7 @@ final class DuelLayout extends ViewGroup {
         int w=MeasureSpec.getSize(widthSpec),h=MeasureSpec.getSize(heightSpec);
         float density=getResources().getDisplayMetrics().density,wdp=w/density,hdp=h/density;
         layoutMode=wdp>=840&&hdp>=600?WIDE:w>h?PHONE_LANDSCAPE:PHONE_PORTRAIT;
-        boolean wide=layoutMode==WIDE,portrait=layoutMode==PHONE_PORTRAIT;
+        boolean wide=layoutMode==WIDE,portrait=layoutMode==PHONE_PORTRAIT;hasSkills=((FourChessView)getChildAt(1)).isSkillMode();SkillRackView rack=(SkillRackView)getChildAt(4);rack.setVisibility(hasSkills?VISIBLE:GONE);rack.setStacked(!portrait&&!wide&&hdp>=300);rackHeight=hasSkills?dp(portrait||wide?80:150):0;
         gap=dp(wide?8:4);headerHeight=0;hudTop=gap;
         ((FactionStripView)getChildAt(0)).setColumns(portrait?2:4);((FourChessView)getChildAt(1)).setCompactUi(!wide);
         getChildAt(2).setVisibility(wide?View.VISIBLE:View.GONE);getChildAt(3).setVisibility(wide?View.GONE:View.VISIBLE);
@@ -26,27 +27,32 @@ final class DuelLayout extends ViewGroup {
         int top=hudHeight+gap*2,bottom=h-gap;
         if(wide){
             sidebarWidth=Math.min(dp(280),Math.max(dp(228),Math.round(w*.23f)));
-            int availableW=w-sidebarWidth-gap*3,availableH=bottom-top;boardSide=Math.max(1,Math.min(availableW,availableH));
+            int availableW=w-sidebarWidth-gap*3,availableH=bottom-top-rackHeight;boardSide=Math.max(1,Math.min(availableW,availableH));
             boardLeft=gap+(availableW-boardSide)/2;boardTop=top+(availableH-boardSide)/2;
-            controlsLeft=w-sidebarWidth-gap;controlsTop=top;controlsWidth=sidebarWidth;controlsHeight=availableH;measureChildAt(2,controlsWidth,controlsHeight);
+            controlsLeft=w-sidebarWidth-gap;controlsTop=top;controlsWidth=sidebarWidth;controlsHeight=bottom-top;measureChildAt(2,controlsWidth,controlsHeight);
         }else if(portrait){
             controlsHeight=dp(hdp<620?100:112);
-            int spare=Math.max(0,h-hudHeight-controlsHeight-w-gap*5);
+            int spare=Math.max(0,h-hudHeight-controlsHeight-rackHeight-w-gap*6);
             headerHeight=Math.min(dp(58),spare/3);hudTop=gap+headerHeight;
-            int availableH=bottom-hudTop-hudHeight-controlsHeight-gap*2;
+            int availableH=bottom-hudTop-hudHeight-controlsHeight-rackHeight-gap*3;
             boardSide=Math.max(1,Math.min(w-gap*2,availableH));boardLeft=(w-boardSide)/2;boardTop=hudTop+hudHeight+gap;
             controlsTop=boardTop+boardSide+gap;controlsLeft=dp(10);controlsWidth=w-dp(20);
             ((CompactControlsLayout)getChildAt(3)).setPortrait(true);measureChildAt(3,controlsWidth,controlsHeight);
         }else{
-            float fontScale=getResources().getConfiguration().fontScale;
-            controlsWidth=dp(hdp<300?124:fontScale>1.2f?76:64);controlsWidth=Math.min(controlsWidth,w/(hdp<300?3:5));
-            controlsHeight=bottom-top;controlsTop=top;boardSide=Math.max(1,Math.min(w-controlsWidth-gap*3,controlsHeight));
-            int groupWidth=boardSide+gap+controlsWidth;boardLeft=(w-groupWidth)/2;boardTop=top+(controlsHeight-boardSide)/2;
-            controlsLeft=boardLeft+boardSide+gap;((CompactControlsLayout)getChildAt(3)).setPortrait(false);measureChildAt(3,controlsWidth,controlsHeight);
+            controlsWidth=Math.max(dp(140),w-(bottom-top)-gap*3);controlsHeight=Math.min(dp(132),Math.max(dp(104),bottom-top-dp(52)));
+            boardSide=Math.max(1,Math.min(w-controlsWidth-gap*3,bottom-top));boardLeft=gap;boardTop=top;
+            controlsLeft=boardLeft+boardSide+gap;controlsTop=bottom-controlsHeight;controlsWidth=w-controlsLeft-gap;
+            rackHeight=hasSkills?Math.max(dp(48),controlsTop-top-gap):0;
+            ((CompactControlsLayout)getChildAt(3)).setPortrait(false);measureChildAt(3,controlsWidth,controlsHeight);
         }
+        if(portrait){rackLeft=gap;rackWidth=w-gap*2;rackTop=controlsTop+controlsHeight+gap;}
+        else if(wide){rackLeft=boardLeft;rackWidth=boardSide;rackTop=boardTop+boardSide+gap;}
+        else{rackLeft=controlsLeft;rackWidth=controlsWidth;rackTop=top;}
+        if(hasSkills)measureChildAt(4,rackWidth,rackHeight);
         measureChildAt(0,w-gap*2,hudHeight);measureChildAt(1,boardSide,boardSide);setMeasuredDimension(w,h);
     }
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+        if(hasSkills)getChildAt(4).layout(rackLeft,rackTop,rackLeft+rackWidth,rackTop+rackHeight);
         getChildAt(0).layout(gap,hudTop,r-l-gap,hudTop+hudHeight);getChildAt(1).layout(boardLeft,boardTop,boardLeft+boardSide,boardTop+boardSide);
         getChildAt(layoutMode==WIDE?2:3).layout(controlsLeft,controlsTop,controlsLeft+controlsWidth,controlsTop+controlsHeight);
     }
@@ -54,7 +60,7 @@ final class DuelLayout extends ViewGroup {
         super.onDraw(c);float d=getResources().getDisplayMetrics().density,w=getWidth(),h=getHeight();
         if(layoutMode==PHONE_PORTRAIT){
             if(headerHeight>=dp(24)){p.setTypeface(GameDesign.TITLE);p.setTextSize(Math.min(dp(24),headerHeight*.52f));p.setTextAlign(Paint.Align.CENTER);p.setColor(GameDesign.GOLD_BRIGHT);c.drawText("四 象 棋 尊",w/2,hudTop*.64f,p);}
-            float foot=controlsTop+controlsHeight+dp(24);
+            float foot=(hasSkills?rackTop+rackHeight:controlsTop+controlsHeight)+dp(24);
             if(h-foot>dp(40)){p.setTextAlign(Paint.Align.CENTER);p.setTypeface(Typeface.create("serif",Typeface.NORMAL));p.setTextSize(dp(12));p.setColor(GameDesign.SECONDARY);c.drawText("四方落子 · 棋会天下",w/2,foot,p);p.setStrokeWidth(d*.6f);p.setColor(0x667e8f97);c.drawLine(w*.18f,foot-dp(4),w*.30f,foot-dp(4),p);c.drawLine(w*.70f,foot-dp(4),w*.82f,foot-dp(4),p);}
         }
         // Sparse foreground petals only in scenery; never cross HUD, controls or board view.

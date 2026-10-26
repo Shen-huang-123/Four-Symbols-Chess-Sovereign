@@ -2,7 +2,7 @@ package com.dorm.fourchess;
 
 /** Thirty deliberately uneven, one-shot skills. IDs are stable wire identifiers. */
 final class SkillRules {
-    static final int COUNT=30, HAND_SIZE=5;
+    static final int COUNT=30, HAND_SIZE=4;
     static final String[] NAMES={"疾行","移形","回春","封印","神行","天遁","破阵","裂甲","穿云","换防","斗转","乾坤","归营","挺进","退守","侧步","飞跃","闪击","横扫","唤马","重铸","鸣炮","护国","灵象","寒潮","解咒","春风","献祭","摸鱼","驱离"};
     static final String[] DETAILS={
         "己方非主将移至相邻空位，可斜行，不吃子。",
@@ -42,5 +42,5 @@ final class SkillRules {
     static boolean twoStep(int id){return id==1||id==2||(id>=5&&id<=19)||id==30;}
     static char restoreType(int id){switch(id){case 3:return 'B';case 20:return 'M';case 21:return 'C';case 22:return 'P';case 23:return 'S';case 24:return 'X';default:return 0;}}
     static String prompt(int id,boolean source){if(!twoStep(id))return name(id)+"："+(restoreType(id)!=0?"选择发亮的空初始位置":id==26||id==27||id==28||id==29?"选择发亮的己方非主将":"选择发亮的敌方非主将");return name(id)+"："+(source?"选择发亮的目标位置":id==30?"选择敌方非主将":"选择己方非主将");}
-    static String guide(){StringBuilder b=new StringBuilder("30种技能随机发牌，每人5张，同局20张互不重复，不保证强度均衡。每张整局限用一次；占用一个回合，也可不出技能、正常走棋。主将不参与技能，技能不能直接消灭主将。被封印棋子不能参与位移、换位或攻击，仍可被普通走棋吃掉。\n\n");for(int i=1;i<=COUNT;i++)b.append("【").append(tier(i)).append("】").append(name(i)).append("：").append(DETAILS[i-1]).append("\n\n");return b.append("取消瞄准不消耗。悔棋恢复技能与效果，不重抽。联机由房主发牌并校验，所有人需安装v4.2或以上。技能牌随棋局同步，不提供防作弊的隐藏手牌机制。").toString();}
+    static String guide(){StringBuilder b=new StringBuilder("30种技能随机发牌，每人4张，同局16张互不重复，不保证强度均衡。每张整局限用一次；占用一个回合，也可不出技能、正常走棋。主将不参与技能，技能不能直接消灭主将。被封印棋子不能参与位移、换位或攻击，仍可被普通走棋吃掉。\n\n");for(int i=1;i<=COUNT;i++)b.append("【").append(tier(i)).append("】").append(name(i)).append("：").append(DETAILS[i-1]).append("\n\n");return b.append("取消瞄准不消耗。悔棋恢复技能与效果，不重抽。联机由房主发牌并校验，所有人需安装v4.4或以上。技能牌随棋局同步，不提供防作弊的隐藏手牌机制。").toString();}
 }

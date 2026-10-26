@@ -38,7 +38,6 @@ final class ModeSelectView extends View {
     private Listener listener;
     private int pressed=-1,confirming=-1,keyboardChoice=0,accessibilityFocus=-1;
     private long confirmStarted,heroEnteredAt;
-    private Shader themeGlow;
     private float touchX,touchY,referenceCardHeight,cardHeight;
     private boolean portrait;
     private Runnable pendingSelection;
@@ -112,7 +111,6 @@ final class ModeSelectView extends View {
     }
     private void updateHeroBounds(){
         Bitmap heroArt=currentHeroArt();
-        themeGlow=new RadialGradient(heroRegion.centerX(),heroRegion.centerY(),Math.max(1,Math.max(getWidth(),getHeight())*.65f),0x24000000|(HERO_ACCENTS[heroIndex]&0xffffff),HERO_ACCENTS[heroIndex]&0xffffff,Shader.TileMode.CLAMP);
         heroImage.setEmpty();if(heroRegion.width()<1||heroRegion.height()<1)return;
         if(heroArt!=null){float scale=Math.min(heroRegion.width()*.90f/heroArt.getWidth(),heroRegion.height()*.96f/heroArt.getHeight());float width=heroArt.getWidth()*scale,height=heroArt.getHeight()*scale;heroImage.set(heroRegion.centerX()-width/2,heroRegion.bottom-height,heroRegion.centerX()+width/2,heroRegion.bottom);}
         else{
@@ -124,7 +122,7 @@ final class ModeSelectView extends View {
     @Override protected void onDraw(Canvas c){
         super.onDraw(c);if(getWidth()==0||getHeight()==0)return;float w=getWidth(),h=getHeight();
 
-        if(themeGlow!=null){p.setShader(themeGlow);p.setAlpha(255);c.drawRect(0,0,w,h,p);p.setShader(null);}drawAmbient(c);drawHero(c);drawHeader(c);drawRules(c);
+        drawAmbient(c);drawHero(c);drawHeader(c);drawRules(c);
         float captionY=portrait?cards[0].top-dp(15):header.bottom+dp(7);
         if(portrait)label(c,"选 择 入 局 方 式",w/2,captionY,sp(12),GameDesign.SECONDARY,Paint.Align.CENTER,false);
         for(int i=0;i<3;i++)drawCard(c,cards[i],i);
@@ -253,7 +251,7 @@ final class ModeSelectView extends View {
     private final class ModeNodes extends AccessibilityNodeProvider {
         @Override public AccessibilityNodeInfo createAccessibilityNodeInfo(int id){
             if(id==View.NO_ID){AccessibilityNodeInfo node=AccessibilityNodeInfo.obtain(ModeSelectView.this);onInitializeAccessibilityNodeInfo(node);for(int i=1;i<=5;i++)node.addChild(ModeSelectView.this,i);return node;}
-            if(id<1||id>5)return null;int index=id-1;RectF rect=id<=3?cards[index]:ruleChoices[id-4];AccessibilityNodeInfo node=AccessibilityNodeInfo.obtain();node.setSource(ModeSelectView.this,id);node.setParent(ModeSelectView.this);node.setPackageName(getContext().getPackageName());node.setClassName("android.widget.Button");node.setText(id<=3?titles[index]:id==4?"普通对局":"四象秘术");node.setContentDescription(id<=3?titles[index]+"，"+subtitles[index]:id==4?"普通对局，原版规则":"四象秘术，技能对局，每人随机五招各限一次");if(id>=4){node.setCheckable(true);node.setChecked(skillSelected==(id==5));}node.setClickable(true);node.setFocusable(true);node.setEnabled(isEnabled());node.setVisibleToUser(isShown());node.setAccessibilityFocused(accessibilityFocus==id);node.addAction(AccessibilityNodeInfo.ACTION_CLICK);node.addAction(accessibilityFocus==id?AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS:AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
+            if(id<1||id>5)return null;int index=id-1;RectF rect=id<=3?cards[index]:ruleChoices[id-4];AccessibilityNodeInfo node=AccessibilityNodeInfo.obtain();node.setSource(ModeSelectView.this,id);node.setParent(ModeSelectView.this);node.setPackageName(getContext().getPackageName());node.setClassName("android.widget.Button");node.setText(id<=3?titles[index]:id==4?"普通对局":"四象秘术");node.setContentDescription(id<=3?titles[index]+"，"+subtitles[index]:id==4?"普通对局，原版规则":"四象秘术，技能对局，每人随机四招各限一次");if(id>=4){node.setCheckable(true);node.setChecked(skillSelected==(id==5));}node.setClickable(true);node.setFocusable(true);node.setEnabled(isEnabled());node.setVisibleToUser(isShown());node.setAccessibilityFocused(accessibilityFocus==id);node.addAction(AccessibilityNodeInfo.ACTION_CLICK);node.addAction(accessibilityFocus==id?AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS:AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
             Rect bounds=new Rect();rect.roundOut(bounds);node.setBoundsInParent(bounds);int[] location=new int[2];getLocationOnScreen(location);bounds.offset(location[0],location[1]);node.setBoundsInScreen(bounds);return node;
         }
         @Override public boolean performAction(int id,int action,Bundle args){

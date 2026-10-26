@@ -17,8 +17,8 @@ public final class DraftSkillProbe extends Instrumentation {
     private int[] xy(int o,int x,int y){return square(o,x-5,18-y);}
     private void piece(StringBuilder s,int owner,char type,int[] p,boolean sealed){s.append(owner).append(',').append(type).append(',').append(p[0]).append(',').append(p[1]).append(',').append(sealed?1:0).append(';');}
     private String fixture(int owner,int skill){
-        StringBuilder s=new StringBuilder(owner+",-1,-1,-1,-1,K2,0,0,0,0,0,0");
-        for(int o=0;o<4;o++){s.append(',').append(skill);int n=1;for(int slot=1;slot<5;slot++){while(n==skill)n++;s.append(',').append(n++);}}
+        StringBuilder s=new StringBuilder(owner+",-1,-1,-1,-1,K3,0,0,0,0,0,0");
+        for(int o=0;o<4;o++){s.append(',').append(skill);int n=1;for(int slot=1;slot<4;slot++){while(n==skill)n++;s.append(',').append(n++);}}
         s.append('|');for(int o=0;o<4;o++)piece(s,o,'J',square(o,4,0),false);
         piece(s,owner,'C',xy(owner,9,9),false);piece(s,owner,'M',xy(owner,10,9),false);piece(s,owner,'P',xy(owner,8,9),true);
         int enemy=(owner+1)%4;piece(s,enemy,'C',xy(owner,10,10),false);piece(s,enemy,'M',xy(owner,11,10),false);piece(s,enemy,'B',xy(owner,9,11),false);return s.toString();
@@ -46,7 +46,7 @@ public final class DraftSkillProbe extends Instrumentation {
         Set<String> deals=new HashSet<>();Set<Integer> seen=new HashSet<>();
         for(int round=0;round<100;round++){
             b.newGame();Set<Integer> unique=new HashSet<>();
-            for(int o=0;o<4;o++){int[] hand=b.skillHand(o);check(hand.length==5,"five cards round "+round+" side "+o);for(int id:hand){check(id>=1&&id<=30&&unique.add(id),"valid globally unique deal "+round+" id "+id);seen.add(id);}int original=hand[0];hand[0]=0;check(b.skillHand(o)[0]==original,"hand accessor defensive copy "+round+" side "+o);}
+            for(int o=0;o<4;o++){int[] hand=b.skillHand(o);check(hand.length==4,"four cards round "+round+" side "+o);for(int id:hand){check(id>=1&&id<=30&&unique.add(id),"valid globally unique deal "+round+" id "+id);seen.add(id);}int original=hand[0];hand[0]=0;check(b.skillHand(o)[0]==original,"hand accessor defensive copy "+round+" side "+o);}
             String state=b.exportState();deals.add(state);copy.importState(state);check(copy.exportState().equals(state),"all hands synchronize round "+round);
             b.cancelSkill();check(b.exportState().equals(state),"cancel never rerolls round "+round);
         }
@@ -79,7 +79,7 @@ public final class DraftSkillProbe extends Instrumentation {
         bad=header.clone();bad[13]=bad[12];b.importState(String.join(",",bad)+"|"+parts[1]);check(valid.equals(b.exportState()),"duplicate card rejected atomically");
         bad=header.clone();bad[6]=Integer.toString(1<<29);b.importState(String.join(",",bad)+"|"+parts[1]);check(valid.equals(b.exportState()),"unowned spent mask rejected atomically");
         b.importState(valid+"0,B,9,9,0;");check(valid.equals(b.exportState()),"duplicate square rejected atomically");
-        b.setSkillMode(false);b.newGame();String normal=b.exportState();check(!normal.contains("K2")&&!b.beginSkill(6)&&!b.trySkill(0,6,5,15,6,14),"ordinary mode never deals or casts skills");
+        b.setSkillMode(false);b.newGame();String normal=b.exportState();check(!normal.contains("K3")&&!b.beginSkill(6)&&!b.trySkill(0,6,5,15,6,14),"ordinary mode never deals or casts skills");
         copy.importState(normal);check(copy.exportState().equals(normal),"ordinary protocol unchanged");
     }
     @Override public void onStart(){Bundle result=new Bundle();try{final Throwable[] error={null};runOnMainSync(()->{try{runChecks();}catch(Throwable e){error[0]=e;}});if(error[0]!=null)throw new AssertionError(error[0]);log.append("DRAFT COMPLETE\n");result.putString("stream",log.toString());finish(Activity.RESULT_OK,result);}catch(Throwable e){result.putString("stream",log+"FAIL "+android.util.Log.getStackTraceString(e));finish(Activity.RESULT_CANCELED,result);}}

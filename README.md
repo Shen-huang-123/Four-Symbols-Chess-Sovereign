@@ -2,7 +2,7 @@
 
 四人象棋 Android 游戏，支持同屏对局、局域网联机、自定义昵称、棋谱、悔棋和音效，采用国风二次元主题。
 
-- [下载最新版 Release](https://github.com/Shen-huang-123/Four-Symbols-Chess-Sovereign/releases/latest) · [全部版本发布记录](发布/版本记录.md) · [仓库中的 v4.3 APK](安装包/最新版/四象棋尊-v4.3.apk)。
+- [下载最新版 Release](https://github.com/Shen-huang-123/Four-Symbols-Chess-Sovereign/releases/latest) · [全部版本发布记录](发布/版本记录.md) · [仓库中的 v4.4 APK](安装包/最新版/四象棋尊-v4.4.apk)。
 - Android Studio 打开 `源码/四象棋尊`；需要 Android SDK 35。构建命令在下方。
 - 仓库保留完整源码、当前安装包及书面说明，生成缓存、历史安装包和临时验收截图未纳入版本管理。
 
@@ -14,8 +14,8 @@
 
 ## 当前版本
 
-- 应用版本：4.3.0
-- 当前安装包：`安装包/最新版/四象棋尊-v4.3.apk`
+- 应用版本：4.4.0
+- 当前安装包：`安装包/最新版/四象棋尊-v4.4.apk`
 - 包名：`com.dorm.fourchess`
 - 最低系统：Android 6.0（API 23）
 - 目标系统：Android 15（API 35）
@@ -57,7 +57,14 @@
 
 当前工程将构建文件输出到：
 
-`app/build-v43/outputs/apk/debug/app-debug.apk`
+`app/build-v44/outputs/apk/debug/app-debug.apk`
+
+## v4.4 四技能与手机布局
+
+- 修复模式页顶部安全区色差，庭院背景连续显示。
+- 每人随机4技能，竖屏底部新增四个方形快捷入口；横屏重排棋盘、技能与操作区。
+- 技能联机所有玩家须升级v4.4；普通模式协议不变。
+- 模拟器6236项检查通过；[修改与验证报告](源码/四象棋尊/验证/v4.4-四技能与布局验收.md)。
 
 ## v4.0 普通对局 / 四象秘术
 

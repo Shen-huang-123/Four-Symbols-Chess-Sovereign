@@ -342,12 +342,12 @@ public class FourChessView extends View {
     boolean tryNetworkMove(int owner,int sx,int sy,int tx,int ty){if(owner!=turn)return false;Piece q=pieceAt(sx,sy);if(q==null||q.owner!=owner)return false;selected=q;moves=legalMoves(q);if(!containsMove(tx,ty)){selected=null;moves.clear();return false;}moveSelected(tx,ty);return true;}
     String exportState(){
         StringBuilder b=new StringBuilder().append(turn).append(',').append(lastFx).append(',').append(lastFy).append(',').append(lastTx).append(',').append(lastTy);
-        if(skillMode){b.append(",K2");for(int used:skillUse)b.append(',').append(used);b.append(',').append(lastSkill).append(',').append(lastActor);for(int[] hand:skillHands)for(int held:hand)b.append(',').append(held);}
+        if(skillMode){b.append(",K3");for(int used:skillUse)b.append(',').append(used);b.append(',').append(lastSkill).append(',').append(lastActor);for(int[] hand:skillHands)for(int held:hand)b.append(',').append(held);}
         b.append('|');for(Piece q:pieces){b.append(q.owner).append(',').append(q.type).append(',').append(q.x).append(',').append(q.y);if(skillMode)b.append(',').append(q.sealed?1:0);b.append(';');}return b.toString();
     }
     void importState(String state){try{
         String[] top=state.split("\\|",2),h=top[0].split(",");int newTurn=Integer.parseInt(h[0]);if(newTurn<0||newTurn>3)return;
-        boolean variant=h.length==32&&"K2".equals(h[5]);if(!variant&&h.length!=5)return;
+        boolean variant=h.length==12+4*SkillRules.HAND_SIZE&&"K3".equals(h[5]);if(!variant&&h.length!=5)return;
         int[] uses=new int[4];int[][] hands=new int[4][SkillRules.HAND_SIZE];
         if(variant)for(int owner=0;owner<4;owner++){int heldMask=0;for(int slot=0;slot<SkillRules.HAND_SIZE;slot++){int id=Integer.parseInt(h[12+owner*SkillRules.HAND_SIZE+slot]);if(id<1||id>SkillRules.COUNT||(heldMask&(1<<(id-1)))!=0)return;hands[owner][slot]=id;heldMask|=1<<(id-1);}uses[owner]=Integer.parseInt(h[6+owner]);if((uses[owner]&~heldMask)!=0)return;}
         int action=variant?Integer.parseInt(h[10]):0,actor=variant?Integer.parseInt(h[11]):0;

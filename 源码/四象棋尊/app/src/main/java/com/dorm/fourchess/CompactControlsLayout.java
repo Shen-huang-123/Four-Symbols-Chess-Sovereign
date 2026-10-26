@@ -19,19 +19,19 @@ final class CompactControlsLayout extends ViewGroup {
     private int dp(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
     @Override protected void onMeasure(int widthSpec,int heightSpec){
         int w=MeasureSpec.getSize(widthSpec),h=MeasureSpec.getSize(heightSpec),count=getChildCount()-2;gap=dp(4);twoColumns=!portrait&&w>=dp(100);
-        int rows=twoColumns?(count+1)/2:count;
+        int rows=twoColumns?(count+2)/3:count;
         hintHeight=portrait?dp(15):0;stateHeight=portrait?dp(26):Math.min(dp(44),Math.max(dp(30),h/7));
         actionHeight=portrait?Math.max(1,h-stateHeight-hintHeight-gap*2):Math.min(dp(66),Math.max(1,(h-stateHeight-gap*rows)/rows));
         actionsTop=stateHeight+gap;measureAt(0,w,stateHeight);
-        for(int i=1;i<=count;i++)measureAt(i,portrait?Math.max(1,(w-gap*(count-1))/count):twoColumns?(w-gap)/2:w,actionHeight);
+        for(int i=1;i<=count;i++)measureAt(i,portrait?Math.max(1,(w-gap*(count-1))/count):twoColumns?(w-gap*2)/3:w,actionHeight);
         if(portrait)measureAt(count+1,w,hintHeight);setMeasuredDimension(w,h);
     }
     private void measureAt(int index,int w,int h){getChildAt(index).measure(MeasureSpec.makeMeasureSpec(Math.max(1,w),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(Math.max(1,h),MeasureSpec.EXACTLY));}
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
         int w=r-l,count=getChildCount()-2;getChildAt(0).layout(0,0,w,stateHeight);
         for(int i=1;i<=count;i++){
-            int left=portrait?(i-1)*(w+gap)/count:twoColumns?(i-1)%2*(w+gap)/2:0,right=portrait?i*(w+gap)/count-gap:twoColumns?left+(w-gap)/2:w;
-            int top=actionsTop+(portrait?0:(twoColumns?(i-1)/2:i-1)*(actionHeight+gap));getChildAt(i).layout(left,top,right,top+actionHeight);
+            int left=portrait?(i-1)*(w+gap)/count:twoColumns?(i-1)%3*(w+gap)/3:0,right=portrait?i*(w+gap)/count-gap:twoColumns?left+(w-gap*2)/3:w;
+            int top=actionsTop+(portrait?0:(twoColumns?(i-1)/3:i-1)*(actionHeight+gap));getChildAt(i).layout(left,top,right,top+actionHeight);
         }
         if(portrait)getChildAt(count+1).layout(0,b-t-hintHeight,w,b-t);
     }
