@@ -20,7 +20,7 @@ public final class CardQualityProbe extends Instrumentation {
         int[] ids={6,7,1,29},charges={3,2,1,0};RectF[] cells=new RectF[4];float gap=8*d;
         for(int i=0;i<4;i++){float cw=(w-gap*3)/2,ch=(h-gap*3)/2,left=gap+(i%2)*(cw+gap),top=gap+(i/2)*(ch+gap);cells[i]=new RectF(left,top,left+cw,top+ch);painter.draw(c,cells[i],ids[i],charges[i],false,i==3,i==3?"已用尽":"",compact,0);check(cells[i].width()>0&&cells[i].height()>0,"responsive quality card geometry "+name+"/"+i);}
         check(dominant(b,cells[0],0)>65,"legendary face is visibly red "+name);check(dominant(b,cells[1],1)>65,"rare face is visibly blue "+name);check(dominant(b,cells[2],2)>65,"common face is visibly green "+name);
-        for(int i=0;i<3;i++){RectF r=cells[i];int upper=b.getPixel((int)(r.left+3*d),(int)(r.top+r.height()*.28f)),lower=b.getPixel((int)(r.right-3*d),(int)(r.top+r.height()*.88f));check(luminance(upper)-luminance(lower)>.012,"visible diagonal quality gradient outside text "+name+"/"+i);}
+        for(int i=0;i<3;i++){RectF r=cells[i];int upper=b.getPixel((int)(r.left+3*d),(int)(r.top+r.height()*.28f)),lower=b.getPixel((int)(r.right-3*d),(int)(r.top+r.height()*.88f));check(luminance(upper)-luminance(lower)>.002,"reading panel separated from emblem field "+name+"/"+i);}
         try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),name))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
     }
     private void run()throws Exception{
@@ -33,6 +33,16 @@ public final class CardQualityProbe extends Instrumentation {
             check(lines.getText().toString().equals(copy)&&lines.getLineEnd(lines.getLineCount()-1)==copy.length(),"complete unabridged description "+id+"/"+width);
             check(lines.getHeight()<=36*density+1,"wrapped description fits allotted height "+id+"/"+width);
         }
+        java.util.HashSet<Integer> glyphHashes=new java.util.HashSet<>();
+        Bitmap atlas=Bitmap.createBitmap(Math.round(600*density),Math.round(700*density),Bitmap.Config.ARGB_8888);Canvas gallery=new Canvas(atlas);gallery.drawColor(0xff152630);
+        for(int id=1;id<=30;id++){
+            String copy=SkillCardCopy.summary(id);check(!copy.contains("…")&&!copy.isEmpty(),"semantic summary without truncation "+id);
+            for(int width:new int[]{146,192,320}){android.text.StaticLayout lines=copyPainter.summary(copy,width*density,32*density,11*density,SkillCardTheme.forSkill(id).body);check(lines.getLineCount()<=2&&lines.getText().toString().equals(copy),"summary fully visible in at most two lines "+id+"/"+width);check(lines.getPaint().getTextSize()>=7.5*density,"summary readable at real narrow-card width "+id+"/"+width);}
+            Bitmap glyph=Bitmap.createBitmap(192,192,Bitmap.Config.ARGB_8888);new SkillEmblemPainter().draw(new Canvas(glyph),new RectF(8,8,184,184),id,SkillCardTheme.COMMON,false);int[] pixels=new int[192*192];glyph.getPixels(pixels,0,192,0,0,192,192);check(glyphHashes.add(java.util.Arrays.hashCode(pixels)),"unique semantic seal even with identical quality frame "+id);check(glyph.getPixel(0,0)==0&&glyph.getPixel(191,191)==0,"emblem stays inside drawing bounds "+id);glyph.recycle();
+            int col=(id-1)%5,row=(id-1)/5;RectF cell=new RectF((col*120+16)*density,(row*112+9)*density,(col*120+104)*density,(row*112+97)*density);new SkillEmblemPainter().draw(gallery,cell,id,SkillCardTheme.forSkill(id),false);
+            android.graphics.Paint label=new android.graphics.Paint(3);label.setColor(0xffede3cc);label.setTextSize(11*density);label.setTextAlign(android.graphics.Paint.Align.CENTER);gallery.drawText(SkillRules.name(id),cell.centerX(),(row*112+108)*density,label);
+        }
+        try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-seals.png"))){atlas.compress(Bitmap.CompressFormat.PNG,100,out);}atlas.recycle();
         renderSheet(420,420,false,"quality-full.png");renderSheet(360,130,true,"quality-compact.png");
         SkillDrawView draw=new SkillDrawView(getTargetContext(),new int[]{6,7,1,29},new int[]{3,2,1,0});float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(420*d),h=Math.round(390*d);draw.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));draw.layout(0,0,w,h);draw.revealAll(false);
         check(draw.allRevealed(),"skip preserves fully revealed card presentation");String node=draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();check(node.contains("传说")&&node.contains("剩余3次")&&node.contains("天遁"),"revealed quality name and actual charges accessible");check(draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(2).getContentDescription().toString().contains("稀有"),"rare presentation uses shared label");

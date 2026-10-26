@@ -674,7 +674,7 @@
   {
     "tag": "v4.8",
     "title": "四象棋尊 v4.8 · 品质分层渐变卡牌",
-    "apk": "安装包/最新版/四象棋尊-v4.8.apk",
+    "apk": "安装包/历史版本/四象棋尊-v4.8.apk",
     "size": 6316522,
     "sha256": "7cb32719b41f7ff7dc9df95f8f6726ee5a77aae33b8cde88c34f8ae50aa00bdd",
     "manifest": {
@@ -686,5 +686,21 @@
     "notes": "发布/说明/v4.8.md",
     "checksum": "发布/说明/SHA256SUMS-v4.8.txt",
     "download_name": "Four-Symbols-Chess-Sovereign-v4.8.apk"
+  },
+  {
+    "tag": "v4.9",
+    "title": "四象棋尊 v4.9 · 东方秘术典籍",
+    "apk": "安装包/最新版/四象棋尊-v4.9.apk",
+    "size": 6327453,
+    "sha256": "32f06f1e551ea0d9d48dd6b041f24bf313ab4196f914c81fc0afc4e2ba1c8757",
+    "manifest": {
+      "versionCode": 49,
+      "versionName": "4.9.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "完整源码",
+    "notes": "发布/说明/v4.9.md",
+    "checksum": "发布/说明/SHA256SUMS-v4.9.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v4.9.apk"
   }
 ]

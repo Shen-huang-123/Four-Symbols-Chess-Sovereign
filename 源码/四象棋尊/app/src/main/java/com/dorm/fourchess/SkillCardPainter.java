@@ -3,85 +3,75 @@ package com.dorm.fourchess;
 import android.graphics.*;
 import android.text.*;
 
-/** Layered pigment gradients. Coordinates and game state remain owned by callers. */
+/** Collectible manuscript composition, with semantic vector artwork and grade-specific engraving. */
 final class SkillCardPainter {
     private final TextPaint p=new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private final SkillEmblemPainter emblem=new SkillEmblemPainter();
     private final float density,scaled;
     SkillCardPainter(android.content.Context context){density=context.getResources().getDisplayMetrics().density;scaled=context.getResources().getDisplayMetrics().scaledDensity;}
     private float dp(float n){return n*density;}
     private int muted(int color,boolean disabled){return disabled?BattleSkin.blend(color,0xff27353c,.68f):color;}
     private void text(Canvas c,String value,float x,float y,float size,float width,int color,Paint.Align align){
         p.setShader(null);p.setStyle(Paint.Style.FILL);p.setTypeface(GameDesign.EMPHASIS);p.setTextSize(size);p.setColor(color);p.setTextAlign(align);
-        if(p.measureText(value)>width)p.setTextSize(size*width/p.measureText(value));
-        c.drawText(value,x,y-(p.ascent()+p.descent())/2,p);
+        if(p.measureText(value)>width)p.setTextSize(size*width/p.measureText(value));c.drawText(value,x,y-(p.ascent()+p.descent())/2,p);
     }
-    /** Complete copy, wrapped without ellipsis; fit is determined by both actual width and height. */
-    StaticLayout description(String value,float width,float height,float preferred,int color){
+    StaticLayout description(String value,float width,float height,float preferred,int color){return layout(value,width,height,preferred,color,Integer.MAX_VALUE);}
+    StaticLayout summary(String value,float width,float height,float preferred,int color){return layout(value,width,height,preferred,color,2);}
+    private StaticLayout layout(String value,float width,float height,float preferred,int color,int maxLines){
         p.setShader(null);p.setStyle(Paint.Style.FILL);p.setTypeface(GameDesign.BODY);p.setColor(color);p.setTextAlign(Paint.Align.LEFT);
         StaticLayout result;float size=preferred;
-        do{p.setTextSize(size);result=StaticLayout.Builder.obtain(value,0,value.length(),p,Math.max(1,(int)width))
-            .setAlignment(Layout.Alignment.ALIGN_CENTER).setIncludePad(false).setLineSpacing(0,1.08f).build();
-            if(result.getHeight()<=height||size<=dp(5))break;size-=dp(.25f);
-        }while(true);
-        return result;
+        do{p.setTextSize(size);result=StaticLayout.Builder.obtain(value,0,value.length(),p,Math.max(1,(int)width)).setAlignment(Layout.Alignment.ALIGN_CENTER).setIncludePad(false).setLineSpacing(0,1.08f).build();
+            if((result.getHeight()<=height&&result.getLineCount()<=maxLines)||size<=dp(5))break;size-=dp(.25f);
+        }while(true);return result;
+    }
+    private Path frame(RectF r,SkillCardTheme t){
+        float cut=dp(t.pattern==0?8:t.pattern==1?5:2);Path path=new Path();
+        path.moveTo(r.left+cut,r.top);path.lineTo(r.right-cut,r.top);path.lineTo(r.right,r.top+cut);path.lineTo(r.right,r.bottom-cut);path.lineTo(r.right-cut,r.bottom);path.lineTo(r.left+cut,r.bottom);path.lineTo(r.left,r.bottom-cut);path.lineTo(r.left,r.top+cut);path.close();return path;
     }
     void draw(Canvas c,RectF r,int id,int remaining,boolean selected,boolean disabled,String reason,boolean compact,float shine){
-        SkillCardTheme t=SkillCardTheme.forSkill(id);float radius=dp(5),pad=Math.min(dp(10),r.width()*.05f),h=r.height(),w=r.width();
-        p.setShader(null);p.setStyle(Paint.Style.FILL);p.setColor(0x20091016);c.drawRoundRect(r.left,r.top+dp(1),r.right,r.bottom+dp(1),radius,radius,p);
-        // Broad diagonal hue transition plus two off-centre pigment pools, never a white specular band.
-        p.setColor(Color.WHITE);p.setShader(new LinearGradient(r.left,r.top,r.right,r.bottom,
-            new int[]{muted(t.deep,disabled),muted(t.middle,disabled),muted(BattleSkin.blend(t.middle,t.deep,.38f),disabled),muted(t.deep,disabled)},
-            new float[]{0,.36f,.72f,1},Shader.TileMode.CLAMP));
-        c.drawRoundRect(r,radius,radius,p);p.setShader(null);
-        c.save();Path clip=new Path();clip.addRoundRect(r,radius,radius,Path.Direction.CW);c.clipPath(clip);
-        pigment(c,r,t,disabled);fibres(c,r,t,disabled);pattern(c,r,t,disabled);c.restore();
-        // A single etched perimeter; selection changes the line rather than adding another shell.
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(selected?.95f:.65f));p.setColor(disabled?0xff667777:selected?t.title:GameDesign.alpha(t.edge,185));c.drawRoundRect(r,radius,radius,p);
-        // One restrained binding mark, rather than four repeated ornamental corners.
-        p.setStrokeWidth(dp(.55f));p.setColor(GameDesign.alpha(t.edge,85));c.drawLine(r.left+pad,r.bottom-dp(4),r.left+pad+dp(12),r.bottom-dp(4),p);p.setStyle(Paint.Style.FILL);
+        SkillCardTheme t=SkillCardTheme.forSkill(id);float pad=Math.min(dp(10),r.width()*.055f),h=r.height(),w=r.width();Path outline=frame(r,t);
+        p.setStyle(Paint.Style.FILL);p.setShader(null);p.setColor(0x20081016);c.save();c.translate(0,dp(1));c.drawPath(outline,p);c.restore();
+        p.setColor(muted(t.middle,disabled));c.drawPath(outline,p);
+        c.save();c.clipPath(outline);
+        // Bound pages and a quiet reading panel replace the previous edge-to-edge spotlight gradients.
+        p.setColor(GameDesign.alpha(muted(t.deep,disabled),90));c.drawRect(r.left,r.top+h*.54f,r.right,r.bottom,p);
+        p.setColor(GameDesign.alpha(t.edge,18));c.drawRect(r.left,r.top,r.left+dp(3),r.bottom,p);
+        fibres(c,r,t);p.setColor(GameDesign.alpha(t.edge,35));p.setStrokeWidth(dp(.5f));c.drawLine(r.left+pad,r.top+h*.54f,r.right-pad,r.top+h*.54f,p);
+        c.restore();
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(selected?1.0f:.65f));p.setColor(disabled?0xff667777:selected?t.title:GameDesign.alpha(t.edge,190));c.drawPath(outline,p);
+        corners(c,r,t,disabled);p.setStyle(Paint.Style.FILL);
         int title=disabled?0xffbec8c4:t.title,body=disabled?0xffa9b7b4:t.body;
-        float badgeSize=Math.min(9*scaled,h*.16f),badgeH=Math.min(dp(16),h*.22f),badgeY=r.top+pad+badgeH/2;
-        // Quality is a typographic seal, not a brightly filled capsule.
+        float badgeSize=Math.min(9*scaled,h*.15f),badgeH=Math.min(dp(16),h*.22f),badgeY=r.top+pad+badgeH/2;
+        if(!compact){p.setColor(GameDesign.alpha(t.edge,12));c.drawRect(r.left+pad-dp(3),badgeY-badgeH*.6f,r.left+pad+badgeSize*2.6f,badgeY+badgeH*.6f,p);}
         text(c,t.label,r.left+pad,badgeY,badgeSize,w*.4f,disabled?body:t.edge,Paint.Align.LEFT);
         float countW=Math.min(w*.25f,Math.max(dp(26),badgeSize*2.6f)),countLeft=r.right-pad-countW;
         p.setColor(muted(t.badgeInk,disabled));c.drawRoundRect(countLeft,badgeY-badgeH/2,r.right-pad,badgeY+badgeH/2,dp(2),dp(2),p);
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.5f));p.setColor(GameDesign.alpha(disabled?body:t.edge,165));c.drawRoundRect(countLeft,badgeY-badgeH/2,r.right-pad,badgeY+badgeH/2,dp(2),dp(2),p);p.setStyle(Paint.Style.FILL);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.5f));p.setColor(GameDesign.alpha(disabled?body:t.edge,150));c.drawRoundRect(countLeft,badgeY-badgeH/2,r.right-pad,badgeY+badgeH/2,dp(2),dp(2),p);p.setStyle(Paint.Style.FILL);
         text(c,"×"+remaining,countLeft+countW/2,badgeY,badgeSize,countW-dp(3),title,Paint.Align.CENTER);
-        float titleSize=Math.min((compact?15:20)*scaled,Math.min(h*(compact?.23f:.18f),w*.18f));
-        float titleY=compact?r.top+h*.46f:Math.max(badgeY+badgeH*.6f+titleSize*.75f,r.top+h*.34f);
+        float titleSize=Math.min((compact?15:18)*scaled,Math.min(h*(compact?.23f:.12f),w*.17f));
+        float titleY=r.top+h*(compact?.46f:.61f);
+        if(!compact){
+            // Wide cards can use the otherwise empty centre beside the corner badges.
+            float top=w>h*1.4f?r.top+pad:badgeY+badgeH*.65f+dp(2),bottom=r.top+h*.51f,size=Math.min(w*.43f,Math.max(dp(12),bottom-top));
+            float cy=(top+bottom)/2;emblem.draw(c,new RectF(r.centerX()-size/2,cy-size/2,r.centerX()+size/2,cy+size/2),id,t,disabled);
+        }
         text(c,SkillRules.name(id),r.centerX(),titleY,titleSize,w-pad*2,title,Paint.Align.CENTER);
-        float descTop=titleY+titleSize*.65f,descBottom=r.bottom-(compact?dp(4):Math.max(dp(18),h*.15f));
-        String copy=compact?SkillCardTheme.brief(id):SkillRules.DETAILS[id-1];
-        if(disabled&&reason!=null&&!reason.isEmpty())copy=compact?reason:copy+"\n"+reason;
-        StaticLayout lines=description(copy,w-pad*2,Math.max(dp(8),descBottom-descTop),Math.min((compact?9:11)*scaled,h*(compact?.17f:.11f)),body);
-        c.save();c.translate(r.left+pad,descTop+Math.max(0,(descBottom-descTop-lines.getHeight())*.35f));lines.draw(c);c.restore();
-        if(!compact){String rule="整活".equals(SkillRules.tier(id))?"整活秘术 · 十回合换牌":"施放耗1次 · 十回合换牌";
-            text(c,rule,r.centerX(),r.bottom-Math.max(dp(8),h*.065f),Math.min(8*scaled,h*.08f),w-pad*2,GameDesign.alpha(body,210),Paint.Align.CENTER);}
+        float descTop=titleY+titleSize*.65f,descBottom=r.bottom-(compact?dp(4):Math.max(dp(17),h*.13f));
+        String copy=compact?SkillCardTheme.brief(id):SkillCardCopy.summary(id);
+        if(compact&&disabled&&reason!=null&&!reason.isEmpty())copy=reason;
+        StaticLayout lines=summary(copy,w-pad*2,Math.max(dp(8),descBottom-descTop),Math.min((compact?9:11)*scaled,h*(compact?.17f:.09f)),body);
+        c.save();c.translate(r.left+pad,descTop+Math.max(0,(descBottom-descTop-lines.getHeight())*.25f));lines.draw(c);c.restore();
+        if(!compact){String rule=disabled&&reason!=null&&!reason.isEmpty()?reason:"整活".equals(SkillRules.tier(id))?"整活秘术 · 十回合换牌":"耗1次行动 · 十回合换牌";
+            text(c,rule,r.centerX(),r.bottom-Math.max(dp(8),h*.055f),Math.min(8*scaled,h*.07f),w-pad*2,GameDesign.alpha(body,210),Paint.Align.CENTER);}
     }
-    private void pigment(Canvas c,RectF r,SkillCardTheme t,boolean disabled){
-        float reach=Math.max(r.width(),r.height());
-        p.setStyle(Paint.Style.FILL);p.setColor(Color.WHITE);
-        p.setShader(new RadialGradient(r.left+r.width()*.08f,r.top+r.height()*.08f,reach*.86f,
-            new int[]{GameDesign.alpha(muted(t.light,disabled),disabled?45:190),GameDesign.alpha(muted(t.light,disabled),disabled?12:65),0},
-            new float[]{0,.45f,1},Shader.TileMode.CLAMP));c.drawRect(r,p);
-        p.setShader(new RadialGradient(r.right+r.width()*.12f,r.bottom-r.height()*.12f,reach*.72f,
-            new int[]{GameDesign.alpha(muted(t.light,disabled),disabled?30:120),0},null,Shader.TileMode.CLAMP));c.drawRect(r,p);
-        // A transparent dark ink wash quiets only the reading zone, retaining colour around its edges.
-        p.setShader(new LinearGradient(r.left,r.top,r.left,r.bottom,
-            new int[]{0,GameDesign.alpha(t.deep,35),GameDesign.alpha(t.deep,48),0},new float[]{0,.32f,.73f,1},Shader.TileMode.CLAMP));c.drawRect(r,p);p.setShader(null);
+    private void fibres(Canvas c,RectF r,SkillCardTheme t){
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.35f));p.setColor(GameDesign.alpha(t.body,5));
+        for(int i=0;i<21;i++){float f=(i*.618034f)%1f,y=r.top+r.height()*f,x=r.left+r.width()*((i*.381966f)%1f);Path fibre=new Path();fibre.moveTo(x,y);fibre.quadTo(x+r.width()*.07f,y-dp(.5f),Math.min(r.right,x+r.width()*.2f),y+dp(.6f));c.drawPath(fibre,p);}p.setStyle(Paint.Style.FILL);
     }
-    private void fibres(Canvas c,RectF r,SkillCardTheme t,boolean disabled){
-        // Deterministic sub-visible curved fibres: no bitmap tiling, random noise or per-frame flicker.
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.35f));p.setColor(GameDesign.alpha(t.body,disabled?3:5));
-        for(int i=0;i<17;i++){float f=(i*.618034f)%1f,y=r.top+r.height()*f,x=r.left+r.width()*((i*.381966f)%1f);Path path=new Path();path.moveTo(x,y);path.quadTo(x+r.width()*.09f,y-dp(.5f),Math.min(r.right,x+r.width()*.26f),y+dp(.6f));c.drawPath(path,p);}
-        p.setStyle(Paint.Style.FILL);
-    }
-    private void pattern(Canvas c,RectF r,SkillCardTheme t,boolean disabled){
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.6f));p.setColor(GameDesign.alpha(t.edge,disabled?8:17));
-        float x=r.right-r.width()*.12f,y=r.centerY(),u=Math.min(r.width()*.2f,r.height()*.3f);Path path=new Path();
-        if(t.pattern==0){for(int i=0;i<2;i++){path.reset();path.moveTo(x-u*.6f,y+u);path.cubicTo(x+u,y+u*.4f,x-u,y-u*.3f,x+u*.2f,y-u-i*u*.25f);path.cubicTo(x+u,y-u*.1f,x+u*.4f,y+u*.6f,x+u*.8f,y+u);c.drawPath(path,p);}}
-        else if(t.pattern==1){for(int i=0;i<3;i++){float yy=y+u*(i-1)*.5f;path.reset();path.moveTo(x-u,yy);path.cubicTo(x-u*.3f,yy-u*.5f,x+u*.3f,yy+u*.5f,x+u,yy);c.drawPath(path,p);}}
-        else{c.drawLine(x-u*.4f,y+u,x+u*.4f,y-u,p);for(int i=0;i<3;i++){float yy=y+u*(i-1)*.6f;path.reset();path.moveTo(x,yy);path.quadTo(x-u*.8f,yy-u*.65f,x-u*.8f,yy-u*.1f);path.quadTo(x-u*.3f,yy+u*.2f,x,yy);c.drawPath(path,p);}}
-        p.setStyle(Paint.Style.FILL);
+    private void corners(Canvas c,RectF r,SkillCardTheme t,boolean disabled){
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.6f));p.setColor(GameDesign.alpha(t.edge,disabled?35:110));
+        if(t.pattern==0){for(int side=0;side<2;side++){float x=side==0?r.left:r.right,sign=side==0?1:-1;Path wing=new Path();wing.moveTo(x+sign*dp(4),r.top+dp(19));wing.lineTo(x+sign*dp(4),r.top+dp(9));wing.lineTo(x+sign*dp(10),r.top+dp(4));wing.lineTo(x+sign*dp(23),r.top+dp(4));c.drawPath(wing,p);c.drawLine(x+sign*dp(10),r.top+dp(8),x+sign*dp(15),r.top+dp(8),p);}}
+        else if(t.pattern==1){float x=r.right-dp(5),y=r.bottom-dp(5);c.drawLine(x-dp(11),y,x,y,p);c.drawLine(x,y,x,y-dp(8),p);}
+        else{c.drawLine(r.left+dp(7),r.bottom-dp(4),r.left+dp(18),r.bottom-dp(4),p);}p.setStyle(Paint.Style.FILL);
     }
 }

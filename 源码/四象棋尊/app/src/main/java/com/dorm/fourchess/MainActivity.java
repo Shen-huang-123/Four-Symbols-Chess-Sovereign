@@ -267,16 +267,22 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(12),0,dp(12),0);
         int[] charges=new int[hand.length];for(int i=0;i<hand.length;i++)charges[i]=board.skillRemaining(owner,hand[i]);drawView=new SkillDrawView(this,hand,charges);
         ScrollView manuscripts=new ScrollView(this);manuscripts.setFillViewport(true);manuscripts.setClipToPadding(false);manuscripts.addView(drawView,new ScrollView.LayoutParams(-1,-2));content.addView(manuscripts,new LinearLayout.LayoutParams(-1,0,1));
-        TextView detail=text("点击秘卷逐张翻开 · 也可全部揭晓",12,GameDesign.SECONDARY);detail.setTag("skill_draw_detail");detail.setGravity(Gravity.CENTER);detail.setMaxLines(3);detail.setEllipsize(android.text.TextUtils.TruncateAt.END);detail.setPadding(dp(4),dp(4),dp(4),dp(4));content.addView(detail,new LinearLayout.LayoutParams(-1,dp(getResources().getConfiguration().fontScale>1.2f?72:58)));
+        TextView detail=text("逐张揭晓秘卷 · 选中后可查看详解",11,GameDesign.SECONDARY);detail.setTag("skill_draw_detail");detail.setGravity(Gravity.CENTER);detail.setMaxLines(2);detail.setPadding(dp(4),dp(3),dp(4),dp(3));content.addView(detail,new LinearLayout.LayoutParams(-1,dp(44)));
+        final int[] inspected={0};detail.setEnabled(false);detail.setContentDescription("揭晓并选择卡牌后，点击查看完整原始技能说明");
+        detail.setOnClickListener(v->{int id=inspected[0];if(id<1||skillCardDialog!=null)return;
+            AlertDialog info=new AlertDialog.Builder(this).setMessage(SkillRules.DETAILS[id-1]+"\n\n剩余 "+board.skillRemaining(owner,id)+" 次 · 施放占用一次行动\n每十个完整回合替换技能与次数")
+                .setPositiveButton("返回秘卷",null).create();skillCardDialog=info;info.setOnDismissListener(d->skillCardDialog=null);GameDialogStyle.title(info,SkillCardTheme.label(id)+" · "+SkillRules.name(id));info.show();GameDialogStyle.apply(info,null);
+        });
         drawDialog=new AlertDialog.Builder(this).setView(content).setPositiveButton("进入对局",null).setNeutralButton("全部揭晓",null).setNegativeButton("跳过动画",null).create();
         final AlertDialog shown=drawDialog;final int generation=board.skillGeneration();
         GameDialogStyle.title(shown,board.ownerName(owner)+" · 四卷定机缘");
         drawView.setListener(new SkillDrawView.Listener(){
-            public void onCard(int id,boolean visible){String next=visible?"【"+SkillCardTheme.label(id)+"】"+SkillRules.name(id)+" ×"+board.skillRemaining(owner,id)+" · "+SkillRules.DETAILS[id-1]:"秘卷开启中…";if(!next.equals(drawDetail)){drawDetail=next;detail.setText(next);detail.setTextColor(visible?SkillCardTheme.forSkill(id).edge:GameDesign.SECONDARY);}}
+            public void onCard(int id,boolean visible){inspected[0]=visible?id:0;detail.setEnabled(visible);String next=visible?SkillRules.name(id)+" · "+SkillCardTheme.label(id)+" · ×"+board.skillRemaining(owner,id)+"   查看完整说明 ›":"秘卷开启中…";if(!next.equals(drawDetail)){drawDetail=next;detail.setText(next);detail.setTextColor(visible?SkillCardTheme.forSkill(id).edge:GameDesign.SECONDARY);}}
             public void onComplete(){if(shown.getButton(-1)!=null)shown.getButton(-1).setEnabled(true);}
         });
-        shown.setOnDismissListener(d->{if(board.skillGeneration()==generation)handRevealed[owner]=true;if(drawDialog==shown){drawDialog=null;drawView=null;}drawDetail="";updateHud();});
+        shown.setOnDismissListener(d->{if(skillCardDialog!=null)skillCardDialog.dismiss();if(board.skillGeneration()==generation)handRevealed[owner]=true;if(drawDialog==shown){drawDialog=null;drawView=null;}drawDetail="";updateHud();});
         shown.show();GameDialogStyle.apply(shown,null);shown.getButton(-1).setEnabled(false);
+        GradientDrawable manuscriptPanel=new GradientDrawable();manuscriptPanel.setColor(0xff142630);manuscriptPanel.setCornerRadius(dp(8));manuscriptPanel.setStroke(dp(1),0xff52616a);shown.getWindow().setBackgroundDrawable(manuscriptPanel);shown.getWindow().setDimAmount(.82f);
         shown.getButton(-3).setOnClickListener(v->{if(drawView!=null)drawView.revealAll(true);});shown.getButton(-2).setOnClickListener(v->{if(drawView!=null)drawView.revealAll(false);});
         sizeDrawDialog();
     }
@@ -285,15 +291,18 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         int w=screen.getWidth()-screen.getPaddingLeft()-screen.getPaddingRight(),h=screen.getHeight()-screen.getPaddingTop()-screen.getPaddingBottom();
         float density=getResources().getDisplayMetrics().density,font=getResources().getConfiguration().fontScale;boolean compact=h/density<440||(font>1.2f&&h/density<600);
         boolean narrow=w/density<320;int[] actions={-1,-3,-2};String[] labels={"进入对局","全部揭晓",narrow?"跳过":"跳过动画"};
-        for(int i=0;i<actions.length;i++){android.widget.Button button=drawDialog.getButton(actions[i]);if(button!=null){button.setText(labels[i]);button.setTextSize(narrow?12:14);button.setMinWidth(dp(44));button.setMinimumWidth(dp(44));button.setPadding(dp(8),0,dp(8),0);}}
-        TextView heading=window.getDecorView().findViewWithTag("game_dialog_title");if(heading!=null){heading.setTextSize(compact?15:19);heading.setPadding(dp(20),dp(compact?8:18),dp(20),dp(compact?6:12));}
-        TextView detail=window.getDecorView().findViewWithTag("skill_draw_detail");int detailHeight=dp(compact?(font>1.2f?36:24):(font>1.2f?72:58));
+        for(int i=0;i<actions.length;i++){android.widget.Button button=drawDialog.getButton(actions[i]);if(button!=null){button.setText(labels[i]);button.setTextSize(narrow?12:13);button.setMinWidth(dp(44));button.setMinimumWidth(dp(44));button.setMinHeight(dp(44));button.setPadding(dp(8),0,dp(8),0);
+            GradientDrawable action=new GradientDrawable();action.setColor(0xff1d333f);action.setCornerRadius(dp(4));action.setStroke(dp(1),0xff52616a);button.setBackground(new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(GameDesign.RIPPLE),action,null));
+            if(button.getLayoutParams() instanceof android.view.ViewGroup.MarginLayoutParams){android.view.ViewGroup.MarginLayoutParams lp=(android.view.ViewGroup.MarginLayoutParams)button.getLayoutParams();lp.leftMargin=dp(3);lp.rightMargin=dp(3);button.setLayoutParams(lp);}
+        }}
+        TextView heading=window.getDecorView().findViewWithTag("game_dialog_title");if(heading!=null){heading.setTextSize(compact?14:16);heading.setPadding(dp(16),dp(10),dp(16),dp(8));}
+        TextView detail=window.getDecorView().findViewWithTag("skill_draw_detail");int detailHeight=dp(font>1.2f?52:44);
         if(detail!=null){android.view.ViewGroup.LayoutParams lp=detail.getLayoutParams();lp.height=detailHeight;detail.setLayoutParams(lp);}
-        int available=Math.max(dp(48),h-dp(16)-dp((int)((compact?34:66)*Math.max(1,font)))-detailHeight-dp((int)(56*Math.max(1,font))));
-        int artHeight=Math.min(dp(w<h?560:230),available);
+        int available=Math.max(dp(48),h-dp(16)-dp((int)(36*Math.max(1,font)))-detailHeight-dp((int)(56*Math.max(1,font))));
+        int artHeight=Math.min(dp(w<h?520:340),available);
         // On short landscape screens scroll the manuscript grid, rather than shrinking full copy to illegibility.
         ScrollView manuscripts=(ScrollView)drawView.getParent();manuscripts.setLayoutParams(new LinearLayout.LayoutParams(-1,artHeight));
-        drawView.setLayoutParams(new ScrollView.LayoutParams(-1,Math.max(artHeight,dp((int)(252*Math.min(1.3f,Math.max(1,font)))))));
+        drawView.setLayoutParams(new ScrollView.LayoutParams(-1,Math.max(artHeight,dp((int)(288*Math.min(1.3f,Math.max(1,font)))))));
         window.setLayout(Math.min(dp(900),Math.max(dp(180),w-dp(16))),android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
     }
     private void showSkillCard(int slot){
