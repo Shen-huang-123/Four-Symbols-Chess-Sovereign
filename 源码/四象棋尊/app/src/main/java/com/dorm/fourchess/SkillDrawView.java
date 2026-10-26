@@ -36,11 +36,10 @@ final class SkillDrawView extends View {
             RectF r=cards[i];float t=progress(i),age=flips[i]<0?9999:SystemClock.uptimeMillis()-flips[i];boolean face=flips[i]>=0&&t>=.5f;
             boolean active=flips[i]>=0&&age<820&&motion();moving|=active;
             int ink=face?SkillCardTheme.forSkill(hand[i]).edge:GameDesign.GOLD;
-            if(active&&age>=160){float a=Math.max(0,1-(age-160)/660f);p.setStyle(Paint.Style.FILL);p.setShader(new RadialGradient(r.centerX(),r.centerY(),Math.max(1,r.width()*.9f),GameDesign.alpha(ink,(int)(60*a)),GameDesign.alpha(ink,0),Shader.TileMode.CLAMP));c.drawRoundRect(r,dp(8),dp(8),p);p.setShader(null);}
             c.save();float sx=flips[i]<0?1:Math.max(.035f,Math.abs((float)Math.cos(t*Math.PI)));c.scale(sx,1,r.centerX(),r.centerY());float radius=Math.min(dp(8),r.height()*.08f);
-            if(face){cardPainter.draw(c,r,hand[i],charges[i],selected==i,charges[i]==0,charges[i]==0?"已用尽":"",r.height()<dp(76),active?Math.max(0,Math.min(1,(age-160)/660f)):0);}
+            if(face){cardPainter.draw(c,r,hand[i],charges[i],selected==i,charges[i]==0,charges[i]==0?"已用尽":"",false,0);}
             else{
-                p.setStyle(Paint.Style.FILL);p.setColor(Color.WHITE);p.setShader(new LinearGradient(r.left,r.top,r.right,r.bottom,GameDesign.PANEL_RAISED,GameDesign.NIGHT,Shader.TileMode.CLAMP));c.drawRoundRect(r,radius,radius,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.8f));p.setColor(GameDesign.EDGE);c.drawRoundRect(r,radius,radius,p);RectF inner=new RectF(r);inner.inset(dp(4),dp(4));p.setStrokeWidth(dp(.45f));c.drawRoundRect(inner,radius,radius,p);float seal=Math.min(r.width(),r.height())*.19f;c.drawCircle(r.centerX(),r.centerY(),seal,p);p.setStyle(Paint.Style.FILL);
+                p.setStyle(Paint.Style.FILL);p.setColor(0xff1b2b36);c.drawRoundRect(r,radius,radius,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.8f));p.setColor(GameDesign.EDGE);c.drawRoundRect(r,radius,radius,p);float seal=Math.min(r.width(),r.height())*.19f;c.drawCircle(r.centerX(),r.centerY(),seal,p);p.setStyle(Paint.Style.FILL);
                 label(c,"四 象 秘 卷",r.centerX(),r.top+r.height()*.16f,Math.min(sp(10),r.height()*.12f),GameDesign.SECONDARY);label(c,"秘",r.centerX(),r.centerY(),Math.min(sp(32),r.height()*.27f),GameDesign.GOLD);label(c,"点击揭晓",r.centerX(),r.top+r.height()*.85f,Math.min(sp(10),r.height()*.12f),GameDesign.SECONDARY);
             }c.restore();
         }

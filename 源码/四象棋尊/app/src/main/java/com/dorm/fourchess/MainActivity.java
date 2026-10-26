@@ -265,7 +265,8 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         int owner=board.skillViewer();if(owner<0||owner>3||handRevealed[owner])return;
         int[] hand=board.skillHand(owner);for(int id:hand)if(id<1||id>SkillRules.COUNT)return;
         LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(12),0,dp(12),0);
-        int[] charges=new int[hand.length];for(int i=0;i<hand.length;i++)charges[i]=board.skillRemaining(owner,hand[i]);drawView=new SkillDrawView(this,hand,charges);content.addView(drawView,new LinearLayout.LayoutParams(-1,0,1));
+        int[] charges=new int[hand.length];for(int i=0;i<hand.length;i++)charges[i]=board.skillRemaining(owner,hand[i]);drawView=new SkillDrawView(this,hand,charges);
+        ScrollView manuscripts=new ScrollView(this);manuscripts.setFillViewport(true);manuscripts.setClipToPadding(false);manuscripts.addView(drawView,new ScrollView.LayoutParams(-1,-2));content.addView(manuscripts,new LinearLayout.LayoutParams(-1,0,1));
         TextView detail=text("点击秘卷逐张翻开 · 也可全部揭晓",12,GameDesign.SECONDARY);detail.setTag("skill_draw_detail");detail.setGravity(Gravity.CENTER);detail.setMaxLines(3);detail.setEllipsize(android.text.TextUtils.TruncateAt.END);detail.setPadding(dp(4),dp(4),dp(4),dp(4));content.addView(detail,new LinearLayout.LayoutParams(-1,dp(getResources().getConfiguration().fontScale>1.2f?72:58)));
         drawDialog=new AlertDialog.Builder(this).setView(content).setPositiveButton("进入对局",null).setNeutralButton("全部揭晓",null).setNegativeButton("跳过动画",null).create();
         final AlertDialog shown=drawDialog;final int generation=board.skillGeneration();
@@ -289,7 +290,10 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         TextView detail=window.getDecorView().findViewWithTag("skill_draw_detail");int detailHeight=dp(compact?(font>1.2f?36:24):(font>1.2f?72:58));
         if(detail!=null){android.view.ViewGroup.LayoutParams lp=detail.getLayoutParams();lp.height=detailHeight;detail.setLayoutParams(lp);}
         int available=Math.max(dp(48),h-dp(16)-dp((int)((compact?34:66)*Math.max(1,font)))-detailHeight-dp((int)(56*Math.max(1,font))));
-        int artHeight=Math.min(dp(w<h?560:230),available);drawView.setLayoutParams(new LinearLayout.LayoutParams(-1,artHeight));
+        int artHeight=Math.min(dp(w<h?560:230),available);
+        // On short landscape screens scroll the manuscript grid, rather than shrinking full copy to illegibility.
+        ScrollView manuscripts=(ScrollView)drawView.getParent();manuscripts.setLayoutParams(new LinearLayout.LayoutParams(-1,artHeight));
+        drawView.setLayoutParams(new ScrollView.LayoutParams(-1,Math.max(artHeight,dp((int)(252*Math.min(1.3f,Math.max(1,font)))))));
         window.setLayout(Math.min(dp(900),Math.max(dp(180),w-dp(16))),android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
     }
     private void showSkillCard(int slot){

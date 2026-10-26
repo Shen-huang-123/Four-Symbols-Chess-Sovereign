@@ -26,6 +26,12 @@ public final class CardQualityProbe extends Instrumentation {
         int[] totals=new int[3];for(int id=1;id<=30;id++){SkillCardTheme t=SkillCardTheme.forSkill(id);check(t!=null,"all skill IDs have a shared quality theme "+id);totals[t.pattern]++;}
         check(totals[0]==6&&totals[1]==10&&totals[2]==14,"mapping retains original six legendary ten rare fourteen common skills");check(SkillCardTheme.forSkill(29)==SkillCardTheme.COMMON&&SkillCardTheme.label(29).contains("整活"),"weak entertainment identity retained");
         for(SkillCardTheme t:new SkillCardTheme[]{SkillCardTheme.LEGENDARY,SkillCardTheme.RARE,SkillCardTheme.COMMON})for(int bg:new int[]{t.deep,t.middle,t.light}){check(contrast(t.title,bg)>=4.5,"title contrast >=4.5 "+t.key);check(contrast(t.body,bg)>=4.5,"description contrast >=4.5 "+t.key);}
+        SkillCardPainter copyPainter=new SkillCardPainter(getTargetContext());float density=getTargetContext().getResources().getDisplayMetrics().density;
+        for(int id=1;id<=30;id++)for(int width:new int[]{146,192,320}){
+            String copy=SkillRules.DETAILS[id-1];android.text.StaticLayout lines=copyPainter.description(copy,width*density,36*density,11*density,SkillCardTheme.forSkill(id).body);
+            check(lines.getText().toString().equals(copy)&&lines.getLineEnd(lines.getLineCount()-1)==copy.length(),"complete unabridged description "+id+"/"+width);
+            check(lines.getHeight()<=36*density+1,"wrapped description fits allotted height "+id+"/"+width);
+        }
         renderSheet(420,420,false,"quality-full.png");renderSheet(360,130,true,"quality-compact.png");
         SkillDrawView draw=new SkillDrawView(getTargetContext(),new int[]{6,7,1,29},new int[]{3,2,1,0});float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(420*d),h=Math.round(390*d);draw.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));draw.layout(0,0,w,h);draw.revealAll(false);
         check(draw.allRevealed(),"skip preserves fully revealed card presentation");String node=draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();check(node.contains("传说")&&node.contains("剩余3次")&&node.contains("天遁"),"revealed quality name and actual charges accessible");check(draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(2).getContentDescription().toString().contains("稀有"),"rare presentation uses shared label");
