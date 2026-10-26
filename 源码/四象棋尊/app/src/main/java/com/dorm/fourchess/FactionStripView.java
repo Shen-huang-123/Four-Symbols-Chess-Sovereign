@@ -12,6 +12,7 @@ final class FactionStripView extends View {
     private int columns=4;
     private int active,seconds;private long turnChangedAt;
     private final boolean[] alive={true,true,true,true};
+    private final String[] treaties={"","","",""};
     private final int[] colors=GameDesign.factionInks();
     private final String[] titles={"红尘弈心","花间一弈","清风入弈","金陵弈梦"};
     private final String[] factions={"南 · 红方","西 · 绿方","北 · 蓝方","东 · 金方"};
@@ -21,6 +22,7 @@ final class FactionStripView extends View {
     void setColumns(int value){if(columns!=value){columns=value;invalidate();}}
     void setActivePlayer(int value,int elapsed){if(active!=value)turnChangedAt=android.os.SystemClock.uptimeMillis();active=value;seconds=elapsed;invalidate();}
     void setAlive(int owner,boolean value){alive[owner]=value;invalidate();}
+    void setTreaty(int owner,String value){if(!treaties[owner].equals(value)){treaties[owner]=value;invalidate();}StringBuilder info=new StringBuilder("四方角色与行动状态");for(int i=0;i<4;i++)info.append('，').append(titles[i]).append(' ').append(alive[i]?treaties[i]:"退场");setContentDescription(info);}
     private void fit(String label,float width,float size){paint.setTextSize(size);float measured=paint.measureText(label);if(measured>width&&measured>0)paint.setTextSize(size*width/measured);}
     @Override protected void onDraw(Canvas c){
         super.onDraw(c);float d=getResources().getDisplayMetrics().density;int rows=4/columns;float rowH=getHeight()/(float)rows,gap=4*d,h=rowH-(rows==2?gap:0),cw=(getWidth()-gap*(columns-1))/columns;
@@ -38,7 +40,7 @@ final class FactionStripView extends View {
             paint.setTextAlign(Paint.Align.LEFT);paint.setTypeface(GameDesign.EMPHASIS);paint.setColor(current?GameDesign.TEXT:GameDesign.SECONDARY);paint.setTextSize(h*.29f);String shown=android.text.TextUtils.ellipsize(titles[i],paint,Math.max(1,available-(current?10*d:0)),android.text.TextUtils.TruncateAt.END).toString();c.drawText(shown,tx,h*.42f,paint);
             if(current){paint.setColor(0xffe6c58b);float markX=right-3*d,markY=h*.30f;Path mark=new Path();mark.moveTo(markX,markY-2.2f*d);mark.lineTo(markX+2.2f*d,markY);mark.lineTo(markX,markY+2.2f*d);mark.lineTo(markX-2.2f*d,markY);mark.close();c.drawPath(mark,paint);}
             paint.setTypeface(Typeface.DEFAULT);paint.setColor(current?GameDesign.GOLD:GameDesign.MUTED);fit(factions[i],available*.51f,h*.205f);c.drawText(factions[i],tx,h*.77f,paint);
-            String state=!alive[i]?"退场":current?String.format(java.util.Locale.CHINA,"%02d:%02d",seconds/60,seconds%60):"候场";
+            String state=!alive[i]?"退场":current?String.format(java.util.Locale.CHINA,"%02d:%02d",seconds/60,seconds%60):treaties[i].isEmpty()?"候场":treaties[i];
             paint.setTextAlign(Paint.Align.RIGHT);paint.setTypeface(Typeface.DEFAULT_BOLD);paint.setColor(current?GameDesign.GOLD_BRIGHT:GameDesign.MUTED);fit(state,available*.45f,h*.255f);c.drawText(state,right,h*.77f,paint);
             if(current){float t=Math.min(1,(android.os.SystemClock.uptimeMillis()-turnChangedAt)/280f);paint.setColor(colors[i]);c.drawRoundRect(tx,h-3*d,tx+available*(1-(1-t)*(1-t)),h-2*d,d,d,paint);boolean motion=android.os.Build.VERSION.SDK_INT<26||android.animation.ValueAnimator.areAnimatorsEnabled();
                 long age=android.os.SystemClock.uptimeMillis()-turnChangedAt;

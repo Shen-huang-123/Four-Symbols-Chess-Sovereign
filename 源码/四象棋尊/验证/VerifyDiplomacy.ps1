@@ -1,0 +1,44 @@
+param([string[]]$CaseNames=@())
+$ErrorActionPreference='Stop'
+$adb='D:\Android Studio\Sdk\platform-tools\adb.exe'
+& $adb shell settings put secure immersive_mode_confirmations confirmed
+$cases=@(
+@{Name='portrait';Size='1272x2800';Density=480;Orientation='portrait';Font='1.0';Motion='1'},
+@{Name='landscape';Size='1272x2800';Density=480;Orientation='landscape';Font='1.0';Motion='1'},
+@{Name='low-height';Size='720x1280';Density=480;Orientation='landscape';Font='1.0';Motion='1'},
+@{Name='font150';Size='1272x2800';Density=560;Orientation='portrait';Font='1.5';Motion='1'},
+@{Name='tablet';Size='1600x2560';Density=320;Orientation='landscape';Font='1.0';Motion='1'},
+@{Name='reduced-motion';Size='1272x2800';Density=480;Orientation='portrait';Font='1.0';Motion='0'}
+)
+if($CaseNames.Count){$cases=@($cases | Where-Object { $_.Name -in $CaseNames })}
+function Wait-TestDevice {
+ for($retry=0;$retry -lt 45;$retry++){
+  $state=(& $adb get-state 2>$null)
+  if($state -eq 'device' -and (& $adb shell getprop sys.boot_completed 2>$null) -eq '1'){return}
+  Start-Sleep -Seconds 1
+ }
+ throw 'Emulator did not reconnect after display reconfiguration'
+}
+try{foreach($case in $cases){
+ & $adb shell wm size $case.Size
+ Wait-TestDevice
+ $actual=(& $adb shell wm size) -join " "
+ if(([regex]::Matches($actual,"(?:Physical|Override) size: (\d+x\d+)"))[-1].Groups[1].Value -ne $case.Size){throw ("Emulator size was clamped: "+$actual)}
+ & $adb shell wm density $case.Density
+ Wait-TestDevice
+ & $adb shell settings put system font_scale $case.Font
+ & $adb shell settings put global animator_duration_scale $case.Motion
+ & $adb shell am force-stop com.dorm.fourchess
+ $path=Join-Path $PSScriptRoot ('v5.1-diplomacy-'+$case.Name+'.txt')
+ & $adb shell am instrument -w -e network $(if($case.Name -eq 'portrait'){'true'}else{'false'}) -e orientation $case.Orientation com.dorm.fourchess.test/com.dorm.fourchess.DiplomacyProbe | Set-Content -LiteralPath $path -Encoding utf8
+ $log=Get-Content -LiteralPath $path -Raw
+ if($log -match 'FAIL|crashed' -or $log -notmatch 'DIPLOMACY COMPLETE'){Write-Output $log;throw ('Diplomacy flow failed: '+$case.Name)}
+ Write-Output ($case.Name+' PASS '+[regex]::Matches($log,'(?m)^PASS ').Count+' checks')
+ foreach($frame in @('treaties','surrender','match')){
+  $info=[Diagnostics.ProcessStartInfo]::new($adb);$info.UseShellExecute=$false;$info.RedirectStandardOutput=$true;$info.Arguments='exec-out run-as com.dorm.fourchess cat files/diplomacy-'+$frame+'.png'
+  $process=[Diagnostics.Process]::Start($info);$out=[IO.File]::Create((Join-Path $PSScriptRoot ('v5.1-diplomacy-'+$case.Name+'-'+$frame+'.png')))
+  try{$process.StandardOutput.BaseStream.CopyTo($out)}finally{$out.Dispose()};$process.WaitForExit();if($process.ExitCode -ne 0){throw 'Screenshot export failed'}
+ }
+}}finally{& $adb shell settings put global animator_duration_scale 1}
+
+

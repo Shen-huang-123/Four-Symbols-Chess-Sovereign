@@ -706,7 +706,7 @@
   {
     "tag": "v5.0",
     "title": "四象棋尊 v5.0 · 秘术品质动效",
-    "apk": "安装包/最新版/四象棋尊-v5.0.apk",
+    "apk": "安装包/历史版本/四象棋尊-v5.0.apk",
     "size": 6213232,
     "sha256": "1af4e6704c9d6b90ae42265e01ac237f4fb0b1155b45d968fa236bba038851aa",
     "manifest": {
@@ -718,5 +718,21 @@
     "notes": "发布/说明/v5.0.md",
     "checksum": "发布/说明/SHA256SUMS-v5.0.txt",
     "download_name": "Four-Symbols-Chess-Sovereign-v5.0.apk"
+  },
+  {
+    "tag": "v5.1",
+    "title": "四象棋尊 v5.1 · 盟约与投降",
+    "apk": "安装包/最新版/四象棋尊-v5.1.apk",
+    "size": 6222504,
+    "sha256": "e08b25e997549dd58d91441128d77940c98f5ea028baeeb3b416796480c16d0f",
+    "manifest": {
+      "versionCode": 51,
+      "package": "com.dorm.fourchess",
+      "versionName": "5.1.0"
+    },
+    "source": "完整源码",
+    "notes": "发布/说明/v5.1.md",
+    "checksum": "发布/说明/SHA256SUMS-v5.1.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v5.1.apk"
   }
 ]

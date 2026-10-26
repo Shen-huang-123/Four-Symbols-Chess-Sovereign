@@ -23,6 +23,7 @@ final class ActionGlyph extends Drawable {
         else if(type==4){canvas.drawRoundRect(4,3,20,21,2,2,p);for(int i=0;i<3;i++){float y=7+i*5;canvas.drawCircle(8,y,.5f,p);canvas.drawLine(11,y,17,y,p);}}
         else if(type==5){canvas.drawLine(10,3,4,3,p);canvas.drawLine(4,3,4,21,p);canvas.drawLine(4,21,10,21,p);canvas.drawLine(10,12,22,12,p);canvas.drawLine(17,7,22,12,p);canvas.drawLine(22,12,17,17,p);}
         else if(type==6){Path star=new Path();star.moveTo(12,2);star.lineTo(15,9);star.lineTo(22,12);star.lineTo(15,15);star.lineTo(12,22);star.lineTo(9,15);star.lineTo(2,12);star.lineTo(9,9);star.close();canvas.drawPath(star,p);canvas.drawLine(19,2,19,6,p);canvas.drawLine(17,4,21,4,p);}
+        else if(type==7){canvas.drawRoundRect(2,8,14,16,4,4,p);canvas.drawRoundRect(10,8,22,16,4,4,p);canvas.drawLine(8,12,16,12,p);canvas.drawLine(5,4,19,4,p);canvas.drawLine(5,20,19,20,p);}
         else{Path speaker=new Path();speaker.moveTo(3,9);speaker.lineTo(7,9);speaker.lineTo(12,5);speaker.lineTo(12,19);speaker.lineTo(7,15);speaker.lineTo(3,15);speaker.close();canvas.drawPath(speaker,p);if(muted){canvas.drawLine(16,9,22,15,p);canvas.drawLine(22,9,16,15,p);}else{canvas.drawArc(11,7,19,17,-65,130,false,p);canvas.drawArc(10,3,24,21,-60,120,false,p);}}
         canvas.restore();
     }
