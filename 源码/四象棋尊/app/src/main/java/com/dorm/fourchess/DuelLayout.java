@@ -49,9 +49,11 @@ final class DuelLayout extends ViewGroup {
         else if(wide){rackLeft=boardLeft;rackWidth=boardSide;rackTop=boardTop+boardSide+gap;}
         else{rackLeft=controlsLeft;rackWidth=controlsWidth;rackTop=top;}
         if(hasSkills)measureChildAt(4,rackWidth,rackHeight);
+        if(getChildCount()>5)measureChildAt(5,Math.min(w-gap*2,dp(500)),Math.min(hudHeight,dp(72)));
         measureChildAt(0,w-gap*2,hudHeight);measureChildAt(1,boardSide,boardSide);setMeasuredDimension(w,h);
     }
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+        if(getChildCount()>5){View notice=getChildAt(5);int x=(r-l-notice.getMeasuredWidth())/2,y=hudTop+(hudHeight-notice.getMeasuredHeight())/2;notice.layout(x,y,x+notice.getMeasuredWidth(),y+notice.getMeasuredHeight());}
         if(hasSkills)getChildAt(4).layout(rackLeft,rackTop,rackLeft+rackWidth,rackTop+rackHeight);
         getChildAt(0).layout(gap,hudTop,r-l-gap,hudTop+hudHeight);getChildAt(1).layout(boardLeft,boardTop,boardLeft+boardSide,boardTop+boardSide);
         getChildAt(layoutMode==WIDE?2:3).layout(controlsLeft,controlsTop,controlsLeft+controlsWidth,controlsTop+controlsHeight);

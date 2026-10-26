@@ -5,4 +5,5 @@
     <instrumentation android:name="com.dorm.fourchess.SkillRevealProbe" android:targetPackage="com.dorm.fourchess" />
     <instrumentation android:name="com.dorm.fourchess.CardQualityProbe" android:targetPackage="com.dorm.fourchess" />
     <instrumentation android:name="com.dorm.fourchess.DiplomacyProbe" android:targetPackage="com.dorm.fourchess" />
+    <instrumentation android:name="com.dorm.fourchess.AllianceUiProbe" android:targetPackage="com.dorm.fourchess" />
 </manifest>

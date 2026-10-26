@@ -39,3 +39,5 @@ __pycache__/
 !源码/四象棋尊/验证/VerifyCardQuality.ps1
 
 !源码/四象棋尊/验证/VerifyDiplomacy.ps1
+
+!源码/四象棋尊/验证/VerifyAllianceUi.ps1

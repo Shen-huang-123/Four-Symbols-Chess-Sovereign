@@ -25,6 +25,8 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private LinearLayout gameUi;
     private ModeSelectView modePage;
     private FactionStripView playerStrip;
+    private AllianceAnnouncementView allianceAnnouncement;
+    private boolean receivedNetworkState;
     private TextView status, networkStatus;
     private TextView timer, moveLog;
     private LinearLayout stateBox;
@@ -82,6 +84,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         for(Button action:new Button[]{phoneMode,phoneRules,phoneUndo,phoneSound,historyButton,phoneExit}){action.setPadding(dp(3),0,dp(3),0);mobileControls.addView(action);}
         TextView rotateHint=text("长按放大棋盘 · 横竖屏自适应",10,GameDesign.MUTED);rotateHint.setSingleLine();fitText(rotateHint,8,10);mobileControls.addView(rotateHint);
         skillRack=new SkillRackView(this);skillRack.setListener(this::showSkillCard);duel.addView(skillRack);
+        allianceAnnouncement=new AllianceAnnouncementView(this);duel.addView(allianceAnnouncement);
         screen.addView(gameUi,new FrameLayout.LayoutParams(-1,-1));
         modePage=new ModeSelectView(this);modePage.setListener(new ModeSelectView.Listener(){
             public void onLocal(){showNamesDialog(false);}
@@ -128,7 +131,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private android.graphics.drawable.Drawable panelBackground(){return frame(GameDesign.PANEL,GameDesign.EDGE,true);}
     private BattleSkin.Frame frame(int fill,int edge,boolean ornament){return new BattleSkin.Frame(fill,edge,getResources().getDisplayMetrics().density,ornament);}
 
-    private void showModePage(){modePage.onEnter();gameUi.setVisibility(android.view.View.INVISIBLE);modePage.setVisibility(android.view.View.VISIBLE);modePage.bringToFront();modePage.invalidate();screen.invalidate();}
+    private void showModePage(){if(allianceAnnouncement!=null)allianceAnnouncement.clear();modePage.onEnter();gameUi.setVisibility(android.view.View.INVISIBLE);modePage.setVisibility(android.view.View.VISIBLE);modePage.bringToFront();modePage.invalidate();screen.invalidate();}
     private void recordMove(String entry){displayedMoves.add(0,entry);moveTimes.add(0,turnSeconds);renderMoves();}
     private void clearMoves(){displayedMoves.clear();moveTimes.clear();turnSeconds=0;clockTurn=board.currentTurn();refreshClock();renderMoves();}
     private void showUndoOptions(){
@@ -153,6 +156,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         int[] tints=GameDesign.factionLights();
         status.setTextColor(tints[board.currentTurn()]);timer.setTextColor(GameDesign.GOLD_BRIGHT);stateBox.setBackground(frame(GameDesign.PANEL_RAISED,GameDesign.EDGE,false));
         for(int i=0;i<4;i++){playerStrip.setAlive(i,board.isPlayerAlive(i));playerStrip.setTreaty(i,board.allianceLabel(i));}
+        playerStrip.setAllianceMask(board.allianceMask());if(allianceAnnouncement!=null)allianceAnnouncement.reconcile(board.allianceMask());
         boolean canUndo=network==null&&board.undoCount()>0;undoButton.setEnabled(canUndo);undoButton.setAlpha(canUndo?1f:.48f);syncCompactControls();refreshClock();
     }
     private void renderMoves(){
@@ -169,7 +173,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     }
     private void hideModePage(){modePage.setVisibility(android.view.View.GONE);gameUi.setVisibility(android.view.View.VISIBLE);screen.invalidate();updateHud();}
     @Override public void onBackPressed(){if(modePage!=null&&modePage.getVisibility()==android.view.View.VISIBLE){if(matchActive)hideModePage();else super.onBackPressed();}else showExitConfirm();}
-    @Override public void onWindowFocusChanged(boolean focused){super.onWindowFocusChanged(focused);if(focused)immersive();}
+    @Override public void onWindowFocusChanged(boolean focused){super.onWindowFocusChanged(focused);if(focused){immersive();if(allianceAnnouncement!=null)allianceAnnouncement.resumeIfReady();}}
     private void immersive(){getWindow().getDecorView().setSystemUiVisibility(android.view.View.SYSTEM_UI_FLAG_FULLSCREEN|android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION|android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE);}
 
     private void syncCompactControls(){
@@ -209,7 +213,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         entryDialog=new AlertDialog.Builder(this).setTitle(title).setView(scroll).setPositiveButton(confirm,(dialog,which)->accepted.run()).setNegativeButton("取消",null).create();
         GameDialogStyle.title(entryDialog,title);entryDialog.setOnDismissListener(dialog->{entryDialog=null;screen.post(this::maybeShowSkillDraw);});entryDialog.show();GameDialogStyle.apply(entryDialog,content);
     }
-    private void startMatch(String[] names){if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();java.util.Arrays.fill(handRevealed,false);closeNetwork();board.setSkillMode(modePage.usesSkills());board.newGame();clearMoves();board.setLocalPlayer(-1);playerStrip.setPlayerNames(names);matchActive=true;hideModePage();screen.post(()->{if(network==null)maybeShowSkillDraw();});}
+    private void startMatch(String[] names){allianceAnnouncement.clear();if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();java.util.Arrays.fill(handRevealed,false);closeNetwork();board.setSkillMode(modePage.usesSkills());board.newGame();clearMoves();board.setLocalPlayer(-1);playerStrip.setPlayerNames(names);matchActive=true;hideModePage();screen.post(()->{if(network==null)maybeShowSkillDraw();});}
     private void showNamesDialog(boolean hostMode){
         LinearLayout content=entryContent();EditText[] names=new EditText[hostMode?1:4];String[] sides={"南 · 红方昵称","西 · 绿方昵称","北 · 蓝方昵称","东 · 金方昵称"};
         for(int i=0;i<names.length;i++){String label=hostMode?"我的昵称（最多12个字）":sides[i]+"（最多12个字）";TextView heading=text(label,12,0xff736450);heading.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);content.addView(heading,new LinearLayout.LayoutParams(-1,dp(28)));names[i]=nameInput(label,playerPrefs().getString(hostMode?"nickname":"local_"+i,hostMode?"棋友":PlayerNames.DEFAULTS[i]));content.addView(names[i],new LinearLayout.LayoutParams(-1,dp(48)));}
@@ -220,6 +224,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         });
     }
     private NetworkManager newNetwork(String nickname){
+        receivedNetworkState=false;
         final int session=++networkSession;
         return new NetworkManager(this,new NetworkManager.Callback(){
             private void dispatch(Runnable action){runOnUiThread(()->{if(session==networkSession&&network!=null)action.run();});}
@@ -319,12 +324,18 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private void requestDiplomacy(int actor,int action,int target){
         if(!board.canDiplomacy(actor,action,target)){toast("局势已变化，本次操作不可用");return;}
         if(network!=null){if(actor!=board.localSeat()){toast("只能操作自己的阵营");return;}if(hosting)onHostDiplomacy(actor,action,target);else{network.clientDiplomacy(actor,action,target);toast("请求已发送，等待房主同步");}}
-        else if(board.tryDiplomacy(actor,action,target))toast(board.diplomacyLog());
+        else if(board.tryDiplomacy(actor,action,target)){presentAlliance(action,actor,target);toast(board.diplomacyLog());}
+    }
+    private void presentAlliance(int action,int actor,int target){
+        if(action!=DiplomacyState.ACCEPT||!matchActive||!board.allied(actor,target))return;
+        allianceAnnouncement.reconcile(board.allianceMask());allianceAnnouncement.enqueue(actor,target,playerStrip.playerName(actor),playerStrip.playerName(target));
     }
     private void exitToLobby(){
+        allianceAnnouncement.clear();
         if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();if(skillDialog!=null)skillDialog.dismiss();if(historyDialog!=null)historyDialog.dismiss();if(entryDialog!=null)entryDialog.dismiss();if(connectionDialog!=null)connectionDialog.dismiss();closeNetwork();matchActive=false;board.newGame();board.setLocalPlayer(-1);clearMoves();showModePage();
     }
     private void connectionLost(String reason){
+        allianceAnnouncement.clear();
         if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();closeNetwork();matchActive=false;board.setLocalPlayer(9);networkStatus.setText(reason);
         if(connectionDialog==null){connectionDialog=new AlertDialog.Builder(this).setTitle("房间连接已结束").setMessage(reason).setPositiveButton("返回大厅",(dialog,which)->exitToLobby()).setCancelable(false).create();GameDialogStyle.title(connectionDialog,"房间连接已结束");connectionDialog.setOnDismissListener(dialog->connectionDialog=null);connectionDialog.show();GameDialogStyle.apply(connectionDialog,null);}
     }
@@ -408,11 +419,11 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_SHORT).show();}
     @Override public void onNetworkStatus(String s){runOnUiThread(()->networkStatus.setText(s));}
     @Override public void onAssigned(int owner){runOnUiThread(()->{board.setLocalPlayer(owner);networkStatus.setText("已入座 · "+board.ownerName(owner));});}
-    @Override public void onState(String state){runOnUiThread(()->{int oldDiplomacy=board.diplomacySerial();String before=board.exportState();board.importState(state);String after=board.exportState();if(!before.equals(after)){try{String[] header=after.split("\\|",2)[0].split(",");int sx=Integer.parseInt(header[1]),sy=Integer.parseInt(header[2]),tx=Integer.parseInt(header[3]),ty=Integer.parseInt(header[4]);if(board.diplomacySerial()!=oldDiplomacy&&board.diplomacySerial()>0){recordMove(board.diplomacyLog());if(network!=null&&board.localSeat()>=0&&board.localSeat()<4&&!board.allianceLabel(board.localSeat()).isEmpty())toast("盟约状态已更新，可在结盟/投降中查看");}else if(board.isSkillMode()&&board.lastSkill()>0){recordMove(board.skillLog());}else if(sx>=0){recordMove("联机落子 "+(char)('A'+sx)+(19-sy)+" → "+(char)('A'+tx)+(19-ty));}else clearMoves();}catch(RuntimeException ignored){}}screen.post(this::maybeShowSkillDraw);});}
+    @Override public void onState(String state){runOnUiThread(()->{int oldDiplomacy=board.diplomacySerial(),oldAlliances=board.allianceMask();String before=board.exportState();board.importState(state);String after=board.exportState();if(!before.equals(after)){try{String[] header=after.split("\\|",2)[0].split(",");int sx=Integer.parseInt(header[1]),sy=Integer.parseInt(header[2]),tx=Integer.parseInt(header[3]),ty=Integer.parseInt(header[4]);if(board.diplomacySerial()!=oldDiplomacy&&board.diplomacySerial()>0){recordMove(board.diplomacyLog());if(network!=null&&board.localSeat()>=0&&board.localSeat()<4&&!board.allianceLabel(board.localSeat()).isEmpty())toast("盟约状态已更新，可在结盟/投降中查看");}else if(board.isSkillMode()&&board.lastSkill()>0){recordMove(board.skillLog());}else if(sx>=0){recordMove("联机落子 "+(char)('A'+sx)+(19-sy)+" → "+(char)('A'+tx)+(19-ty));}else clearMoves();}catch(RuntimeException ignored){}}if(!before.equals(after)&&receivedNetworkState){int actor=board.lastDiplomacyActor(),target=board.lastDiplomacyTarget();if((oldAlliances&DiplomacyState.pair(actor,target))==0)presentAlliance(board.lastDiplomacyKind(),actor,target);}if(after.equals(state))receivedNetworkState=true;screen.post(this::maybeShowSkillDraw);});}
     @Override public void onHostMove(int owner,int sx,int sy,int tx,int ty){runOnUiThread(()->{if(board.tryNetworkMove(owner,sx,sy,tx,ty)&&network!=null)network.broadcast(board.exportState());});}
     @Override public void onHostSkill(int owner,int skill,int sx,int sy,int tx,int ty){runOnUiThread(()->{if(board.trySkill(owner,skill,sx,sy,tx,ty)&&network!=null)network.broadcast(board.exportState());});}
-    @Override public void onHostDiplomacy(int owner,int action,int target){runOnUiThread(()->{if(board.tryDiplomacy(owner,action,target)&&network!=null)network.broadcast(board.exportState());});}
-    @Override public void onDestroy(){if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();clockHandler.removeCallbacks(clockTick);closeNetwork();super.onDestroy();}
+    @Override public void onHostDiplomacy(int owner,int action,int target){runOnUiThread(()->{if(board.tryDiplomacy(owner,action,target)){presentAlliance(action,owner,target);if(network!=null)network.broadcast(board.exportState());}});}
+    @Override public void onDestroy(){if(allianceAnnouncement!=null)allianceAnnouncement.clear();if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();clockHandler.removeCallbacks(clockTick);closeNetwork();super.onDestroy();}
     private final Runnable clockTick=new Runnable(){@Override public void run(){if(matchActive){turnSeconds++;refreshClock();}clockHandler.postDelayed(this,1000);}};
     private int dp(int n){return(int)(n*getResources().getDisplayMetrics().density+.5f);}
 }

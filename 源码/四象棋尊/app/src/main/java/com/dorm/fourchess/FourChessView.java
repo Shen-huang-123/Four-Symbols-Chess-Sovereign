@@ -203,6 +203,8 @@ public class FourChessView extends View {
         float limit=radius*1.42f;float extent=Math.max(glyphBounds.width(),glyphBounds.height());if(extent>limit){p.setTextSize(p.getTextSize()*limit/extent);p.getTextBounds(glyph,0,glyph.length(),glyphBounds);}
         c.drawText(glyph,x-glyphBounds.exactCenterX(),y-glyphBounds.exactCenterY(),p);
         p.setFakeBoldText(false);p.clearShadowLayer();
+        int seals=allianceMarks(q.owner),count=Integer.bitCount(seals),index=0;float badgeRadius=Math.min(cell*.105f,cell*.49f-radius),step=badgeRadius*2+cell*.012f;
+        for(int pair=1;pair<=32;pair<<=1)if((seals&pair)!=0){AllianceMarkPainter.draw(c,x+(index-(count-1)*.5f)*step,y+radius,badgeRadius,pair,p);index++;}
     }
     private void drawAmbientGlow(Canvas c){float pulse=.72f+.28f*(float)Math.sin(animationPhase*Math.PI*2);float cx,cy;if(turn==0){cx=getWidth()*.5f;cy=getHeight();}else if(turn==1){cx=0;cy=getHeight()*.5f;}else if(turn==2){cx=getWidth()*.5f;cy=0;}else{cx=getWidth();cy=getHeight()*.5f;}int col=(colors[turn]&0x00ffffff)|((int)(58*pulse)<<24);p.setShader(new RadialGradient(cx,cy,Math.max(getWidth(),getHeight())*.55f,col,0x00000000,Shader.TileMode.CLAMP));c.drawRect(0,0,getWidth(),getHeight(),p);p.setShader(null);}
     private void drawMoveTrail(Canvas c,float pulse){float x1=ox+lastFx*cellX,y1=oy+lastFy*cellY,x2=ox+lastTx*cellX,y2=oy+lastTy*cellY;p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(cell*.07f);p.setColor(0x66ffd875);c.drawLine(x1,y1,x2,y2,p);float t=(animationPhase*3)%1f;p.setStyle(Paint.Style.FILL);p.setColor(0xeefff0a0);c.drawCircle(x1+(x2-x1)*t,y1+(y2-y1)*t,cell*(.07f+pulse*.025f),p);}
@@ -358,6 +360,11 @@ public class FourChessView extends View {
     boolean tryNetworkMove(int owner,int sx,int sy,int tx,int ty){if(owner<0||owner>3||owner!=turn||!alive[owner]||liveCount()<2)return false;Piece q=pieceAt(sx,sy);if(q==null||q.owner!=owner)return false;selected=q;moves=legalMoves(q);if(!containsMove(tx,ty)){selected=null;moves.clear();return false;}moveSelected(tx,ty);return true;}
     int localSeat(){return localPlayer;}
     int liveCount(){int count=0;for(boolean value:alive)if(value)count++;return count;}
+    int allianceMask(){return diplomacy.allies;}
+    int lastDiplomacyKind(){return diplomacy.lastKind;}
+    int lastDiplomacyActor(){return diplomacy.lastOwner;}
+    int lastDiplomacyTarget(){return diplomacy.lastTarget;}
+    int allianceMarks(int owner){return AllianceMarkPainter.forOwner(diplomacy.allies,owner);}
     boolean allied(int a,int b){return diplomacy.allied(a,b);}
     boolean treatyBroken(int a,int b){return diplomacy.broken(a,b);}
     boolean allianceOffered(int from,int to){return diplomacy.offered(from,to);}
