@@ -37,7 +37,8 @@ def request(url, method="GET", data=None, binary=False):
     for attempt in range(4):
         try:
             with urllib.request.urlopen(urllib.request.Request(url, data=content, headers=headers, method=method), timeout=120) as response:
-                return json.load(response)
+                body = response.read()
+                return json.loads(body) if body else None
         except urllib.error.HTTPError as error:
             if error.code not in (429, 500, 502, 503, 504) or attempt == 3:
                 raise RuntimeError(f"GitHub {method} returned HTTP {error.code}: {error.read().decode('utf-8', 'replace')[:500]}") from None
@@ -79,7 +80,11 @@ def prepare_tags(items, head):
     for row in items:
         tag = row["tag"]
         if tag == LATEST:
-            target = head
+            target = git("rev-parse", tag + "^{commit}") if tag in existing else head
+            if tag in existing:
+                # Release tags are immutable; later publishing-documentation commits may advance main.
+                code = "源码/四象棋尊/app"
+                assert git("rev-parse", target + ":" + code) == git("rev-parse", head + ":" + code), "Latest game source differs; publish a new version"
         elif tag == "v3.3":
             target = ORIGINAL
         elif tag in existing:
@@ -100,24 +105,32 @@ def prepare_tags(items, head):
         tags.append(tag)
     git("push", "--atomic", "origin", "main", *["refs/tags/" + tag for tag in tags])
 
+def asset_name(row, key):
+    return "Four-Symbols-Chess-Sovereign-" + row["tag"] + ".apk" if key == "apk" else (ROOT / row[key]).name
+
+def release_body(row):
+    body = (ROOT / row["notes"]).read_text(encoding="utf-8")
+    return body.replace("- APK：", "- 原始 APK 文件名：") + "\n下载附件：`" + asset_name(row, "apk") + "`（与原始 APK 内容一致）。\n"
+
 def upload(row):
     tag = row["tag"]
     # List lookup handles both new drafts and resumed releases without overwriting artifacts.
     releases = request(BASE + "/releases?per_page=100")
     release = next((item for item in releases if item["tag_name"] == tag), None)
-    body = (ROOT / row["notes"]).read_text(encoding="utf-8")
+    body = release_body(row)
     if release is None:
         release = request(BASE + "/releases", "POST", {"tag_name": tag, "name": row["title"], "body": body, "draft": True, "prerelease": False, "make_latest": "false"})
     for key in ("apk", "checksum"):
         path = ROOT / row[key]
         assets = request(BASE + f"/releases/{release['id']}/assets?per_page=100")
-        existing = next((asset for asset in assets if asset["name"] == path.name), None)
+        name = asset_name(row, key)
+        existing = next((asset for asset in assets if asset["name"] == name), None)
         payload = path.read_bytes()
         digest = "sha256:" + hashlib.sha256(payload).hexdigest()
         if existing:
             assert existing["size"] == len(payload) and existing.get("digest") == digest, "Existing asset differs: " + path.name
         else:
-            url = release["upload_url"].split("{")[0] + "?" + urllib.parse.urlencode({"name": path.name})
+            url = release["upload_url"].split("{")[0] + "?" + urllib.parse.urlencode({"name": name, "label": path.name})
             asset = request(url, "POST", payload, binary=True)
             assert asset["size"] == len(payload) and asset.get("digest") == digest, "Uploaded asset mismatch"
     result = request(BASE + f"/releases/{release['id']}", "PATCH", {"name": row["title"], "body": body, "draft": False, "prerelease": False, "make_latest": "true" if tag == LATEST else "false"})
@@ -130,7 +143,7 @@ def verify(items, head):
         assert not release["draft"] and not release["prerelease"]
         for key in ("apk", "checksum"):
             path = ROOT / row[key]
-            asset = next(item for item in release["assets"] if item["name"] == path.name)
+            asset = next(item for item in release["assets"] if item["name"] == asset_name(row, key))
             assert asset["size"] == path.stat().st_size
             assert asset.get("digest") == "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
     assert request(BASE + "/releases/latest")["tag_name"] == LATEST

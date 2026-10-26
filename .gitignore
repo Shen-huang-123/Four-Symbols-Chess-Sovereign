@@ -31,3 +31,7 @@ Thumbs.db
 !源码/四象棋尊/验证/VerifySkillMode.ps1
 !源码/四象棋尊/验证/VerifyDraftSkills.ps1
 !源码/四象棋尊/验证/VerifySkillReveal.ps1
+
+# Python release-tool caches
+__pycache__/
+*.pyc

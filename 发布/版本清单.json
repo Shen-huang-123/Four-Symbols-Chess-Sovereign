@@ -12,7 +12,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v0.5.md",
-    "checksum": "发布/说明/SHA256SUMS-v0.5.txt"
+    "checksum": "发布/说明/SHA256SUMS-v0.5.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v0.5.apk"
   },
   {
     "tag": "v0.6",
@@ -27,7 +28,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v0.6.md",
-    "checksum": "发布/说明/SHA256SUMS-v0.6.txt"
+    "checksum": "发布/说明/SHA256SUMS-v0.6.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v0.6.apk"
   },
   {
     "tag": "v0.7",
@@ -42,7 +44,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v0.7.md",
-    "checksum": "发布/说明/SHA256SUMS-v0.7.txt"
+    "checksum": "发布/说明/SHA256SUMS-v0.7.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v0.7.apk"
   },
   {
     "tag": "v0.8",
@@ -57,7 +60,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v0.8.md",
-    "checksum": "发布/说明/SHA256SUMS-v0.8.txt"
+    "checksum": "发布/说明/SHA256SUMS-v0.8.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v0.8.apk"
   },
   {
     "tag": "v0.9",
@@ -72,7 +76,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v0.9.md",
-    "checksum": "发布/说明/SHA256SUMS-v0.9.txt"
+    "checksum": "发布/说明/SHA256SUMS-v0.9.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v0.9.apk"
   },
   {
     "tag": "v1.0",
@@ -87,7 +92,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.0.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.0.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.0.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.0.apk"
   },
   {
     "tag": "v1.1",
@@ -102,7 +108,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.1.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.1.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.1.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.1.apk"
   },
   {
     "tag": "v1.2",
@@ -117,7 +124,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.2.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.2.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.2.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.2.apk"
   },
   {
     "tag": "v1.3",
@@ -132,7 +140,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.3.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.3.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.3.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.3.apk"
   },
   {
     "tag": "v1.4",
@@ -147,7 +156,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.4.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.4.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.4.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.4.apk"
   },
   {
     "tag": "v1.5",
@@ -162,7 +172,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.5.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.5.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.5.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.5.apk"
   },
   {
     "tag": "v1.6",
@@ -177,7 +188,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.6.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.6.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.6.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.6.apk"
   },
   {
     "tag": "v1.7",
@@ -192,7 +204,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.7.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.7.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.7.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.7.apk"
   },
   {
     "tag": "v1.8",
@@ -207,7 +220,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.8.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.8.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.8.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.8.apk"
   },
   {
     "tag": "v1.9",
@@ -222,7 +236,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v1.9.md",
-    "checksum": "发布/说明/SHA256SUMS-v1.9.txt"
+    "checksum": "发布/说明/SHA256SUMS-v1.9.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v1.9.apk"
   },
   {
     "tag": "v2.0",
@@ -237,7 +252,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.0.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.0.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.0.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.0.apk"
   },
   {
     "tag": "v2.1",
@@ -252,7 +268,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.1.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.1.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.1.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.1.apk"
   },
   {
     "tag": "v2.2",
@@ -267,7 +284,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.2.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.2.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.2.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.2.apk"
   },
   {
     "tag": "v2.3",
@@ -282,7 +300,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.3.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.3.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.3.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.3.apk"
   },
   {
     "tag": "v2.4",
@@ -297,7 +316,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.4.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.4.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.4.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.4.apk"
   },
   {
     "tag": "v2.5",
@@ -312,7 +332,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.5.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.5.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.5.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.5.apk"
   },
   {
     "tag": "v2.6",
@@ -327,7 +348,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.6.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.6.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.6.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.6.apk"
   },
   {
     "tag": "v2.7",
@@ -342,7 +364,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.7.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.7.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.7.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.7.apk"
   },
   {
     "tag": "v2.8",
@@ -357,7 +380,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.8.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.8.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.8.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.8.apk"
   },
   {
     "tag": "v2.9",
@@ -372,7 +396,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v2.9.md",
-    "checksum": "发布/说明/SHA256SUMS-v2.9.txt"
+    "checksum": "发布/说明/SHA256SUMS-v2.9.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v2.9.apk"
   },
   {
     "tag": "v3.0",
@@ -387,7 +412,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v3.0.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.0.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.0.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.0.apk"
   },
   {
     "tag": "v3.1",
@@ -402,7 +428,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v3.1.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.1.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.1.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.1.apk"
   },
   {
     "tag": "v3.2",
@@ -417,7 +444,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v3.2.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.2.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.2.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.2.apk"
   },
   {
     "tag": "v3.3",
@@ -432,7 +460,8 @@
     },
     "source": "完整源码",
     "notes": "发布/说明/v3.3.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.3.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.3.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.3.apk"
   },
   {
     "tag": "v3.4",
@@ -447,7 +476,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v3.4.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.4.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.4.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.4.apk"
   },
   {
     "tag": "v3.5",
@@ -462,7 +492,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v3.5.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.5.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.5.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.5.apk"
   },
   {
     "tag": "v3.6",
@@ -477,7 +508,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v3.6.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.6.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.6.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.6.apk"
   },
   {
     "tag": "v3.7",
@@ -492,7 +524,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v3.7.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.7.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.7.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.7.apk"
   },
   {
     "tag": "v3.8",
@@ -507,7 +540,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v3.8.md",
-    "checksum": "发布/说明/SHA256SUMS-v3.8.txt"
+    "checksum": "发布/说明/SHA256SUMS-v3.8.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v3.8.apk"
   },
   {
     "tag": "v4.0",
@@ -522,7 +556,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v4.0.md",
-    "checksum": "发布/说明/SHA256SUMS-v4.0.txt"
+    "checksum": "发布/说明/SHA256SUMS-v4.0.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v4.0.apk"
   },
   {
     "tag": "v4.1",
@@ -537,7 +572,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v4.1.md",
-    "checksum": "发布/说明/SHA256SUMS-v4.1.txt"
+    "checksum": "发布/说明/SHA256SUMS-v4.1.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v4.1.apk"
   },
   {
     "tag": "v4.2",
@@ -552,7 +588,8 @@
     },
     "source": "仅安装包与归档说明",
     "notes": "发布/说明/v4.2.md",
-    "checksum": "发布/说明/SHA256SUMS-v4.2.txt"
+    "checksum": "发布/说明/SHA256SUMS-v4.2.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v4.2.apk"
   },
   {
     "tag": "v4.3",
@@ -567,6 +604,7 @@
     },
     "source": "完整源码",
     "notes": "发布/说明/v4.3.md",
-    "checksum": "发布/说明/SHA256SUMS-v4.3.txt"
+    "checksum": "发布/说明/SHA256SUMS-v4.3.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v4.3.apk"
   }
 ]
