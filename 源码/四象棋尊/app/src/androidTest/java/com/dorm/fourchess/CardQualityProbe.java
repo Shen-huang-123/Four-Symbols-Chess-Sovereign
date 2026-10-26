@@ -1,0 +1,35 @@
+package com.dorm.fourchess;
+
+import android.app.*;
+import android.os.*;
+import android.graphics.*;
+import android.view.View;
+import java.io.*;
+
+/** Renders every quality through the same production painter, including compact/disabled states. */
+public final class CardQualityProbe extends Instrumentation {
+    private final StringBuilder log=new StringBuilder();
+    private void check(boolean value,String label){if(!value)throw new AssertionError(label);log.append("PASS ").append(label).append('\n');}
+    @Override public void onCreate(Bundle args){super.onCreate(args);start();}
+    private double luminance(int color){double[] rgb={Color.red(color)/255d,Color.green(color)/255d,Color.blue(color)/255d};for(int i=0;i<3;i++)rgb[i]=rgb[i]<=.04045?rgb[i]/12.92:Math.pow((rgb[i]+.055)/1.055,2.4);return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;}
+    private double contrast(int a,int b){double x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+    private int dominant(Bitmap b,RectF r,int which){int count=0,total=0;for(int y=(int)r.top+6;y<r.bottom-6;y+=2)for(int x=(int)r.left+6;x<r.right-6;x+=2){int color=b.getPixel(x,y),red=Color.red(color),green=Color.green(color),blue=Color.blue(color);total++;if(which==0?red>green*1.5&&red>blue*1.4:which==1?blue>red*1.35&&blue>green:green>red*1.3&&green>blue)count++;}return count*100/Math.max(1,total);}
+    private void renderSheet(int widthDp,int heightDp,boolean compact,String name)throws Exception{
+        float d=getTargetContext().getResources().getDisplayMetrics().density;
+        int w=Math.round(widthDp*d),h=Math.round(heightDp*d);Bitmap b=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);c.drawColor(GameDesign.NIGHT);SkillCardPainter painter=new SkillCardPainter(getTargetContext());
+        int[] ids={6,7,1,29},charges={3,2,1,0};RectF[] cells=new RectF[4];float gap=8*d;
+        for(int i=0;i<4;i++){float cw=(w-gap*3)/2,ch=(h-gap*3)/2,left=gap+(i%2)*(cw+gap),top=gap+(i/2)*(ch+gap);cells[i]=new RectF(left,top,left+cw,top+ch);painter.draw(c,cells[i],ids[i],charges[i],false,i==3,i==3?"已用尽":"",compact,0);check(cells[i].width()>0&&cells[i].height()>0,"responsive quality card geometry "+name+"/"+i);}
+        check(dominant(b,cells[0],0)>65,"legendary face is visibly red "+name);check(dominant(b,cells[1],1)>65,"rare face is visibly blue "+name);check(dominant(b,cells[2],2)>65,"common face is visibly green "+name);
+        try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),name))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
+    }
+    private void run()throws Exception{
+        int[] totals=new int[3];for(int id=1;id<=30;id++){SkillCardTheme t=SkillCardTheme.forSkill(id);check(t!=null,"all skill IDs have a shared quality theme "+id);totals[t.pattern]++;}
+        check(totals[0]==6&&totals[1]==10&&totals[2]==14,"mapping retains original six legendary ten rare fourteen common skills");check(SkillCardTheme.forSkill(29)==SkillCardTheme.COMMON&&SkillCardTheme.label(29).contains("整活"),"weak entertainment identity retained");
+        for(SkillCardTheme t:new SkillCardTheme[]{SkillCardTheme.LEGENDARY,SkillCardTheme.RARE,SkillCardTheme.COMMON})for(int bg:new int[]{t.deep,t.middle,t.light}){check(contrast(t.title,bg)>=4.5,"title contrast >=4.5 "+t.key);check(contrast(t.body,bg)>=4.5,"description contrast >=4.5 "+t.key);}
+        renderSheet(420,420,false,"quality-full.png");renderSheet(360,130,true,"quality-compact.png");
+        SkillDrawView draw=new SkillDrawView(getTargetContext(),new int[]{6,7,1,29},new int[]{3,2,1,0});float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(420*d),h=Math.round(390*d);draw.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));draw.layout(0,0,w,h);draw.revealAll(false);
+        check(draw.allRevealed(),"skip preserves fully revealed card presentation");String node=draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();check(node.contains("传说")&&node.contains("剩余3次")&&node.contains("天遁"),"revealed quality name and actual charges accessible");check(draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(2).getContentDescription().toString().contains("稀有"),"rare presentation uses shared label");
+        Bitmap b=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);draw.draw(new Canvas(b));try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-reveal.png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
+    }
+    @Override public void onStart(){Bundle result=new Bundle();try{final Throwable[] error={null};runOnMainSync(()->{try{run();}catch(Throwable e){error[0]=e;}});if(error[0]!=null)throw new AssertionError(error[0]);log.append("QUALITY COMPLETE\n");result.putString("stream",log.toString());finish(Activity.RESULT_OK,result);}catch(Throwable e){result.putString("stream",log+"FAIL "+android.util.Log.getStackTraceString(e));finish(Activity.RESULT_CANCELED,result);}}
+}

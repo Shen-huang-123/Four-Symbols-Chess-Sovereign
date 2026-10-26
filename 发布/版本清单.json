@@ -626,7 +626,7 @@
   {
     "tag": "v4.5",
     "title": "四象棋尊 v4.5 · 紧凑技能与周期抽牌",
-    "apk": "安装包/最新版/四象棋尊-v4.5.apk",
+    "apk": "安装包/历史版本/四象棋尊-v4.5.apk",
     "size": 6307893,
     "sha256": "4a30b24ca1b5d27d88f99b95aaaafdfe6a632e0872a4b2e840321ec606f1bd84",
     "manifest": {
@@ -638,5 +638,21 @@
     "notes": "发布/说明/v4.5.md",
     "checksum": "发布/说明/SHA256SUMS-v4.5.txt",
     "download_name": "Four-Symbols-Chess-Sovereign-v4.5.apk"
+  },
+  {
+    "tag": "v4.6",
+    "title": "四象棋尊 v4.6 · 技能品质卡牌",
+    "apk": "安装包/最新版/四象棋尊-v4.6.apk",
+    "size": 6315685,
+    "sha256": "44ad2adcde26bddc64094f6bc15ea8ce65b4a23f199368267666ffeab9b64735",
+    "manifest": {
+      "versionCode": 46,
+      "versionName": "4.6.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "完整源码",
+    "notes": "发布/说明/v4.6.md",
+    "checksum": "发布/说明/SHA256SUMS-v4.6.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v4.6.apk"
   }
 ]

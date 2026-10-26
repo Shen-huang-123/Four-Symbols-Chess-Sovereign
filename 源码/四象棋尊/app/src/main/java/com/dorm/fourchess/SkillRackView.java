@@ -24,11 +24,11 @@ final class SkillRackView extends ViewGroup {
             int id=hand[i],remaining=board.skillRemaining(owner,id);
             boolean ready=board.currentTurn()==owner&&board.skillAvailable(id);
             String reason=remaining==0?"次数已用完":!board.canAct()||board.currentTurn()!=owner?"等待你的回合":!ready?"暂无合法目标":"";
-            int accent=(id==7||id==30)?GameDesign.BLUE_LIGHT:(id==15||id==24)?GameDesign.GREEN_LIGHT:SkillRules.tierColor(id);
+            int accent=SkillCardTheme.forSkill(id).edge;
             Tile tile=tiles[i];tile.title=revealed?SkillRules.name(id):"未揭晓秘卷";tile.description=revealed?shortDescription(id):"点击揭晓本轮技能";
-            tile.remaining=revealed?remaining:-1;tile.accent=accent;tile.setText(tile.title);tile.setEnabled(!revealed||ready);
-            tile.setSelected(revealed&&board.selectedSkill()==id);tile.setAlpha(!revealed||ready?1f:.52f);
-            tile.setContentDescription(revealed?tile.title+"，剩余"+remaining+"次，"+SkillRules.DETAILS[id-1]+(reason.isEmpty()?"":"，"+reason):"第"+(i+1)+"张技能，点击揭晓");
+            tile.skillId=id;tile.reason=reason;tile.revealed=revealed;tile.remaining=revealed?remaining:-1;tile.accent=accent;tile.setText(tile.title);tile.setEnabled(!revealed||ready);
+            tile.setSelected(revealed&&board.selectedSkill()==id);tile.setAlpha(1f);
+            tile.setContentDescription(revealed?SkillCardTheme.label(id)+"，"+tile.title+"，剩余"+remaining+"次，"+SkillRules.DETAILS[id-1]+(reason.isEmpty()?"":"，"+reason):"第"+(i+1)+"张技能，点击揭晓");
             tile.refreshBackground();tile.invalidate();
         }
     }
@@ -43,20 +43,15 @@ final class SkillRackView extends ViewGroup {
         for(int i=0;i<tiles.length;i++){int x=(i%cols)*(tw+gap),top=y+(i/cols)*(th+gap);tiles[i].layout(x,top,x+tw,top+th);}
     }
     private final class Tile extends Button {
-        String title="",description="";int remaining,accent;final TextPaint paint=new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        String title="",description="",reason="";int remaining,accent,skillId;boolean revealed;private long selectedAt=-1000;private final SkillCardPainter painter=new SkillCardPainter(getContext());
         Tile(Context c){super(c);setAllCaps(false);setMinWidth(0);setMinimumWidth(0);setMinHeight(0);setMinimumHeight(0);setPadding(0,0,0,0);setSingleLine(true);setWillNotDraw(false);setElevation(dp(1));}
-        void refreshBackground(){
-            StateListDrawable states=new StateListDrawable();states.addState(new int[]{android.R.attr.state_pressed},surface(0xee314959,GameDesign.GOLD_BRIGHT));states.addState(new int[]{android.R.attr.state_selected},surface(0xee263d50,GameDesign.GOLD_BRIGHT));states.addState(new int[]{},surface(0xd51b3040,isEnabled()?0x997f8f93:GameDesign.EDGE_QUIET));setBackground(states);setWillNotDraw(false);
-        }
-        GradientDrawable surface(int fill,int edge){GradientDrawable d=new GradientDrawable();d.setColor(fill);d.setCornerRadius(dp(7));d.setStroke(Math.max(1,dp(.7f)),edge);return d;}
+        void refreshBackground(){setBackgroundColor(android.graphics.Color.TRANSPARENT);setWillNotDraw(false);}
+        @Override public void setSelected(boolean value){if(value&&!isSelected())selectedAt=android.os.SystemClock.uptimeMillis();super.setSelected(value);}
         @Override protected void onDraw(Canvas c){
-            c.save();c.translate(getScrollX(),getScrollY());float sd=getResources().getDisplayMetrics().scaledDensity,h=getHeight(),pad=dp(10),badge=dp(18),cx=getWidth()-pad-badge/2,cy=pad+badge/2;
-            paint.setColor(isSelected()?GameDesign.GOLD_BRIGHT:accent);c.drawRoundRect(pad/2,dp(10),pad/2+dp(2),h-dp(10),dp(1),dp(1),paint);
-            paint.setColor(0x553f596b);c.drawCircle(cx,cy,badge/2,paint);paint.setColor(GameDesign.GOLD_BRIGHT);paint.setTypeface(GameDesign.EMPHASIS);paint.setTextSize(Math.min(11*sd,h*.26f));paint.setTextAlign(Paint.Align.CENTER);
-            Paint.FontMetrics fm=paint.getFontMetrics();c.drawText(remaining<0?"?":String.valueOf(remaining),cx,cy-(fm.ascent+fm.descent)/2,paint);
-            paint.setTextAlign(Paint.Align.LEFT);paint.setTextSize(Math.min(14*sd,h*.32f));paint.setColor(GameDesign.GOLD_BRIGHT);paint.setTypeface(GameDesign.EMPHASIS);
-            String heading=TextUtils.ellipsize(title,paint,Math.max(1,getWidth()-pad*2-badge-dp(6)),TextUtils.TruncateAt.END).toString();fm=paint.getFontMetrics();c.drawText(heading,pad,h*.32f-(fm.ascent+fm.descent)/2,paint);
-            paint.setTypeface(GameDesign.BODY);paint.setTextSize(Math.min(10*sd,h*.24f));paint.setColor(GameDesign.SECONDARY);String detail=TextUtils.ellipsize(description,paint,Math.max(1,getWidth()-pad*2),TextUtils.TruncateAt.END).toString();fm=paint.getFontMetrics();c.drawText(detail,pad,h*.73f-(fm.ascent+fm.descent)/2,paint);c.restore();
+            c.save();c.translate(getScrollX(),getScrollY());RectF rect=new RectF(dp(1),dp(1),getWidth()-dp(1),getHeight()-dp(2));
+            if(revealed){boolean motion=android.os.Build.VERSION.SDK_INT<26||android.animation.ValueAnimator.areAnimatorsEnabled();float shine=isSelected()&&motion?(android.os.SystemClock.uptimeMillis()-selectedAt)/340f:0;painter.draw(c,rect,skillId,remaining,isSelected()||isPressed(),!isEnabled(),remaining==0?"已用尽":reason,true,shine);if(shine>0&&shine<1)postInvalidateOnAnimation();}
+            else{android.graphics.Paint p=new android.graphics.Paint(3);p.setColor(GameDesign.PANEL_RAISED);c.drawRoundRect(rect,dp(7),dp(7),p);p.setColor(GameDesign.GOLD_BRIGHT);p.setTextSize(Math.min(13*getResources().getDisplayMetrics().scaledDensity,getHeight()*.26f));p.setTypeface(GameDesign.EMPHASIS);p.setTextAlign(Paint.Align.CENTER);c.drawText("秘卷 · 点击揭晓",getWidth()/2f,getHeight()/2f-(p.ascent()+p.descent())/2,p);}
+            c.restore();
         }
         @Override public boolean onTouchEvent(MotionEvent e){if(isEnabled()){if(e.getActionMasked()==MotionEvent.ACTION_DOWN)animate().scaleX(.985f).scaleY(.985f).setDuration(80).start();else if(e.getActionMasked()==MotionEvent.ACTION_UP||e.getActionMasked()==MotionEvent.ACTION_CANCEL)animate().scaleX(1).scaleY(1).setDuration(100).start();}return super.onTouchEvent(e);}
     }

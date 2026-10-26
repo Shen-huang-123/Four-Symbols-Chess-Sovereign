@@ -2,7 +2,7 @@
 
 四人象棋 Android 游戏，支持同屏对局、局域网联机、自定义昵称、棋谱、悔棋和音效，采用国风二次元主题。
 
-- [下载最新版 Release](https://github.com/Shen-huang-123/Four-Symbols-Chess-Sovereign/releases/latest) · [全部版本发布记录](发布/版本记录.md) · [仓库中的 v4.5 APK](安装包/最新版/四象棋尊-v4.5.apk)。
+- [下载最新版 Release](https://github.com/Shen-huang-123/Four-Symbols-Chess-Sovereign/releases/latest) · [全部版本发布记录](发布/版本记录.md) · [仓库中的 v4.6 APK](安装包/最新版/四象棋尊-v4.6.apk)。
 - Android Studio 打开 `源码/四象棋尊`；需要 Android SDK 35。构建命令在下方。
 - 仓库保留完整源码、当前安装包及书面说明，生成缓存、历史安装包和临时验收截图未纳入版本管理。
 
@@ -14,8 +14,8 @@
 
 ## 当前版本
 
-- 应用版本：4.5.0
-- 当前安装包：`安装包/最新版/四象棋尊-v4.5.apk`
+- 应用版本：4.6.0
+- 当前安装包：`安装包/最新版/四象棋尊-v4.6.apk`
 - 包名：`com.dorm.fourchess`
 - 最低系统：Android 6.0（API 23）
 - 目标系统：Android 15（API 35）
@@ -57,7 +57,15 @@
 
 当前工程将构建文件输出到：
 
-`app/build-v45/outputs/apk/debug/app-debug.apk`
+`app/build-v46/outputs/apk/debug/app-debug.apk`
+
+## v4.6 技能品质卡牌
+
+- 传说红金、稀有蓝银、常规绿玉完整卡面，抽卡和对局技能区共用主题。
+- 品质徽章、真实×N次数、双边框、低对比纹样和短促选中扫光。
+- 抽卡页两列两行，保留全部揭晓、跳过和进入对局；大字体横屏单独压缩外围空间。
+- 规则、效果、随机次数与换牌协议不变；可与v4.5技能联机。
+- 7716项检查通过；[修改文件和验收结果](源码/四象棋尊/验证/v4.6-技能品质卡牌验收.md) · [主题规范及预览](源码/四象棋尊/设计规范/技能卡牌品质系统.md)。
 
 ## v4.5 紧凑技能与周期抽牌
 

@@ -35,3 +35,5 @@ Thumbs.db
 # Python release-tool caches
 __pycache__/
 *.pyc
+
+!源码/四象棋尊/验证/VerifyCardQuality.ps1

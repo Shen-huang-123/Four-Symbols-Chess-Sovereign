@@ -17,7 +17,7 @@ foreach($case in $cases){
     & $adb shell wm density $case.Density
     & $adb shell settings put system font_scale $case.Font
     & $adb shell am force-stop com.dorm.fourchess
-    $path=Join-Path $PSScriptRoot ('v4.5-players-'+$case.Name+'.txt')
+    $path=Join-Path $PSScriptRoot ('v4.6-players-'+$case.Name+'.txt')
     & $adb shell am instrument -w -e orientation $case.Orientation -e network $case.Network -e keyboard true com.dorm.fourchess.test/com.dorm.fourchess.PlayerFlowProbe | Set-Content -LiteralPath $path -Encoding utf8
     $log=Get-Content -LiteralPath $path -Raw
     if($log -match 'FAIL|crashed' -or $log -notmatch 'port is reusable after leaving room'){Write-Output $log;throw ('Player flow failed: '+$case.Name)}
@@ -26,7 +26,7 @@ foreach($case in $cases){
     $frames=@('name-form','name-keyboard','selected-piece','undo-options','local-match','history','rules','exit-confirm','final-lobby');if($case.Network -eq 'true'){$frames+=@('host-roster','client-match')}
     foreach($frame in $frames){
         $info=[Diagnostics.ProcessStartInfo]::new($adb);$info.UseShellExecute=$false;$info.RedirectStandardOutput=$true;$info.Arguments='exec-out run-as com.dorm.fourchess cat files/players-'+$frame+'.png'
-        $process=[Diagnostics.Process]::Start($info);$out=[IO.File]::Create((Join-Path $PSScriptRoot ('v4.5-'+$case.Name+'-'+$frame+'.png')))
+        $process=[Diagnostics.Process]::Start($info);$out=[IO.File]::Create((Join-Path $PSScriptRoot ('v4.6-'+$case.Name+'-'+$frame+'.png')))
         try{$process.StandardOutput.BaseStream.CopyTo($out)}finally{$out.Dispose()};$process.WaitForExit();if($process.ExitCode -ne 0){throw 'Screenshot export failed'}
     }
 }
