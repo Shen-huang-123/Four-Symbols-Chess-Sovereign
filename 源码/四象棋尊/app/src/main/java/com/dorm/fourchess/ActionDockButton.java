@@ -17,7 +17,7 @@ final class ActionDockButton extends Button {
     }
     @Override protected void onDetachedFromWindow(){if(pressAnimator!=null)pressAnimator.cancel();pressAmount=0;super.onDetachedFromWindow();}
     ActionDockButton(Context context){super(context);setBackground(null);}
-    float labelSize(){float d=getResources().getDisplayMetrics().density,sd=getResources().getDisplayMetrics().scaledDensity;return Math.min(GameDesign.TYPE_LABEL*sd,Math.min(getWidth()*.28f,getHeight()*.23f));}
+    float labelSize(){float d=getResources().getDisplayMetrics().density,sd=getResources().getDisplayMetrics().scaledDensity;float size=Math.min(GameDesign.TYPE_LABEL*sd,Math.min(getWidth()*.28f,getHeight()*.23f));p.setTypeface(GameDesign.EMPHASIS);p.setTextSize(size);float width=p.measureText(getText().toString());return width>getWidth()*.94f?size*getWidth()*.94f/width:size;}
     @Override protected void onDraw(Canvas c){
         float w=getWidth(),h=getHeight(),d=getResources().getDisplayMetrics().density;
         int save=c.saveLayerAlpha(0,0,w,h,isEnabled()?255:145);c.scale(1-.045f*pressAmount,1-.045f*pressAmount,w/2,h/2);

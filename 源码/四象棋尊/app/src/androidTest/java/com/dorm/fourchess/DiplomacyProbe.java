@@ -26,7 +26,7 @@ public final class DiplomacyProbe extends Instrumentation {
         for(int a=0;a<4;a++)for(int other=a+1;other<4;other++){b.newGame();pact(b,a,other);check(b.tryDiplomacy(a,3,other),"either pair may break");check(b.treatyBroken(a,other)&&!b.allied(a,other),"breaking removes protection");check(!b.tryDiplomacy(a,0,other)&&!b.tryDiplomacy(other,0,a),"neither party can re-ally in this match");}
         b.importState(position);pact(b,0,1);String treaty=b.exportState();
         check(!b.tryNetworkMove(0,9,9,9,10)&&treaty.equals(b.exportState()),"rook cannot capture allied piece and no turn consumed");
-        check(!b.tryDiplomacy(0,0,0)&&!b.tryDiplomacy(0,1,2)&&!b.tryDiplomacy(9,4,-1)&&!b.tryDiplomacy(0,4,1),"self alliance invalid accept spoofed seat and malformed surrender rejected");
+        check(!b.tryDiplomacy(0,0,0)&&!b.tryDiplomacy(0,1,2)&&!b.tryDiplomacy(9,4,-1)&&!b.tryDiplomacy(0,4,-1)&&!b.tryDiplomacy(0,4,0),"self alliance invalid accept spoofed seat and malformed surrender rejected");
         FourChessView copy=new FourChessView(getTargetContext());copy.setSoundEnabled(false);copy.importState(treaty);check(copy.exportState().equals(treaty)&&copy.allied(0,1),"treaty and offers synchronize atomically");
         check(b.tryDiplomacy(0,3,1)&&b.tryNetworkMove(0,9,9,9,10),"capture is enabled after explicit treaty break");
         check(b.undoSteps(2)&&b.treatyBroken(0,1)&&!b.allied(0,1)&&at(b,9,10)!=null,"undo restores pieces but cannot restore broken treaty");
@@ -36,7 +36,7 @@ public final class DiplomacyProbe extends Instrumentation {
         b.importState(position);pact(b,0,1);pact(b,1,2);check(!b.allied(0,2),"alliances do not transitively protect allies of allies");pieces(b).add(new FourChessView.Piece(2,'C',9,12));check(!b.tryNetworkMove(0,9,9,9,12),"allied rook still blocks the ray to an enemy behind it");
         b.importState(position.replace("0,C,9,9;1,C,9,10;","0,P,9,9;3,B,9,10;").replace("3,B,10,9;","1,C,9,12;"));pact(b,0,1);check(!b.tryNetworkMove(0,9,9,9,12),"cannon also cannot capture ally beyond a screen");check(b.tryDiplomacy(1,3,0)&&b.tryNetworkMove(0,9,9,9,12),"cannon capture resumes after break");
         b.importState(position);pact(b,0,1);String valid=b.exportState();String base=valid.substring(0,valid.lastIndexOf('|')+1);
-        for(String invalid:new String[]{"D1,1,1,0,1,1,0,1","D1,0,0,1,1,0,0,1","D1,64,0,0,1,1,0,1","D1,1,0,0,0,-1,-1,-1","D1,1,0,0,1,1,0,0"}){b.importState(base+invalid);check(valid.equals(b.exportState()),"malformed diplomacy rejected without mutation "+invalid);}
+        for(String invalid:new String[]{"D2,1,1,0,1,1,0,1","D2,0,0,1,1,0,0,1","D2,64,0,0,1,1,0,1","D2,1,0,0,0,-1,-1,-1","D2,1,0,0,1,1,0,0"}){b.importState(base+invalid);check(valid.equals(b.exportState()),"malformed diplomacy rejected without mutation "+invalid);}
         for(int id:new int[]{4,7,8,9,11,12,18,19,25,30}){
             Method fixture=DraftSkillProbe.class.getDeclaredMethod("fixture",int.class,int.class);fixture.setAccessible(true);b.importState((String)fixture.invoke(new DraftSkillProbe(),0,id));pact(b,0,1);
             int sx=9,sy=9,tx=10,ty=10;if(id==4||id==25){sx=tx;sy=ty;}if(id==9||id==19){tx=9;ty=11;}if(id==30){sx=10;sy=10;tx=10;ty=11;}
@@ -44,12 +44,21 @@ public final class DiplomacyProbe extends Instrumentation {
         }
         Method fixture=DraftSkillProbe.class.getDeclaredMethod("fixture",int.class,int.class);fixture.setAccessible(true);b.importState((String)fixture.invoke(new DraftSkillProbe(),0,25));pieces(b).add(new FourChessView.Piece(2,'C',10,11));pact(b,0,1);
         check(b.trySkill(0,25,10,11,10,11)&&at(b,10,11).sealed&&!at(b,10,10).sealed,"area seal hits enemy while protecting neighbouring ally");
-        b.importState(position);pact(b,0,1);check(b.tryDiplomacy(1,4,-1)&&b.currentTurn()==0&&!b.isPlayerAlive(1)&&!b.allied(0,1),"out of turn surrender removes own side and treaty without advancing actor");
+        b.importState(position);pact(b,0,1);check(b.tryDiplomacy(1,4,2)&&b.currentTurn()==0&&!b.isPlayerAlive(1)&&!b.allied(0,1),"out of turn surrender removes own side and treaty without advancing actor");
         check(b.undoSteps(1)&&b.isPlayerAlive(1)&&b.allied(0,1),"local undo can restore surrender as explained in confirmation");
-        check(b.tryDiplomacy(0,4,-1)&&b.currentTurn()==1,"current player surrender advances to next survivor");
+        check(b.tryDiplomacy(0,4,1)&&b.currentTurn()==1,"current player surrender advances to next survivor");
         check(!b.tryDiplomacy(0,0,2)&&!b.tryNetworkMove(0,9,9,9,10),"eliminated player can neither negotiate nor move");
-        b.newGame();for(int i=0;i<3;i++)check(b.tryDiplomacy(i,4,-1),"sequential surrender "+i);
-        check(b.liveCount()==1&&b.currentTurn()==3&&!b.canAct()&&!b.tryDiplomacy(3,4,-1)&&!b.tryNetworkMove(3,18,5,17,5),"last survivor wins and finished game rejects further actions");
+        for(int actor=0;actor<4;actor++)for(int target=0;target<4;target++)if(actor!=target){
+            b.newGame();String original=b.exportState();List<FourChessView.Piece> originals=new ArrayList<>();for(FourChessView.Piece q:pieces(b))originals.add(q.copy());
+            int expected=pieces(b).size()-1;check(b.tryDiplomacy(actor,4,target),"recipient surrender permitted "+actor+" -> "+target);
+            check(pieces(b).size()==expected&&!b.isPlayerAlive(actor)&&b.isPlayerAlive(target),"only surrendering general removed");
+            for(FourChessView.Piece old:originals){FourChessView.Piece q=at(b,old.x,old.y);if(old.owner==actor&&old.type=='J')check(q==null,"surrendered general disappears");else check(q!=null&&q.owner==(old.owner==actor?target:old.owner)&&q.type==old.type&&q.x==old.x&&q.y==old.y,"piece owner changes only for surrendered army without coordinate/type change");}
+            copy.importState(b.exportState());check(copy.exportState().equals(b.exportState()),"recipient and transferred army survive state round trip");check(b.undoSteps(1)&&b.exportState().equals(original),"undo restores complete armies and their original owners");
+        }
+        b.importState(position.replaceFirst("^0,","1,"));check(b.tryDiplomacy(0,4,1)&&at(b,9,9).owner==1&&b.tryNetworkMove(1,9,9,9,8),"recipient can immediately move inherited rook");
+        check(!b.tryDiplomacy(2,4,0),"cannot surrender to eliminated recipient");
+        b.newGame();for(int i=0;i<3;i++)check(b.tryDiplomacy(i,4,3),"sequential surrender "+i);
+        check(b.liveCount()==1&&b.currentTurn()==3&&!b.canAct()&&!b.tryDiplomacy(3,4,0)&&!b.tryNetworkMove(3,18,5,17,5),"last survivor wins and finished game rejects further actions");
     }
     private AlertDialog dialog()throws Exception{return (AlertDialog)field(activity,"diplomacyDialog");}
     private void invoke(String name,Class<?>[] types,Object... values)throws Exception{call(activity,name,types,values);}
@@ -57,27 +66,24 @@ public final class DiplomacyProbe extends Instrumentation {
     private void button(int which)throws Exception{AlertDialog d=dialog();check(d!=null&&d.getButton(which)!=null,"actual diplomacy action exists");d.getButton(which).performClick();}
     private interface UiStep{void run()throws Exception;}
     private void step(UiStep task)throws Exception{final Throwable[] error={null};main(()->{try{task.run();}catch(Throwable t){error[0]=t;}});if(error[0]!=null)throw new AssertionError(error[0]);}
+    private void action(String tag)throws Exception{View v=dialog().getWindow().getDecorView().findViewWithTag(tag);check(v instanceof Button&&v.isEnabled(),"framed action enabled: "+tag);v.performClick();}
     private void ui()throws Exception{
         activity=(MainActivity)startActivitySync(new Intent(getTargetContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));waitForIdleSync();
         main(()->activity.setRequestedOrientation("landscape".equals(orientation)?0:1));SystemClock.sleep(600);
-        step(()->{
-            invoke("startMatch",new Class<?>[]{String[].class},(Object)new String[]{"红盟主","绿盟主","蓝盟主","金盟主"});
-            invoke("showMatchMenu",new Class<?>[0]);pick(1);pick(0);pick(0);button(-1);
-        });
-        step(()->{FourChessView b=(FourChessView)field(activity,"board");
-            check(b.allianceOffered(0,1)&&!b.allied(0,1),"real UI sends invitation and waits for consent");
-            invoke("chooseDiplomacyActor",new Class<?>[]{boolean.class},false);pick(1);pick(0);button(-1);
-        });
-        step(()->{FourChessView b=(FourChessView)field(activity,"board");
-            check(b.allied(0,1),"other local player accepts using real UI");
-            invoke("showTreaties",new Class<?>[]{int.class},0);
-        });SystemClock.sleep(200);shot("treaties");
-        step(()->{pick(0);button(-2);});
-        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(b.allied(0,1),"cancel break preserves treaty");invoke("showTreaties",new Class<?>[]{int.class},0);pick(0);button(-1);});
-        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(b.treatyBroken(0,1),"confirmed break uses actual action");invoke("confirmSurrender",new Class<?>[]{int.class},0);});shot("surrender");
-        step(()->button(-2));
-        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(b.isPlayerAlive(0),"cancel surrender preserves side");invoke("confirmSurrender",new Class<?>[]{int.class},0);button(-1);});
-        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(!b.isPlayerAlive(0)&&b.currentTurn()==1,"confirmed surrender eliminates only own side");check(((TextView)field(activity,"moveLog")).getText().toString().contains("投降"),"surrender appears in actual history");});shot("match");main(()->activity.finish());activity=null;
+        step(()->{invoke("startMatch",new Class<?>[]{String[].class},(Object)new String[]{"红盟主","绿盟主","蓝盟主","金盟主"});invoke("showMatchMenu",new Class<?>[0]);});shot("menu");
+        step(()->action("diplomacy_choice_1"));step(()->action("diplomacy_choice_0"));
+        step(()->{action("diplomacy_offer_1");button(-1);});
+        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(b.allianceOffered(0,1)&&!b.allied(0,1),"real framed invitation waits for consent");invoke("chooseDiplomacyActor",new Class<?>[]{boolean.class},false);});step(()->action("diplomacy_choice_1"));
+        shot("incoming");step(()->action("diplomacy_accept_0"));
+        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(b.allied(0,1),"framed accept establishes treaty");invoke("showTreaties",new Class<?>[]{int.class},0);});shot("treaties");
+        step(()->{action("diplomacy_break_1");button(-2);});
+        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(b.allied(0,1),"cancel break preserves treaty");invoke("showTreaties",new Class<?>[]{int.class},0);});
+        step(()->{action("diplomacy_break_1");button(-1);});
+        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(b.treatyBroken(0,1),"confirmed break uses actual action");invoke("confirmSurrender",new Class<?>[]{int.class},0);});shot("recipient");
+        step(()->action("diplomacy_choice_0"));shot("surrender");step(()->button(-2));
+        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(b.isPlayerAlive(0),"cancel surrender preserves side");invoke("confirmSurrender",new Class<?>[]{int.class},0);});
+        step(()->{action("diplomacy_choice_0");button(-1);});
+        step(()->{FourChessView b=(FourChessView)field(activity,"board");check(!b.isPlayerAlive(0)&&b.currentTurn()==1&&pieces(b).size()==63,"confirmed surrender removes only general");check(at(b,5,18).owner==1&&at(b,9,18)==null,"actual UI transfers army to chosen green recipient");check(((TextView)field(activity,"moveLog")).getText().toString().contains("投降"),"surrender appears in actual history");});shot("match");main(()->activity.finish());activity=null;
     }
     private void shot(String name)throws Exception{android.graphics.Bitmap image=getUiAutomation().takeScreenshot();try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"diplomacy-"+name+".png"))){image.compress(android.graphics.Bitmap.CompressFormat.PNG,100,out);}image.recycle();}
     private static final class Client implements NetworkManager.Callback {
@@ -102,15 +108,16 @@ public final class DiplomacyProbe extends Instrumentation {
             nets[0].clientDiplomacy(1,0,0);await(()->readMain(()->board[0].allianceOffered(1,0)),"remote invitation reaches authoritative host");
             main(()->{check(board[0].tryDiplomacy(0,1,1),"host independently accepts remote invitation");host[0].broadcast(board[0].exportState());});
             await(()->readMain(()->board[0].exportState().equals(clients[0].state)&&clients[0].state.equals(clients[1].state)&&clients[1].state.equals(clients[2].state)),"three clients receive identical treaty state");
-            String before=clients[0].state;nets[0].clientMove(1,9,10,9,9);nets[1].clientDiplomacy(1,4,-1);SystemClock.sleep(400);
+            String before=clients[0].state;nets[0].clientMove(1,9,10,9,9);nets[1].clientDiplomacy(1,4,0);SystemClock.sleep(400);
             check(readMain(()->before.equals(board[0].exportState())),"host rejects allied capture and forged diplomacy actor");
             nets[0].clientDiplomacy(1,3,0);await(()->readMain(()->board[0].treatyBroken(1,0)),"remote break applied by host");nets[0].clientDiplomacy(1,0,0);SystemClock.sleep(250);check(readMain(()->!board[0].allianceOffered(1,0)),"network re-alliance remains forbidden");
             nets[0].clientMove(1,9,10,9,9);await(()->readMain(()->board[0].currentTurn()==2),"remote capture works after treaty broken");
-            nets[1].clientDiplomacy(2,4,-1);await(()->readMain(()->!board[0].isPlayerAlive(2)&&board[0].currentTurn()==3),"remote surrender retires side and advances turn");
+            nets[1].clientDiplomacy(2,4,3);await(()->readMain(()->!board[0].isPlayerAlive(2)&&board[0].currentTurn()==3),"remote surrender retires side and advances turn");
             await(()->readMain(()->board[0].exportState().equals(clients[0].state)&&clients[0].state.equals(clients[1].state)&&clients[1].state.equals(clients[2].state)),"surrender synchronized to every client including surrendering seat");
+            check(readMain(()->at(board[0],10,10).owner==3&&at(board[0],9,0)==null),"TCP recipient owns inherited rook and surrendered general removed");
             check(clients[0].closed==null&&clients[1].closed==null&&clients[2].closed==null,"surrender keeps room and spectator connection open");
             nets[1].close();SystemClock.sleep(250);
-            try(Socket raw=new Socket("127.0.0.1",27888)){raw.setSoTimeout(3000);PrintWriter out=new PrintWriter(raw.getOutputStream(),true);out.println("CAPS|SK4");out.println("HELLO|b2xk");BufferedReader in=new BufferedReader(new InputStreamReader(raw.getInputStream()));boolean rejected=false;for(int i=0;i<12;i++){String line=in.readLine();if(line==null)break;if(line.contains("diplomacy_require_v51")){rejected=true;break;}}check(rejected,"ordinary room explicitly rejects clients missing diplomacy support");}
+            try(Socket raw=new Socket("127.0.0.1",27888)){raw.setSoTimeout(3000);PrintWriter out=new PrintWriter(raw.getOutputStream(),true);out.println("CAPS|SK4");out.println("CAPS|DP1");out.println("HELLO|b2xk");BufferedReader in=new BufferedReader(new InputStreamReader(raw.getInputStream()));boolean rejected=false;for(int i=0;i<12;i++){String line=in.readLine();if(line==null)break;if(line.contains("diplomacy_require_v52")){rejected=true;break;}}check(rejected,"ordinary room explicitly rejects clients missing diplomacy support");}
         }finally{for(NetworkManager net:resources)net.close();SystemClock.sleep(300);}
     }
     @Override public void onCreate(Bundle args){super.onCreate(args);orientation=args==null?"portrait":args.getString("orientation","portrait");runNetwork=args==null||!"false".equals(args.getString("network","true"));start();}

@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -72,10 +73,10 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         Button mode=button("模式",0xff553c32,0),rules=button("规则",0xff33444a,1),undo=button("悔棋",0xff514633,2),sound=button("声音 开",0xff35463b,3);undoButton=undo;
         modeButton=mode;mode.setOnClickListener(v->{if(board.isSkillMode())showSkillOptions();else showModePage();}); rules.setOnClickListener(v->showRules()); undo.setOnClickListener(v->showUndoOptions());
         sound.setOnClickListener(v->{soundOn=!soundOn;board.setSoundEnabled(soundOn);sound.setText(soundOn?"声音 开":"声音 关");sound.setSelected(soundOn);((ActionGlyph)sound.getCompoundDrawables()[0]).setMuted(!soundOn);syncCompactControls();});sound.setSelected(soundOn);
-        LinearLayout row1=new LinearLayout(this),row2=new LinearLayout(this);row1.addView(mode);row1.addView(rules);row2.addView(undo);row2.addView(sound);row.addView(row1,new LinearLayout.LayoutParams(-1,0,1));row.addView(row2,new LinearLayout.LayoutParams(-1,0,1));Button exit=button("退出对局",0xff553c32,5);exit.setOnClickListener(v->showExitConfirm());LinearLayout exitRow=new LinearLayout(this);Button treaty=button("盟约 / 投降",0xff33444a,7);treaty.setOnClickListener(v->showMatchMenu());exitRow.addView(treaty);exitRow.addView(exit);row.addView(exitRow,new LinearLayout.LayoutParams(-1,0,1));panel.addView(row);
+        LinearLayout row1=new LinearLayout(this),row2=new LinearLayout(this);row1.addView(mode);row1.addView(rules);row2.addView(undo);row2.addView(sound);row.addView(row1,new LinearLayout.LayoutParams(-1,0,1));row.addView(row2,new LinearLayout.LayoutParams(-1,0,1));Button exit=button("退出对局",0xff553c32,5);exit.setOnClickListener(v->showExitConfirm());LinearLayout exitRow=new LinearLayout(this);Button treaty=button("结盟 / 投降",0xff33444a,7);treaty.setOnClickListener(v->showMatchMenu());exitRow.addView(treaty);exitRow.addView(exit);row.addView(exitRow,new LinearLayout.LayoutParams(-1,0,1));panel.addView(row);
         mobileControls=new CompactControlsLayout(this);duel.addView(mobileControls);
         compactState=text("准备开局",12,GameDesign.GOLD_BRIGHT);compactState.setTypeface(Typeface.DEFAULT,Typeface.BOLD);compactState.setMaxLines(2);fitText(compactState,8,12);mobileControls.addView(compactState);
-        Button phoneMode=dockButton("模式",0),phoneRules=dockButton("对局",7);phoneRules.setContentDescription("对局菜单：规则、盟约、投降");
+        Button phoneMode=dockButton("模式",0),phoneRules=dockButton("结盟/投降",7);phoneRules.setContentDescription("结盟与投降：邀请盟友、接受邀请、选择归降对象");
         phoneModeButton=phoneMode;phoneUndo=dockButton("悔棋",2);phoneSound=dockButton("声音",3);historyButton=dockButton("棋谱",4);Button phoneExit=dockButton("退出",5);phoneExit.setOnClickListener(v->showExitConfirm());
         phoneMode.setOnClickListener(v->mode.performClick());phoneRules.setOnClickListener(v->showMatchMenu());phoneUndo.setOnClickListener(v->undo.performClick());phoneSound.setOnClickListener(v->sound.performClick());historyButton.setOnClickListener(v->showHistory());
         for(Button action:new Button[]{phoneMode,phoneRules,phoneUndo,phoneSound,historyButton,phoneExit}){action.setPadding(dp(3),0,dp(3),0);mobileControls.addView(action);}
@@ -252,42 +253,53 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         if(diplomacyDialog!=null)diplomacyDialog.dismiss();diplomacyDialog=dialog;
         GameDialogStyle.title(dialog,title);dialog.setOnDismissListener(d->{if(diplomacyDialog==dialog)diplomacyDialog=null;});dialog.show();GameDialogStyle.apply(dialog,null);
     }
+    private interface DiplomacyChoice { void choose(int index); }
+    private Button diplomacyAction(String label,int color,String tag,Runnable click){
+        Button action=new Button(this);action.setText(label);action.setTextSize(14);action.setTextColor(GameDesign.TEXT);action.setTypeface(GameDesign.EMPHASIS);action.setAllCaps(false);action.setMinWidth(0);action.setMinimumWidth(0);action.setMinHeight(dp(48));action.setMinimumHeight(dp(48));action.setPadding(dp(12),dp(8),dp(12),dp(8));action.setTag(tag);
+        android.graphics.drawable.GradientDrawable bg=new android.graphics.drawable.GradientDrawable();bg.setColor(color);bg.setCornerRadius(dp(8));bg.setStroke(dp(1),GameDesign.GOLD);
+        action.setBackground(new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(GameDesign.RIPPLE),bg,null));action.setOnClickListener(v->click.run());return action;
+    }
+    private AlertDialog diplomacyChoices(String[] labels,DiplomacyChoice choice){
+        final AlertDialog[] dialog={null};DiplomacyChoice select=index->{if(dialog[0]!=null)dialog[0].dismiss();choice.choose(index);};
+        android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,labels){
+            @Override public View getView(int index,View old,android.view.ViewGroup parent){LinearLayout row=new LinearLayout(MainActivity.this);row.setPadding(dp(16),dp(5),dp(16),dp(5));row.addView(diplomacyAction(labels[index],GameDesign.INK_TEAL,"diplomacy_choice_"+index,()->select.choose(index)),new LinearLayout.LayoutParams(-1,-2));return row;}
+        };
+        dialog[0]=new AlertDialog.Builder(this).setAdapter(adapter,(d,index)->select.choose(index)).setNegativeButton("返回棋局",null).create();return dialog[0];
+    }
     private void showMatchMenu(){
-        AlertDialog menu=new AlertDialog.Builder(this).setItems(new String[]{"规则说明","盟约 · 邀请 / 接受 / 撕盟","投降 · 本方退场"},(d,item)->{
-            if(item==0)showRules();else chooseDiplomacyActor(item==2);
-        }).setNegativeButton("返回棋局",null).create();presentDiplomacy(menu,"对局事务");
+        AlertDialog menu=diplomacyChoices(new String[]{"规则说明","结盟 · 邀请 / 接受 / 撕盟","投降 · 选择归降对象"},item->{if(item==0)showRules();else chooseDiplomacyActor(item==2);});presentDiplomacy(menu,"结盟 / 投降");
     }
     private void chooseDiplomacyActor(boolean surrender){
         if(!matchActive||board.liveCount()<2){toast("本局已结束");return;}
         int local=board.localSeat();if(network!=null){if(local<0||local>3||!board.isPlayerAlive(local)){toast("尚未入座或本方已退场");return;}if(surrender)confirmSurrender(local);else showTreaties(local);return;}
         java.util.ArrayList<Integer> owners=new java.util.ArrayList<>();java.util.ArrayList<String> labels=new java.util.ArrayList<>();for(int i=0;i<4;i++)if(board.isPlayerAlive(i)){owners.add(i);labels.add(board.ownerName(i)+(i==board.currentTurn()?" · 当前行动":""));}
-        AlertDialog picker=new AlertDialog.Builder(this).setItems(labels.toArray(new String[0]),(d,index)->{int actor=owners.get(index);if(surrender)confirmSurrender(actor);else showTreaties(actor);}).setNegativeButton("取消",null).create();presentDiplomacy(picker,"同屏操作 · 请选择本人阵营");
+        AlertDialog picker=diplomacyChoices(labels.toArray(new String[0]),index->{int actor=owners.get(index);if(surrender)confirmSurrender(actor);else showTreaties(actor);});presentDiplomacy(picker,"同屏操作 · 请选择本人阵营");
     }
     private void showTreaties(int actor){
-        java.util.ArrayList<Integer> targets=new java.util.ArrayList<>();java.util.ArrayList<String> labels=new java.util.ArrayList<>();java.util.ArrayList<Boolean> enabled=new java.util.ArrayList<>();
-        for(int other=0;other<4;other++)if(other!=actor){targets.add(other);String relation;boolean allow=true;
-            if(!board.isPlayerAlive(other)){relation="已退场";allow=false;}
-            else if(board.treatyBroken(actor,other)){relation="盟约已破 · 本局不能再次结盟";allow=false;}
-            else if(board.allied(actor,other))relation="已结盟 · 查看 / 撕毁盟约";
-            else if(board.allianceOffered(other,actor))relation="邀请你结盟 · 接受 / 拒绝";
-            else if(board.allianceOffered(actor,other)){relation="已发出邀请 · 等待对方回应";allow=false;}
-            else relation="发起结盟邀请";
-            labels.add(board.ownerName(other)+"\n"+relation);enabled.add(allow);
-        }
-        android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,labels){
-            @Override public boolean areAllItemsEnabled(){return false;}
-            @Override public boolean isEnabled(int position){return enabled.get(position);}
-            @Override public android.view.View getView(int pos,android.view.View old,android.view.ViewGroup parent){TextView row=(TextView)super.getView(pos,old,parent);row.setTextSize(14);row.setSingleLine(false);row.setPadding(dp(18),dp(12),dp(18),dp(12));row.setTextColor(enabled.get(pos)?GameDesign.TEXT:GameDesign.MUTED);return row;}
+        java.util.ArrayList<Integer> targets=new java.util.ArrayList<>();for(int i=0;i<4;i++)if(i!=actor)targets.add(i);
+        android.widget.BaseAdapter adapter=new android.widget.BaseAdapter(){
+            public int getCount(){return targets.size();}public Object getItem(int index){return targets.get(index);}public long getItemId(int index){return index;}
+            @Override public boolean areAllItemsEnabled(){return false;}@Override public boolean isEnabled(int index){return false;}
+            @Override public View getView(int index,View old,android.view.ViewGroup parent){
+                int target=targets.get(index);LinearLayout row=new LinearLayout(MainActivity.this);row.setOrientation(LinearLayout.VERTICAL);row.setPadding(dp(16),dp(8),dp(16),dp(8));
+                boolean alive=board.isPlayerAlive(target),broken=board.treatyBroken(actor,target),allied=board.allied(actor,target),incoming=board.allianceOffered(target,actor),outgoing=board.allianceOffered(actor,target);
+                String relation=!alive?"已退场":broken?"已撕盟 · 本局不可再结盟":allied?"已结盟 · 禁止互相吃子":incoming?"邀请你结盟":outgoing?"邀请已发送 · 等待回应":"尚未结盟";
+                TextView title=text(board.ownerName(target)+" · "+relation,14,alive&&!broken?GameDesign.TEXT:GameDesign.MUTED);title.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);title.setPadding(0,0,0,dp(6));row.addView(title,new LinearLayout.LayoutParams(-1,-2));
+                if(alive&&!broken){LinearLayout actions=new LinearLayout(MainActivity.this);
+                    if(incoming&&!allied){
+                        Button accept=diplomacyAction("接受结盟",0xff29493f,"diplomacy_accept_"+target,()->{if(diplomacyDialog!=null)diplomacyDialog.dismiss();requestDiplomacy(actor,DiplomacyState.ACCEPT,target);});
+                        Button decline=diplomacyAction("拒绝邀请",0xff493637,"diplomacy_decline_"+target,()->{if(diplomacyDialog!=null)diplomacyDialog.dismiss();requestDiplomacy(actor,DiplomacyState.DECLINE,target);});
+                        LinearLayout.LayoutParams first=new LinearLayout.LayoutParams(0,-2,1);first.rightMargin=dp(8);actions.addView(accept,first);actions.addView(decline,new LinearLayout.LayoutParams(0,-2,1));
+                    }else if(allied)actions.addView(diplomacyAction("撕毁盟约",0xff493637,"diplomacy_break_"+target,()->confirmTreaty(actor,DiplomacyState.BREAK,target)),new LinearLayout.LayoutParams(-1,-2));
+                    else{Button offer=diplomacyAction(outgoing?"等待对方接受":"邀请结盟",GameDesign.INK_TEAL,"diplomacy_offer_"+target,()->confirmTreaty(actor,DiplomacyState.OFFER,target));offer.setEnabled(!outgoing);offer.setAlpha(outgoing?.5f:1);actions.addView(offer,new LinearLayout.LayoutParams(-1,-2));}
+                    row.addView(actions,new LinearLayout.LayoutParams(-1,-2));
+                }
+                return row;
+            }
         };
-        AlertDialog list=new AlertDialog.Builder(this).setAdapter(adapter,(d,index)->{
-            int target=targets.get(index);if(board.allied(actor,target))confirmTreaty(actor,DiplomacyState.BREAK,target);
-            else if(board.allianceOffered(target,actor)){
-                AlertDialog response=new AlertDialog.Builder(this).setMessage(board.ownerName(target)+"希望与你结盟。盟友不可互相吃子或施加敌对技能；结盟不共享胜利。")
-                    .setPositiveButton("接受盟约",(a,b)->requestDiplomacy(actor,DiplomacyState.ACCEPT,target)).setNegativeButton("拒绝邀请",(a,b)->requestDiplomacy(actor,DiplomacyState.DECLINE,target)).setNeutralButton("稍后",null).create();presentDiplomacy(response,board.ownerName(actor)+" · 收到盟约");
-            }else confirmTreaty(actor,DiplomacyState.OFFER,target);
-        }).setNegativeButton("返回棋局",null).setNeutralButton("盟约规则",(d,w)->{
-            AlertDialog rules=new AlertDialog.Builder(this).setMessage("双方同意后生效，不消耗行动。盟友不能互相吃子，敌对技能也不能作用于盟友；盟友棋子仍会阻挡路线。\n\n撕盟立即解除保护，双方本局不能再次结盟，悔棋也无法恢复资格。盟约是两方之间的约定，不传递给其他盟友。\n\n仍以最后存活的一方获胜；若最后两方为盟友，需要撕盟决胜或一方投降。").setPositiveButton("明白了",null).create();presentDiplomacy(rules,"盟约规则");
-        }).create();presentDiplomacy(list,board.ownerName(actor)+" · 盟约");
+        AlertDialog list=new AlertDialog.Builder(this).setAdapter(adapter,null).setNegativeButton("返回棋局",null).setNeutralButton("盟约规则",(d,w)->{
+            AlertDialog rules=new AlertDialog.Builder(this).setMessage("双方同意后生效，不消耗行动。盟友不能互相吃子，敌对技能也不能作用于盟友；盟友棋子仍会阻挡路线。\n\n撕盟立即解除保护，双方本局不能再次结盟，悔棋也无法恢复资格。盟约是两方之间的约定，不传递给其他盟友。\n\n仍以最后存活的一方获胜；若最后两方为盟友，需要撕盟决胜或一方归降。").setPositiveButton("明白了",null).create();presentDiplomacy(rules,"盟约规则");
+        }).create();presentDiplomacy(list,board.ownerName(actor)+" · 邀请结盟");
     }
     private void confirmTreaty(int actor,int action,int target){
         String title=action==DiplomacyState.BREAK?"撕毁盟约？":"发起结盟？";
@@ -295,8 +307,14 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         AlertDialog confirm=new AlertDialog.Builder(this).setMessage(copy).setNegativeButton("取消",null).setPositiveButton(action==DiplomacyState.BREAK?"确认撕盟":"发送邀请",(d,w)->requestDiplomacy(actor,action,target)).create();presentDiplomacy(confirm,board.ownerName(actor)+" · "+title);
     }
     private void confirmSurrender(int actor){
-        AlertDialog confirm=new AlertDialog.Builder(this).setMessage("本方全部棋子将退场，其他玩家继续对局。投降不会关闭房间，也不等于退出软件。"+(network==null?"同屏模式可通过悔棋恢复；已撕毁的盟约资格不会恢复。":"联机不支持悔棋，确认后无法撤回。"))
-            .setNegativeButton("继续对局",null).setPositiveButton("确认投降",(d,w)->requestDiplomacy(actor,DiplomacyState.SURRENDER,-1)).create();presentDiplomacy(confirm,board.ownerName(actor)+" · 投降？");
+        java.util.ArrayList<Integer> targets=new java.util.ArrayList<>();java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+        for(int i=0;i<4;i++)if(i!=actor&&board.isPlayerAlive(i)){targets.add(i);labels.add("向"+board.ownerName(i)+"投降");}
+        if(targets.isEmpty()){toast("没有可归降的阵营");return;}
+        AlertDialog picker=diplomacyChoices(labels.toArray(new String[0]),index->confirmSurrenderTo(actor,targets.get(index)));presentDiplomacy(picker,board.ownerName(actor)+" · 向谁投降？");
+    }
+    private void confirmSurrenderTo(int actor,int target){
+        AlertDialog confirm=new AlertDialog.Builder(this).setMessage("向"+board.ownerName(target)+"投降后，本方的将退场，其余棋子保留当前位置，全部变为对方阵营颜色，并由对方控制、按对方阵营规则行棋。技能手牌不转移。其他玩家继续对局，你可留在房间观战。"+(network==null?"同屏模式可通过悔棋恢复；已撕毁的盟约资格不会恢复。":"联机不支持悔棋，确认后无法撤回。"))
+            .setNegativeButton("继续对局",null).setPositiveButton("确认归降",(d,w)->requestDiplomacy(actor,DiplomacyState.SURRENDER,target)).create();presentDiplomacy(confirm,board.ownerName(actor)+" → "+board.ownerName(target)+" · 投降？");
     }
     private void requestDiplomacy(int actor,int action,int target){
         if(!board.canDiplomacy(actor,action,target)){toast("局势已变化，本次操作不可用");return;}
@@ -390,7 +408,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_SHORT).show();}
     @Override public void onNetworkStatus(String s){runOnUiThread(()->networkStatus.setText(s));}
     @Override public void onAssigned(int owner){runOnUiThread(()->{board.setLocalPlayer(owner);networkStatus.setText("已入座 · "+board.ownerName(owner));});}
-    @Override public void onState(String state){runOnUiThread(()->{int oldDiplomacy=board.diplomacySerial();String before=board.exportState();board.importState(state);String after=board.exportState();if(!before.equals(after)){try{String[] header=after.split("\\|",2)[0].split(",");int sx=Integer.parseInt(header[1]),sy=Integer.parseInt(header[2]),tx=Integer.parseInt(header[3]),ty=Integer.parseInt(header[4]);if(board.diplomacySerial()!=oldDiplomacy&&board.diplomacySerial()>0){recordMove(board.diplomacyLog());if(network!=null&&board.localSeat()>=0&&board.localSeat()<4&&!board.allianceLabel(board.localSeat()).isEmpty())toast("盟约状态已更新，可在对局菜单中查看");}else if(board.isSkillMode()&&board.lastSkill()>0){recordMove(board.skillLog());}else if(sx>=0){recordMove("联机落子 "+(char)('A'+sx)+(19-sy)+" → "+(char)('A'+tx)+(19-ty));}else clearMoves();}catch(RuntimeException ignored){}}screen.post(this::maybeShowSkillDraw);});}
+    @Override public void onState(String state){runOnUiThread(()->{int oldDiplomacy=board.diplomacySerial();String before=board.exportState();board.importState(state);String after=board.exportState();if(!before.equals(after)){try{String[] header=after.split("\\|",2)[0].split(",");int sx=Integer.parseInt(header[1]),sy=Integer.parseInt(header[2]),tx=Integer.parseInt(header[3]),ty=Integer.parseInt(header[4]);if(board.diplomacySerial()!=oldDiplomacy&&board.diplomacySerial()>0){recordMove(board.diplomacyLog());if(network!=null&&board.localSeat()>=0&&board.localSeat()<4&&!board.allianceLabel(board.localSeat()).isEmpty())toast("盟约状态已更新，可在结盟/投降中查看");}else if(board.isSkillMode()&&board.lastSkill()>0){recordMove(board.skillLog());}else if(sx>=0){recordMove("联机落子 "+(char)('A'+sx)+(19-sy)+" → "+(char)('A'+tx)+(19-ty));}else clearMoves();}catch(RuntimeException ignored){}}screen.post(this::maybeShowSkillDraw);});}
     @Override public void onHostMove(int owner,int sx,int sy,int tx,int ty){runOnUiThread(()->{if(board.tryNetworkMove(owner,sx,sy,tx,ty)&&network!=null)network.broadcast(board.exportState());});}
     @Override public void onHostSkill(int owner,int skill,int sx,int sy,int tx,int ty){runOnUiThread(()->{if(board.trySkill(owner,skill,sx,sy,tx,ty)&&network!=null)network.broadcast(board.exportState());});}
     @Override public void onHostDiplomacy(int owner,int action,int target){runOnUiThread(()->{if(board.tryDiplomacy(owner,action,target)&&network!=null)network.broadcast(board.exportState());});}
@@ -398,14 +416,3 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private final Runnable clockTick=new Runnable(){@Override public void run(){if(matchActive){turnSeconds++;refreshClock();}clockHandler.postDelayed(this,1000);}};
     private int dp(int n){return(int)(n*getResources().getDisplayMetrics().density+.5f);}
 }
-
-
-
-
-
-
-
-
-
-
-

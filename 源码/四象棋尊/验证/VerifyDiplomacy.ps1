@@ -29,14 +29,14 @@ try{foreach($case in $cases){
  & $adb shell settings put system font_scale $case.Font
  & $adb shell settings put global animator_duration_scale $case.Motion
  & $adb shell am force-stop com.dorm.fourchess
- $path=Join-Path $PSScriptRoot ('v5.1-diplomacy-'+$case.Name+'.txt')
+ $path=Join-Path $PSScriptRoot ('v5.2-diplomacy-'+$case.Name+'.txt')
  & $adb shell am instrument -w -e network $(if($case.Name -eq 'portrait'){'true'}else{'false'}) -e orientation $case.Orientation com.dorm.fourchess.test/com.dorm.fourchess.DiplomacyProbe | Set-Content -LiteralPath $path -Encoding utf8
  $log=Get-Content -LiteralPath $path -Raw
  if($log -match 'FAIL|crashed' -or $log -notmatch 'DIPLOMACY COMPLETE'){Write-Output $log;throw ('Diplomacy flow failed: '+$case.Name)}
  Write-Output ($case.Name+' PASS '+[regex]::Matches($log,'(?m)^PASS ').Count+' checks')
- foreach($frame in @('treaties','surrender','match')){
+ foreach($frame in @('menu','incoming','treaties','recipient','surrender','match')){
   $info=[Diagnostics.ProcessStartInfo]::new($adb);$info.UseShellExecute=$false;$info.RedirectStandardOutput=$true;$info.Arguments='exec-out run-as com.dorm.fourchess cat files/diplomacy-'+$frame+'.png'
-  $process=[Diagnostics.Process]::Start($info);$out=[IO.File]::Create((Join-Path $PSScriptRoot ('v5.1-diplomacy-'+$case.Name+'-'+$frame+'.png')))
+  $process=[Diagnostics.Process]::Start($info);$out=[IO.File]::Create((Join-Path $PSScriptRoot ('v5.2-diplomacy-'+$case.Name+'-'+$frame+'.png')))
   try{$process.StandardOutput.BaseStream.CopyTo($out)}finally{$out.Dispose()};$process.WaitForExit();if($process.ExitCode -ne 0){throw 'Screenshot export failed'}
  }
 }}finally{& $adb shell settings put global animator_duration_scale 1}

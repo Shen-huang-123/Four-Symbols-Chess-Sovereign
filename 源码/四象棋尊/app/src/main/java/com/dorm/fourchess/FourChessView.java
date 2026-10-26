@@ -363,12 +363,12 @@ public class FourChessView extends View {
     boolean allianceOffered(int from,int to){return diplomacy.offered(from,to);}
     int diplomacySerial(){return diplomacy.serial;}
     String allianceLabel(int actor){StringBuilder text=new StringBuilder();String[] shortNames={"红","绿","蓝","金"};for(int i=0;i<4;i++)if(allied(actor,i))text.append(shortNames[i]);if(text.length()>0)return "盟·"+text;for(int i=0;i<4;i++)if(allianceOffered(i,actor))return "收到邀约";return "";}
-    String diplomacyLog(){if(diplomacy.serial==0)return "";int a=diplomacy.lastOwner,b=diplomacy.lastTarget;String prefix=names[a]+" · ";switch(diplomacy.lastKind){case 0:return prefix+"向"+names[b]+"发起结盟";case 1:return prefix+"与"+names[b]+"缔结盟约";case 2:return prefix+"婉拒"+names[b]+"的盟约";case 3:return prefix+"撕毁与"+names[b]+"的盟约，本局不再结盟";default:return prefix+"投降退场";}}
-    boolean canDiplomacy(int actor,int action,int target){return actor>=0&&actor<4&&alive[actor]&&liveCount()>1&&(action==DiplomacyState.SURRENDER||target>=0&&target<4&&alive[target])&&diplomacy.can(actor,action,target);}
+    String diplomacyLog(){if(diplomacy.serial==0)return "";int a=diplomacy.lastOwner,b=diplomacy.lastTarget;String prefix=names[a]+" · ";switch(diplomacy.lastKind){case 0:return prefix+"向"+names[b]+"发起结盟";case 1:return prefix+"与"+names[b]+"缔结盟约";case 2:return prefix+"婉拒"+names[b]+"的盟约";case 3:return prefix+"撕毁与"+names[b]+"的盟约，本局不再结盟";default:return prefix+"向"+names[b]+"投降，除将外棋子归入对方阵营";}}
+    boolean canDiplomacy(int actor,int action,int target){return actor>=0&&actor<4&&alive[actor]&&liveCount()>1&&(target>=0&&target<4&&alive[target])&&diplomacy.can(actor,action,target);}
     boolean tryDiplomacy(int actor,int action,int target){
         if(!canDiplomacy(actor,action,target))return false;
         save();diplomacy.apply(actor,action,target);selected=null;pendingSkill=0;skillSource=null;moves.clear();
-        if(action==DiplomacyState.SURRENDER){eliminate(actor);if(actor==turn){nextTurn();}if(liveCount()==1){for(int i=0;i<4;i++)if(alive[i])turn=i;}}
+        if(action==DiplomacyState.SURRENDER){for(Piece q:pieces)if(q.owner==actor&&q.type!='J')q.owner=target;eliminate(actor);if(actor==turn){nextTurn();}if(liveCount()==1){for(int i=0;i<4;i++)if(alive[i])turn=i;}}
         if(moveObserver!=null)moveObserver.onMove(diplomacyLog());invalidate();announce();return true;
     }
     String exportState(){

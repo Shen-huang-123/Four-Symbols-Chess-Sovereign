@@ -11,7 +11,7 @@ final class DiplomacyState {
     boolean offered(int from,int to){return pair(from,to)!=0&&(offers&offer(from,to))!=0;}
     boolean can(int actor,int action,int target){
         if(actor<0||actor>3||action<0||action>4)return false;
-        if(action==SURRENDER)return target==-1;
+        if(action==SURRENDER)return pair(actor,target)!=0;
         if(pair(actor,target)==0)return false;
         if(action==BREAK)return allied(actor,target);
         if(allied(actor,target)||broken(actor,target))return false;
@@ -28,14 +28,14 @@ final class DiplomacyState {
     void eliminate(int owner){for(int i=0;i<4;i++)if(i!=owner){allies&=~pair(owner,i);clearOffers(owner,i);}}
     DiplomacyState copy(){DiplomacyState d=new DiplomacyState();d.allies=allies;d.broken=broken;d.offers=offers;d.serial=serial;d.lastKind=lastKind;d.lastOwner=lastOwner;d.lastTarget=lastTarget;return d;}
     void retainBroken(int permanentlyBroken){broken|=permanentlyBroken;allies&=~broken;for(int a=0;a<4;a++)for(int b=a+1;b<4;b++)if(broken(a,b)){clearOffers(a,b);if(serial==0){serial=1;lastKind=BREAK;lastOwner=a;lastTarget=b;}}}
-    String encode(){return "D1,"+allies+","+broken+","+offers+","+serial+","+lastKind+","+lastOwner+","+lastTarget;}
+    String encode(){return "D2,"+allies+","+broken+","+offers+","+serial+","+lastKind+","+lastOwner+","+lastTarget;}
     static DiplomacyState decode(String text){
-        String[] f=text.split(",",-1);if(f.length!=8||!f[0].equals("D1"))throw new IllegalArgumentException("diplomacy version");
+        String[] f=text.split(",",-1);if(f.length!=8||!f[0].equals("D2"))throw new IllegalArgumentException("diplomacy version");
         DiplomacyState d=new DiplomacyState();d.allies=Integer.parseInt(f[1]);d.broken=Integer.parseInt(f[2]);d.offers=Integer.parseInt(f[3]);d.serial=Integer.parseInt(f[4]);d.lastKind=Integer.parseInt(f[5]);d.lastOwner=Integer.parseInt(f[6]);d.lastTarget=Integer.parseInt(f[7]);
         if(d.allies<0||d.allies>63||d.broken<0||d.broken>63||(d.allies&d.broken)!=0||d.offers<0||(d.offers&~0x7bde)!=0||d.serial<0||d.serial>1000000000)throw new IllegalArgumentException("invalid treaty mask");
         for(int a=0;a<4;a++)for(int b=a+1;b<4;b++)if((d.allied(a,b)||d.broken(a,b))&&(d.offered(a,b)||d.offered(b,a)))throw new IllegalArgumentException("conflicting offer");
         if(d.serial==0){if(d.lastKind!=-1||d.lastOwner!=-1||d.lastTarget!=-1||d.allies!=0||d.broken!=0||d.offers!=0)throw new IllegalArgumentException("empty diplomacy");}
-        else if(d.lastKind<0||d.lastKind>4||d.lastOwner<0||d.lastOwner>3||(d.lastKind==SURRENDER?d.lastTarget!=-1:pair(d.lastOwner,d.lastTarget)==0))throw new IllegalArgumentException("invalid diplomacy event");
+        else if(d.lastKind<0||d.lastKind>4||d.lastOwner<0||d.lastOwner>3||pair(d.lastOwner,d.lastTarget)==0)throw new IllegalArgumentException("invalid diplomacy event");
         return d;
     }
 }

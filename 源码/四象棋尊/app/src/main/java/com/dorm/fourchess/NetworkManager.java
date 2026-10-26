@@ -36,13 +36,13 @@ class NetworkManager {
         }catch(Exception error){if(running)callback.onNetworkStatus("创建失败："+error.getMessage());}},"fourchess-host").start();
     }
     private void servePeer(Peer peer){new Thread(()->{try{
-        synchronized(this){if(!running)return;peer.out=new PrintWriter(new OutputStreamWriter(peer.socket.getOutputStream(),StandardCharsets.UTF_8),true);peer.out.println("WELCOME|"+peer.owner);peer.out.println("RULES|DP1");}publishNames();broadcastStatus();
+        synchronized(this){if(!running)return;peer.out=new PrintWriter(new OutputStreamWriter(peer.socket.getOutputStream(),StandardCharsets.UTF_8),true);peer.out.println("WELCOME|"+peer.owner);peer.out.println("RULES|DP2");}publishNames();broadcastStatus();
         BufferedReader in=new BufferedReader(new InputStreamReader(peer.socket.getInputStream(),StandardCharsets.UTF_8));String line;
         while(running&&(line=in.readLine())!=null){
             if(line.equals("CAPS|SK4")){peer.skills=true;}
-            else if(line.equals("CAPS|DP1")){peer.diplomacy=true;}
+            else if(line.equals("CAPS|DP2")){peer.diplomacy=true;}
             else if(line.startsWith("HELLO|")){
-                if(board.isSkillMode()&&!peer.skills){peer.out.println("CLOSED|skills_require_v45");break;}if(!peer.diplomacy){peer.out.println("CLOSED|diplomacy_require_v51");break;}peer.ready=true;peer.out.println("STATE|"+board.exportState());try{String name=decode(line.substring(6));synchronized(this){names[peer.owner]=name;}publishNames();}catch(IllegalArgumentException ignored){}}
+                if(board.isSkillMode()&&!peer.skills){peer.out.println("CLOSED|skills_require_v45");break;}if(!peer.diplomacy){peer.out.println("CLOSED|diplomacy_require_v52");break;}peer.ready=true;peer.out.println("STATE|"+board.exportState());try{String name=decode(line.substring(6));synchronized(this){names[peer.owner]=name;}publishNames();}catch(IllegalArgumentException ignored){}}
             else if(line.startsWith("MOVE|")){String[] fields=line.split("\\|");if(fields.length!=6)continue;try{int claimed=Integer.parseInt(fields[1]);if(claimed==peer.owner&&peer.ready&&(!board.isSkillMode()||peer.skills))callback.onHostMove(peer.owner,Integer.parseInt(fields[2]),Integer.parseInt(fields[3]),Integer.parseInt(fields[4]),Integer.parseInt(fields[5]));}catch(NumberFormatException ignored){}}
             else if(line.startsWith("DIPLOMACY|")){String[] f=line.split("\\|");if(f.length==4&&peer.ready)try{if(Integer.parseInt(f[1])==peer.owner)callback.onHostDiplomacy(peer.owner,Integer.parseInt(f[2]),Integer.parseInt(f[3]));}catch(NumberFormatException ignored){}}
             else if(line.startsWith("SKILL|")){
@@ -59,14 +59,14 @@ class NetworkManager {
     }
     void join(String ip){new Thread(()->{String reason="与房主的连接已断开";try{
         Socket socket=new Socket();synchronized(this){if(!running){socket.close();return;}client=socket;}socket.connect(new InetSocketAddress(ip,PORT),5000);
-        synchronized(this){if(!running)return;clientOut=new PrintWriter(new OutputStreamWriter(socket.getOutputStream(),StandardCharsets.UTF_8),true);clientOut.println("CAPS|SK4");clientOut.println("CAPS|DP1");clientOut.println("HELLO|"+encode(nickname));}callback.onNetworkStatus("已连接房主 "+ip);
+        synchronized(this){if(!running)return;clientOut=new PrintWriter(new OutputStreamWriter(socket.getOutputStream(),StandardCharsets.UTF_8),true);clientOut.println("CAPS|SK4");clientOut.println("CAPS|DP2");clientOut.println("HELLO|"+encode(nickname));}callback.onNetworkStatus("已连接房主 "+ip);
         BufferedReader in=new BufferedReader(new InputStreamReader(socket.getInputStream(),StandardCharsets.UTF_8));String line;boolean diplomacyHost=false;
         while(running&&(line=in.readLine())!=null){
             if(line.startsWith("WELCOME|"))callback.onAssigned(Integer.parseInt(line.substring(8)));
-            else if(line.equals("RULES|DP1")){diplomacyHost=true;}
-            else if(line.startsWith("STATE|")){if(!diplomacyHost){reason="结盟对局需要房主升级至v5.1或更新版本";break;}if((line.split("\\|",3)[1].contains(",K1")||line.split("\\|",3)[1].contains(",K2")||line.split("\\|",3)[1].contains(",K3"))){reason="周期抽牌房间需要房主升级v4.5";break;}callback.onState(line.substring(6));}
+            else if(line.equals("RULES|DP2")){diplomacyHost=true;}
+            else if(line.startsWith("STATE|")){if(!diplomacyHost){reason="结盟对局需要房主升级至v5.2或更新版本";break;}if((line.split("\\|",3)[1].contains(",K1")||line.split("\\|",3)[1].contains(",K2")||line.split("\\|",3)[1].contains(",K3"))){reason="周期抽牌房间需要房主升级v4.5";break;}callback.onState(line.substring(6));}
             else if(line.startsWith("NAMES|")){String[] fields=line.split("\\|",-1);if(fields.length==5){try{String[] values=new String[4];for(int i=0;i<4;i++)values[i]=decode(fields[i+1]);callback.onNames(values);}catch(IllegalArgumentException ignored){}}}
-            else if(line.startsWith("CLOSED|")){reason=line.contains("diplomacy_require")?"投降与结盟需要所有玩家安装v5.1或更新版本":line.contains("skills_require")?"技能房间需要所有玩家安装v4.5或更新版本":"房主已退出，房间已关闭";break;}
+            else if(line.startsWith("CLOSED|")){reason=line.contains("diplomacy_require")?"投降与结盟需要所有玩家安装v5.2或更新版本":line.contains("skills_require")?"技能房间需要所有玩家安装v4.5或更新版本":"房主已退出，房间已关闭";break;}
         }
     }catch(Exception error){reason="连接失败或已断开，请检查地址和同一 Wi-Fi";}finally{
         boolean notify=running;try{if(client!=null)client.close();}catch(IOException ignored){}if(notify)callback.onConnectionClosed(reason);
