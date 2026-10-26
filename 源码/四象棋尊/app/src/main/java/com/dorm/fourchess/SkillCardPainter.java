@@ -3,7 +3,7 @@ package com.dorm.fourchess;
 import android.graphics.*;
 import android.text.*;
 
-/** Matte manuscript material. Coordinates and game state remain owned by callers. */
+/** Layered pigment gradients. Coordinates and game state remain owned by callers. */
 final class SkillCardPainter {
     private final TextPaint p=new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private final float density,scaled;
@@ -28,12 +28,13 @@ final class SkillCardPainter {
     void draw(Canvas c,RectF r,int id,int remaining,boolean selected,boolean disabled,String reason,boolean compact,float shine){
         SkillCardTheme t=SkillCardTheme.forSkill(id);float radius=dp(5),pad=Math.min(dp(10),r.width()*.05f),h=r.height(),w=r.width();
         p.setShader(null);p.setStyle(Paint.Style.FILL);p.setColor(0x20091016);c.drawRoundRect(r.left,r.top+dp(1),r.right,r.bottom+dp(1),radius,radius,p);
-        // The base is pigment, not a luminous gradient: only a small tonal drift from the middle tone.
-        int top=BattleSkin.blend(t.middle,t.light,.10f),bottom=BattleSkin.blend(t.middle,t.deep,.16f);
-        p.setColor(Color.WHITE);p.setShader(new LinearGradient(r.left,r.top,r.left,r.bottom,muted(top,disabled),muted(bottom,disabled),Shader.TileMode.CLAMP));
+        // Broad diagonal hue transition plus two off-centre pigment pools, never a white specular band.
+        p.setColor(Color.WHITE);p.setShader(new LinearGradient(r.left,r.top,r.right,r.bottom,
+            new int[]{muted(t.deep,disabled),muted(t.middle,disabled),muted(BattleSkin.blend(t.middle,t.deep,.38f),disabled),muted(t.deep,disabled)},
+            new float[]{0,.36f,.72f,1},Shader.TileMode.CLAMP));
         c.drawRoundRect(r,radius,radius,p);p.setShader(null);
         c.save();Path clip=new Path();clip.addRoundRect(r,radius,radius,Path.Direction.CW);c.clipPath(clip);
-        fibres(c,r,t,disabled);pattern(c,r,t,disabled);c.restore();
+        pigment(c,r,t,disabled);fibres(c,r,t,disabled);pattern(c,r,t,disabled);c.restore();
         // A single etched perimeter; selection changes the line rather than adding another shell.
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(selected?.95f:.65f));p.setColor(disabled?0xff667777:selected?t.title:GameDesign.alpha(t.edge,185));c.drawRoundRect(r,radius,radius,p);
         // One restrained binding mark, rather than four repeated ornamental corners.
@@ -56,6 +57,18 @@ final class SkillCardPainter {
         c.save();c.translate(r.left+pad,descTop+Math.max(0,(descBottom-descTop-lines.getHeight())*.35f));lines.draw(c);c.restore();
         if(!compact){String rule="整活".equals(SkillRules.tier(id))?"整活秘术 · 十回合换牌":"施放耗1次 · 十回合换牌";
             text(c,rule,r.centerX(),r.bottom-Math.max(dp(8),h*.065f),Math.min(8*scaled,h*.08f),w-pad*2,GameDesign.alpha(body,210),Paint.Align.CENTER);}
+    }
+    private void pigment(Canvas c,RectF r,SkillCardTheme t,boolean disabled){
+        float reach=Math.max(r.width(),r.height());
+        p.setStyle(Paint.Style.FILL);p.setColor(Color.WHITE);
+        p.setShader(new RadialGradient(r.left+r.width()*.08f,r.top+r.height()*.08f,reach*.86f,
+            new int[]{GameDesign.alpha(muted(t.light,disabled),disabled?45:190),GameDesign.alpha(muted(t.light,disabled),disabled?12:65),0},
+            new float[]{0,.45f,1},Shader.TileMode.CLAMP));c.drawRect(r,p);
+        p.setShader(new RadialGradient(r.right+r.width()*.12f,r.bottom-r.height()*.12f,reach*.72f,
+            new int[]{GameDesign.alpha(muted(t.light,disabled),disabled?30:120),0},null,Shader.TileMode.CLAMP));c.drawRect(r,p);
+        // A transparent dark ink wash quiets only the reading zone, retaining colour around its edges.
+        p.setShader(new LinearGradient(r.left,r.top,r.left,r.bottom,
+            new int[]{0,GameDesign.alpha(t.deep,35),GameDesign.alpha(t.deep,48),0},new float[]{0,.32f,.73f,1},Shader.TileMode.CLAMP));c.drawRect(r,p);p.setShader(null);
     }
     private void fibres(Canvas c,RectF r,SkillCardTheme t,boolean disabled){
         // Deterministic sub-visible curved fibres: no bitmap tiling, random noise or per-frame flicker.

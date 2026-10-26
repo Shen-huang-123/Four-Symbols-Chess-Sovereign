@@ -658,7 +658,7 @@
   {
     "tag": "v4.7",
     "title": "四象棋尊 v4.7 · 东方秘卷哑光卡牌",
-    "apk": "安装包/最新版/四象棋尊-v4.7.apk",
+    "apk": "安装包/历史版本/四象棋尊-v4.7.apk",
     "size": 6315641,
     "sha256": "e006d1b8e48f9c3b7d5bc8a7c8a30954309311facaab5f35eb4e6b4cfc076fbe",
     "manifest": {
@@ -670,5 +670,21 @@
     "notes": "发布/说明/v4.7.md",
     "checksum": "发布/说明/SHA256SUMS-v4.7.txt",
     "download_name": "Four-Symbols-Chess-Sovereign-v4.7.apk"
+  },
+  {
+    "tag": "v4.8",
+    "title": "四象棋尊 v4.8 · 品质分层渐变卡牌",
+    "apk": "安装包/最新版/四象棋尊-v4.8.apk",
+    "size": 6316522,
+    "sha256": "7cb32719b41f7ff7dc9df95f8f6726ee5a77aae33b8cde88c34f8ae50aa00bdd",
+    "manifest": {
+      "versionCode": 48,
+      "versionName": "4.8.0",
+      "package": "com.dorm.fourchess"
+    },
+    "source": "完整源码",
+    "notes": "发布/说明/v4.8.md",
+    "checksum": "发布/说明/SHA256SUMS-v4.8.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v4.8.apk"
   }
 ]

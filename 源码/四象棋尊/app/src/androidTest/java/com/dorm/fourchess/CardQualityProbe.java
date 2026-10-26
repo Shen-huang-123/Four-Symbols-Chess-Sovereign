@@ -20,6 +20,7 @@ public final class CardQualityProbe extends Instrumentation {
         int[] ids={6,7,1,29},charges={3,2,1,0};RectF[] cells=new RectF[4];float gap=8*d;
         for(int i=0;i<4;i++){float cw=(w-gap*3)/2,ch=(h-gap*3)/2,left=gap+(i%2)*(cw+gap),top=gap+(i/2)*(ch+gap);cells[i]=new RectF(left,top,left+cw,top+ch);painter.draw(c,cells[i],ids[i],charges[i],false,i==3,i==3?"已用尽":"",compact,0);check(cells[i].width()>0&&cells[i].height()>0,"responsive quality card geometry "+name+"/"+i);}
         check(dominant(b,cells[0],0)>65,"legendary face is visibly red "+name);check(dominant(b,cells[1],1)>65,"rare face is visibly blue "+name);check(dominant(b,cells[2],2)>65,"common face is visibly green "+name);
+        for(int i=0;i<3;i++){RectF r=cells[i];int upper=b.getPixel((int)(r.left+3*d),(int)(r.top+r.height()*.28f)),lower=b.getPixel((int)(r.right-3*d),(int)(r.top+r.height()*.88f));check(luminance(upper)-luminance(lower)>.012,"visible diagonal quality gradient outside text "+name+"/"+i);}
         try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),name))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
     }
     private void run()throws Exception{
