@@ -43,16 +43,17 @@ final class SkillRackView extends ViewGroup {
         for(int i=0;i<tiles.length;i++){int x=(i%cols)*(tw+gap),top=y+(i/cols)*(th+gap);tiles[i].layout(x,top,x+tw,top+th);}
     }
     private final class Tile extends Button {
-        String title="",description="",reason="";int remaining,accent,skillId;boolean revealed;private long selectedAt=-1000;private final SkillCardPainter painter=new SkillCardPainter(getContext());
+        String title="",description="",reason="";int remaining,accent,skillId;boolean revealed;private long selectedAt=-1000;private final SkillCardPainter painter=new SkillCardPainter(getContext());private final SkillCardPrestige prestige=new SkillCardPrestige();
         Tile(Context c){super(c);setAllCaps(false);setMinWidth(0);setMinimumWidth(0);setMinHeight(0);setMinimumHeight(0);setPadding(0,0,0,0);setSingleLine(true);setWillNotDraw(false);setElevation(dp(1));}
         void refreshBackground(){setBackgroundColor(android.graphics.Color.TRANSPARENT);setWillNotDraw(false);}
         @Override public void setSelected(boolean value){if(value&&!isSelected())selectedAt=android.os.SystemClock.uptimeMillis();super.setSelected(value);}
         @Override protected void onDraw(Canvas c){
             c.save();c.translate(getScrollX(),getScrollY());RectF rect=new RectF(dp(1),dp(1),getWidth()-dp(1),getHeight()-dp(2));
-            if(revealed){boolean motion=android.os.Build.VERSION.SDK_INT<26||android.animation.ValueAnimator.areAnimatorsEnabled();float shine=isSelected()&&motion?(android.os.SystemClock.uptimeMillis()-selectedAt)/340f:0;painter.draw(c,rect,skillId,remaining,isSelected()||isPressed(),!isEnabled(),remaining==0?"已用尽":reason,true,shine);if(shine>0&&shine<1)postInvalidateOnAnimation();}
+            if(revealed){boolean motion=android.os.Build.VERSION.SDK_INT<26||android.animation.ValueAnimator.areAnimatorsEnabled();float shine=isSelected()&&motion?(android.os.SystemClock.uptimeMillis()-selectedAt)/340f:0;painter.draw(c,rect,skillId,remaining,isSelected()||isPressed(),!isEnabled(),remaining==0?"已用尽":reason,true,shine);boolean ambient=SkillCardPrestige.animated(skillId,!isEnabled(),motion);if(ambient)prestige.ambient(c,rect,skillId,android.os.SystemClock.uptimeMillis(),getResources().getDisplayMetrics().density,true,false,true);if(((shine>0&&shine<1)||ambient)&&isShown()&&hasWindowFocus())postInvalidateDelayed(33);}
             else{android.graphics.Paint p=new android.graphics.Paint(3);p.setColor(GameDesign.PANEL_RAISED);c.drawRoundRect(rect,dp(7),dp(7),p);p.setColor(GameDesign.GOLD_BRIGHT);p.setTextSize(Math.min(13*getResources().getDisplayMetrics().scaledDensity,getHeight()*.26f));p.setTypeface(GameDesign.EMPHASIS);p.setTextAlign(Paint.Align.CENTER);c.drawText("秘卷 · 点击揭晓",getWidth()/2f,getHeight()/2f-(p.ascent()+p.descent())/2,p);}
             c.restore();
         }
+        @Override public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus)invalidate();}
         @Override public boolean onTouchEvent(MotionEvent e){if(isEnabled()){if(e.getActionMasked()==MotionEvent.ACTION_DOWN)animate().scaleX(.985f).scaleY(.985f).setDuration(80).start();else if(e.getActionMasked()==MotionEvent.ACTION_UP||e.getActionMasked()==MotionEvent.ACTION_CANCEL)animate().scaleX(1).scaleY(1).setDuration(100).start();}return super.onTouchEvent(e);}
     }
     @Override protected LayoutParams generateDefaultLayoutParams(){return new LayoutParams(-1,-1);}

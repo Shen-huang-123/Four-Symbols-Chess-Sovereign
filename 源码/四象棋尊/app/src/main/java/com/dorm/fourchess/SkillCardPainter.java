@@ -9,6 +9,7 @@ final class SkillCardPainter {
     private final SkillEmblemPainter emblem;
     private final SkillCardPatternPainter patterns=new SkillCardPatternPainter();
     private final float density,scaled;
+    private final SkillCardPrestige prestige=new SkillCardPrestige();
     SkillCardPainter(android.content.Context context){emblem=new SkillEmblemPainter(context);density=context.getResources().getDisplayMetrics().density;scaled=context.getResources().getDisplayMetrics().scaledDensity;}
     private float dp(float n){return n*density;}
     RectF emblemBounds(RectF r){
@@ -34,8 +35,7 @@ final class SkillCardPainter {
         }while(true);return result;
     }
     private Path frame(RectF r,SkillCardTheme t){
-        float cut=dp(t.pattern==0?8:t.pattern==1?5:2);Path path=new Path();
-        path.moveTo(r.left+cut,r.top);path.lineTo(r.right-cut,r.top);path.lineTo(r.right,r.top+cut);path.lineTo(r.right,r.bottom-cut);path.lineTo(r.right-cut,r.bottom);path.lineTo(r.left+cut,r.bottom);path.lineTo(r.left,r.bottom-cut);path.lineTo(r.left,r.top+cut);path.close();return path;
+        return SkillCardPrestige.outline(r,t,density);
     }
     void draw(Canvas c,RectF r,int id,int remaining,boolean selected,boolean disabled,String reason,boolean compact,float shine){
         draw(c,r,id,remaining,selected,disabled,reason,compact,shine,1,1);
@@ -51,8 +51,8 @@ final class SkillCardPainter {
         fibres(c,r,t);if(!compact)patterns.draw(c,r,SkillCardVisual.of(id),t);p.setColor(GameDesign.alpha(t.edge,35));p.setStrokeWidth(dp(.5f));c.drawLine(r.left+pad,r.top+h*.54f,r.right-pad,r.top+h*.54f,p);
         c.restore();
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(selected?1.0f:.65f));p.setColor(disabled?0xff667777:selected?t.title:GameDesign.alpha(t.edge,190));c.drawPath(outline,p);
-        corners(c,r,t,disabled);p.setStyle(Paint.Style.FILL);
-        if(!compact){int artLayer=c.saveLayerAlpha(r,Math.round(Math.max(0,Math.min(1,artworkOpacity))*255));emblem.draw(c,emblemBounds(r),id,t,disabled);c.restoreToCount(artLayer);}
+        corners(c,r,t,disabled);if(!disabled){prestige.metalRim(c,r,t,density,selected);prestige.regalia(c,r,t,density,compact);}p.setStyle(Paint.Style.FILL);
+        if(!compact){int artLayer=c.saveLayerAlpha(r,Math.round(Math.max(0,Math.min(1,artworkOpacity))*255));if(!disabled)prestige.artworkMount(c,emblemBounds(r),t,density);emblem.draw(c,emblemBounds(r),id,t,disabled);c.restoreToCount(artLayer);}
         int information=c.saveLayerAlpha(r,Math.round(Math.max(0,Math.min(1,textOpacity))*255));
         int title=disabled?0xffbec8c4:t.title,body=disabled?0xffa9b7b4:t.body;
         float badgeSize=Math.min(10*scaled,h*.15f),badgeH=Math.min(dp(20),h*.22f),badgeY=r.top+pad+badgeH/2;
@@ -80,7 +80,7 @@ final class SkillCardPainter {
     }
     private void corners(Canvas c,RectF r,SkillCardTheme t,boolean disabled){
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.6f));p.setColor(GameDesign.alpha(t.edge,disabled?35:110));
-        if(t.pattern==0){for(int side=0;side<2;side++){float x=side==0?r.left:r.right,sign=side==0?1:-1;Path wing=new Path();wing.moveTo(x+sign*dp(4),r.top+dp(19));wing.lineTo(x+sign*dp(4),r.top+dp(9));wing.lineTo(x+sign*dp(10),r.top+dp(4));wing.lineTo(x+sign*dp(23),r.top+dp(4));c.drawPath(wing,p);c.drawLine(x+sign*dp(10),r.top+dp(8),x+sign*dp(15),r.top+dp(8),p);}}
+        if(t.pattern==0){/* Legendary engraving is drawn once by SkillCardPrestige. */}
         else if(t.pattern==1){float x=r.right-dp(5),y=r.bottom-dp(5);c.drawLine(x-dp(11),y,x,y,p);c.drawLine(x,y,x,y-dp(8),p);}
         else{c.drawLine(r.left+dp(7),r.bottom-dp(4),r.left+dp(18),r.bottom-dp(4),p);}p.setStyle(Paint.Style.FILL);
     }

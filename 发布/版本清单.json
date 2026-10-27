@@ -786,7 +786,7 @@
   {
     "tag": "v5.5",
     "title": "四象棋尊 v5.5 · 三十秘术独立插画与材质",
-    "apk": "安装包/最新版/四象棋尊-v5.5.apk",
+    "apk": "安装包/历史版本/四象棋尊-v5.5.apk",
     "size": 6420900,
     "sha256": "20512ff85792e3dff80c61cb4e26f471b5c730a00a99d4b57e8b610cd66ec5f8",
     "manifest": {
@@ -798,5 +798,21 @@
     "notes": "发布/说明/v5.5.md",
     "checksum": "发布/说明/SHA256SUMS-v5.5.txt",
     "download_name": "Four-Symbols-Chess-Sovereign-v5.5.apk"
+  },
+  {
+    "tag": "v5.6",
+    "title": "四象棋尊 v5.6 · 传说鎏金动态卡框",
+    "apk": "安装包/最新版/四象棋尊-v5.6.apk",
+    "size": 6287015,
+    "sha256": "f73384226f306e4325bef3947d0d287614db28a15cd7f8574a336a9b8f614ff0",
+    "manifest": {
+      "versionCode": 56,
+      "package": "com.dorm.fourchess",
+      "versionName": "5.6.0"
+    },
+    "source": "完整源码",
+    "notes": "发布/说明/v5.6.md",
+    "checksum": "发布/说明/SHA256SUMS-v5.6.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v5.6.apk"
   }
 ]

@@ -25,6 +25,7 @@ public final class CardQualityProbe extends Instrumentation {
     }
     private void run()throws Exception{
         verifyEffects();
+        verifyPrestige();
         verifyRevealPhases();
         verifyVisualRegistry();
         int[] totals=new int[3];for(int id=1;id<=30;id++){SkillCardTheme t=SkillCardTheme.forSkill(id);check(t!=null,"all skill IDs have a shared quality theme "+id);totals[t.pattern]++;}
@@ -57,6 +58,41 @@ public final class CardQualityProbe extends Instrumentation {
         SkillDrawView draw=new SkillDrawView(getTargetContext(),new int[]{6,7,1,29},new int[]{3,2,1,0});float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(420*d),h=Math.round(390*d);draw.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));draw.layout(0,0,w,h);draw.revealAll(false);
         check(draw.allRevealed(),"skip preserves fully revealed card presentation");String node=draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();check(node.contains("传说")&&node.contains("剩余3次")&&node.contains("天遁"),"revealed quality name and actual charges accessible");check(draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(2).getContentDescription().toString().contains("稀有"),"rare presentation uses shared label");
         Bitmap b=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);draw.draw(new Canvas(b));try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-reveal.png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
+    }
+    private void verifyPrestige()throws Exception{
+        SkillCardPrestige fx=new SkillCardPrestige();float d=getTargetContext().getResources().getDisplayMetrics().density;
+        int[] ids={6,9,7,1};
+        check(SkillCardPrestige.period(6)<SkillCardPrestige.period(7),"legend gold travels more often than rare silver");
+        java.util.HashSet<Integer> moving=new java.util.HashSet<>();
+        for(int id:ids){
+            check(!SkillCardPrestige.animated(id,true,true)&&!SkillCardPrestige.animated(id,false,false),"spent and reduced-motion cards never animate "+id);
+            check(SkillCardPrestige.animated(id,false,true)==(id!=1),"only revealed legendary and rare cards have ambient treatment "+id);
+            for(int phase=0;phase<3;phase++){
+                RectF card=new RectF(4,4,196,264);Bitmap b=Bitmap.createBitmap(200,268,Bitmap.Config.ARGB_8888);
+                fx.ambient(new Canvas(b),card,id,phase*700+250,1,false,false,true);
+                int[] pixels=new int[200*268];b.getPixels(pixels,0,200,0,0,200,268);int count=0;boolean clean=true;
+                for(int y=0;y<268;y++)for(int x=0;x<200;x++)if(Color.alpha(pixels[y*200+x])>0){count++;if(x<4||x>=196||y<4||y>=264||(x>9&&x<190&&y>145&&y<259))clean=false;}
+                check(clean,"ambient never draws over skill explanation or beyond card "+id+"/"+phase);
+                check(id==1?count==0:count>0,"rarity has expected gold silver or static jade output "+id+"/"+phase);
+                if(id==6)check(moving.add(java.util.Arrays.hashCode(pixels)),"gold rim and stars travel between frames "+phase);b.recycle();
+            }
+        }
+        for(boolean disabled:new boolean[]{false,true}){
+            Bitmap b=Bitmap.createBitmap(200,268,Bitmap.Config.ARGB_8888);fx.ambient(new Canvas(b),new RectF(4,4,196,264),6,700,1,false,disabled,!disabled);
+            // The enabled frame is visible; disabled with motion off is completely empty.
+            int[] pixels=new int[200*268];b.getPixels(pixels,0,200,0,0,200,268);boolean empty=true;for(int pixel:pixels)if(pixel!=0)empty=false;
+            check(empty==disabled,"ambient respects disabled and reduced animation output "+disabled);b.recycle();
+        }
+        SkillDrawView view=new SkillDrawView(getTargetContext(),ids,new int[]{3,2,2,1});int w=Math.round(420*d),h=Math.round(580*d);view.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));view.layout(0,0,w,h);
+        final int[] callbacks={0,0};view.setListener(new SkillDrawView.Listener(){public void onCard(int id,boolean shown){callbacks[0]++;}public void onComplete(){callbacks[1]++;}});view.revealAll(false);int before=callbacks[0];
+        Bitmap repeated=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);for(int i=0;i<6;i++)view.draw(new Canvas(repeated));check(callbacks[0]==before&&callbacks[1]==1,"ambient repaint never repeats game selection or completion callbacks");repeated.recycle();
+        SkillCardPainter painter=new SkillCardPainter(getTargetContext());
+        for(int frame=0;frame<64;frame++){
+            Bitmap b=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);c.drawColor(GameDesign.NIGHT);
+            float gap=8*d,cw=(w-gap*3)/2,ch=(h-gap*3)/2;
+            for(int i=0;i<4;i++){float left=gap+(i%2)*(cw+gap),top=gap+(i/2)*(ch+gap);RectF r=new RectF(left,top,left+cw,top+ch);painter.draw(c,r,ids[i],3-i%2,i==0,false,"",false,0);fx.ambient(c,r,ids[i],frame*100, d,false,false,true);}
+            try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-prestige-"+frame+".png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
+        }
     }
     private void verifyVisualRegistry()throws Exception{
         java.util.HashSet<Integer> resources=new java.util.HashSet<>();java.util.HashSet<String> replacements=new java.util.HashSet<>();
