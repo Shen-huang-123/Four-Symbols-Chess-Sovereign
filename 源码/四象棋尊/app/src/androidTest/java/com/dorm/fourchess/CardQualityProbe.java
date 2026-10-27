@@ -25,6 +25,7 @@ public final class CardQualityProbe extends Instrumentation {
     }
     private void run()throws Exception{
         verifyEffects();
+        verifyRenderCache();
         verifyPrestige();
         verifyRevealPhases();
         verifyVisualRegistry();
@@ -58,6 +59,31 @@ public final class CardQualityProbe extends Instrumentation {
         SkillDrawView draw=new SkillDrawView(getTargetContext(),new int[]{6,7,1,29},new int[]{3,2,1,0});float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(420*d),h=Math.round(390*d);draw.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));draw.layout(0,0,w,h);draw.revealAll(false);
         check(draw.allRevealed(),"skip preserves fully revealed card presentation");String node=draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();check(node.contains("传说")&&node.contains("剩余3次")&&node.contains("天遁"),"revealed quality name and actual charges accessible");check(draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(2).getContentDescription().toString().contains("稀有"),"rare presentation uses shared label");
         Bitmap b=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);draw.draw(new Canvas(b));try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-reveal.png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
+    }
+    private void verifyRenderCache()throws Exception{
+        SkillCardPainter painter=new SkillCardPainter(getTargetContext());RectF r=new RectF(4,4,196,264);
+        for(int id=1;id<=30;id++){
+            SkillCardRenderCache cache=new SkillCardRenderCache();cache.prepare(painter,r,id,2,false);
+            Bitmap direct=Bitmap.createBitmap(200,268,Bitmap.Config.ARGB_8888),cached=Bitmap.createBitmap(200,268,Bitmap.Config.ARGB_8888);
+            painter.draw(new Canvas(direct),r,id,2,false,false,"",false,0);cache.draw(new Canvas(cached),r,1,1);
+            int[] a=new int[200*268],b=new int[a.length];direct.getPixels(a,0,200,0,0,200,268);cached.getPixels(b,0,200,0,0,200,268);int changed=0;
+            // Picture replay rasterizes the metallic stroke differently at translated edges.
+            // Exclude only that thin outline; all text, artwork, badges and face pixels must agree.
+            Bitmap edge=Bitmap.createBitmap(200,268,Bitmap.Config.ARGB_8888);Paint stroke=new Paint();stroke.setStyle(Paint.Style.STROKE);stroke.setStrokeWidth(4*getTargetContext().getResources().getDisplayMetrics().density);stroke.setColor(Color.WHITE);
+            new Canvas(edge).drawPath(SkillCardPrestige.outline(r,SkillCardTheme.forSkill(id),getTargetContext().getResources().getDisplayMetrics().density),stroke);
+            for(int k=0;k<a.length;k++)if(a[k]!=b[k]&&edge.getPixel(k%200,k/200)==0)changed++;
+            check(changed<a.length*.015,"native command cache preserves real card artwork text and charges "+id);edge.recycle();            int recorded=cache.recordingCount();for(int i=0;i<60;i++){cache.prepare(painter,r,id,2,false);cache.draw(new Canvas(cached),r,i/59f,i/59f);}
+            check(recorded==3&&cache.recordingCount()==recorded,"60 fade frames never rebuild text or vector layers "+id);
+            cache.prepare(painter,r,id,2,true);check(cache.recordingCount()==4,"selection updates border only "+id);
+            cache.prepare(painter,r,id,0,true);check(cache.recordingCount()==7,"real charge changes invalidate all cached content "+id);
+            cache.prepare(painter,new RectF(0,0,216,284),id,0,true);check(cache.recordingCount()==10,"screen geometry changes regenerate crisp drawing commands "+id);
+            direct.recycle();cached.recycle();
+        }
+        Bitmap frame=Bitmap.createBitmap(600,840,Bitmap.Config.ARGB_8888);Canvas target=new Canvas(frame);RectF large=new RectF(4,4,596,836);SkillCardRenderCache cache=new SkillCardRenderCache();cache.prepare(painter,large,6,3,false);
+        for(int i=0;i<8;i++)cache.draw(target,large,1,1);
+        long direct=System.nanoTime();for(int i=0;i<40;i++)painter.draw(target,large,6,3,false,false,"",false,0);direct=System.nanoTime()-direct;
+        long recorded=System.nanoTime();for(int i=0;i<40;i++)cache.draw(target,large,1,1);recorded=System.nanoTime()-recorded;
+        log.append("BENCH software600x840 direct_ms=").append(direct/40000000d).append(" cached_ms=").append(recorded/40000000d).append(" per_card; not device FPS\n");frame.recycle();
     }
     private void verifyPrestige()throws Exception{
         SkillCardPrestige fx=new SkillCardPrestige();float d=getTargetContext().getResources().getDisplayMetrics().density;

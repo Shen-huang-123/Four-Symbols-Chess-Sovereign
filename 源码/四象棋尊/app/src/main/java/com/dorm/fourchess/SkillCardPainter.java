@@ -41,7 +41,11 @@ final class SkillCardPainter {
         draw(c,r,id,remaining,selected,disabled,reason,compact,shine,1,1);
     }
     void draw(Canvas c,RectF r,int id,int remaining,boolean selected,boolean disabled,String reason,boolean compact,float shine,float artworkOpacity,float textOpacity){
+        drawLayer(c,r,id,remaining,selected,disabled,reason,compact,artworkOpacity,textOpacity,7);
+    }
+    void drawLayer(Canvas c,RectF r,int id,int remaining,boolean selected,boolean disabled,String reason,boolean compact,float artworkOpacity,float textOpacity,int layers){
         SkillCardTheme t=SkillCardVisual.of(id).theme();float pad=Math.min(dp(10),r.width()*.055f),h=r.height(),w=r.width();Path outline=frame(r,t);
+        if((layers&1)!=0){
         p.setStyle(Paint.Style.FILL);p.setShader(null);p.setColor(0x20081016);c.save();c.translate(0,dp(1));c.drawPath(outline,p);c.restore();
         p.setColor(muted(t.middle,disabled));c.drawPath(outline,p);
         c.save();c.clipPath(outline);
@@ -52,8 +56,10 @@ final class SkillCardPainter {
         c.restore();
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(selected?1.0f:.65f));p.setColor(disabled?0xff667777:selected?t.title:GameDesign.alpha(t.edge,190));c.drawPath(outline,p);
         corners(c,r,t,disabled);if(!disabled){prestige.metalRim(c,r,t,density,selected);prestige.regalia(c,r,t,density,compact);}p.setStyle(Paint.Style.FILL);
-        if(!compact){int artLayer=c.saveLayerAlpha(r,Math.round(Math.max(0,Math.min(1,artworkOpacity))*255));if(!disabled)prestige.artworkMount(c,emblemBounds(r),t,density);emblem.draw(c,emblemBounds(r),id,t,disabled);c.restoreToCount(artLayer);}
-        int information=c.saveLayerAlpha(r,Math.round(Math.max(0,Math.min(1,textOpacity))*255));
+        }
+        if((layers&2)!=0&&!compact&&artworkOpacity>0){int artLayer=artworkOpacity<1?c.saveLayerAlpha(r,Math.round(artworkOpacity*255)):c.save();if(!disabled)prestige.artworkMount(c,emblemBounds(r),t,density);emblem.draw(c,emblemBounds(r),id,t,disabled);c.restoreToCount(artLayer);}
+        if((layers&4)==0||textOpacity<=0)return;
+        int information=textOpacity<1?c.saveLayerAlpha(r,Math.round(textOpacity*255)):c.save();
         int title=disabled?0xffbec8c4:t.title,body=disabled?0xffa9b7b4:t.body;
         float badgeSize=Math.min(10*scaled,h*.15f),badgeH=Math.min(dp(20),h*.22f),badgeY=r.top+pad+badgeH/2;
         if(!compact){p.setColor(muted(t.badgeInk,disabled));c.drawRect(r.left+pad-dp(3),badgeY-badgeH*.6f,r.left+pad+badgeSize*2.6f,badgeY+badgeH*.6f,p);}
