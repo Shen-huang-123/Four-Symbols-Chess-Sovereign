@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>回春</title>
+  <path d="M18,79 C18,75.68629 32.32688,73 50,73 C67.67312,73 82,75.68629 82,79 C82,82.31371 67.67312,85 50,85 C32.32688,85 18,82.31371 18,79 Z" fill="none" opacity="0.7" stroke="#5A9983" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,72 C42,55 23,56 19,65 C23,78 42,78 50,72 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,72 Q34,73 22,65" fill="none" opacity="0.6" stroke="#DAE8CB" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,72 C58,55 77,56 81,65 C77,78 58,78 50,72 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,72 Q66,73 78,65" fill="none" opacity="0.6" stroke="#DAE8CB" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,72 C38,63 42,50 50,47 C58,50 62,63 50,72 Z" fill="#75B9A1" opacity="1" stroke="#A7CBB5" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M33,47 C33,42.8689082 40.611155,39.519999999999996 50,39.519999999999996 C59.388845,39.519999999999996 67,42.8689082 67,47 C67,51.1310918 59.388845,54.480000000000004 50,54.480000000000004 C40.611155,54.480000000000004 33,51.1310918 33,47 Z" fill="#25483F" opacity="1" stroke="#5A9983" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M33,42 L33,47 C33,54 67,54 67,47 L67,42 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M33,42 C33,35.0522547 40.611155,29.42 50,29.42 C59.388845,29.42 67,35.0522547 67,42 C67,48.9477453 59.388845,54.58 50,54.58 C40.611155,54.58 33,48.9477453 33,42 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M36.74,41 C36.74,35.9300237 42.6767009,31.82 50,31.82 C57.3232991,31.82 63.26,35.9300237 63.26,41 C63.26,46.0699763 57.3232991,50.18 50,50.18 C42.6767009,50.18 36.74,46.0699763 36.74,41 Z" fill="#25483F" opacity="1" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M38.95,39 C46.6,34 51.7,34 60.2,39" fill="#DAE8CB" opacity="0.2" />
+  <path d="M46,38 L54,38 M46,42 L54,42 M50,38 L50,46 M46,48 L50,45 L54,48" fill="none" opacity="1" stroke="#DAE8CB" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M35,33 C19,17 33,5 40,17 C45,25 37,27 35,23" fill="none" opacity="1" stroke="#75B9A1" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M66,19 L66.6,20.4 L68,21 L66.6,21.6 L66,23 L65.4,21.6 L64,21 L65.4,20.4 Z" fill="#DAE8CB" opacity="0.85" />
+</svg>

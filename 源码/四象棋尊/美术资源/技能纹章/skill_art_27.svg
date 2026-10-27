@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>春风</title>
+  <path d="M18,79 C18,75.68629 32.32688,73 50,73 C67.67312,73 82,75.68629 82,79 C82,82.31371 67.67312,85 50,85 C32.32688,85 18,82.31371 18,79 Z" fill="none" opacity="0.7" stroke="#5A9983" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M31,78 C27,48 62,30 64,13 Q70,46 43,65 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M35,58 Q11,35 10,54 Q22,59 35,58 Z" fill="#75B9A1" opacity="1" stroke="#A7CBB5" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M49,46 Q73,23 74,42 Q62,47 49,46 Z" fill="#75B9A1" opacity="1" stroke="#A7CBB5" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M58,32 Q34,9 33,28 Q45,33 58,32 Z" fill="#75B9A1" opacity="1" stroke="#A7CBB5" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M14,84 C37,56 71,83 82,59 C77,88 37,72 14,84 Z" fill="#75B9A1" opacity="0.6" />
+  <path d="M19,83 C41,65 64,85 80,63" fill="none" opacity="0.7" stroke="#DAE8CB" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M24,19 L24.6,20.4 L26,21 L24.6,21.6 L24,23 L23.4,21.6 L22,21 L23.4,20.4 Z" fill="#DAE8CB" opacity="0.85" />
+</svg>

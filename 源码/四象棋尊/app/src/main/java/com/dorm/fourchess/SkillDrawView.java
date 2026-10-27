@@ -41,11 +41,11 @@ final class SkillDrawView extends View {
             boolean revealFx=motion()&&effects.active(hand[i],revealAge,false),selectFx=motion()&&effects.active(hand[i],selectAge,true);
             moving|=motion()&&flips[i]>=0&&(t<1||revealFx||selectFx);
             c.save();float turn=Math.max(0,Math.min(1,(t-.15f)/.7f));float sx=flips[i]<0?1:Math.max(.035f,Math.abs((float)Math.cos(turn*Math.PI)));float lift=flips[i]<0?0:(float)Math.sin(Math.PI*t)*dp(3);c.translate(0,-lift);c.scale(sx,1,r.centerX(),r.centerY());
-            if(face){cardPainter.draw(c,r,hand[i],charges[i],selected==i,charges[i]==0,charges[i]==0?"已用尽":"",false,0);
+            if(face){float artAlpha=Math.max(0,Math.min(1,(t-.5f)/.18f)),textAlpha=Math.max(0,Math.min(1,(t-.62f)/.28f));cardPainter.draw(c,r,hand[i],charges[i],selected==i,charges[i]==0,charges[i]==0?"已用尽":"",false,0,artAlpha,textAlpha);
                 if(charges[i]>0&&(selectFx||revealFx))effects.draw(c,cardPainter.emblemBounds(r),hand[i],selectFx?selectAge:revealAge,selectFx);
             }
             else{
-                backPainter.draw(c,r,getResources().getDisplayMetrics().density,getResources().getDisplayMetrics().scaledDensity,flips[i]>=0?(float)Math.sin(Math.PI*Math.min(1,t/.5f)):0);
+                backPainter.draw(c,r,getResources().getDisplayMetrics().density,getResources().getDisplayMetrics().scaledDensity,flips[i]>=0?(float)Math.sin(Math.PI*Math.min(1,t/.5f)):0,i);
             }c.restore();
         }
         finishIfReady();if(moving&&isShown()&&hasWindowFocus())postInvalidateOnAnimation();

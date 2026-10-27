@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>灵象</title>
+  <path d="M18,79 C18,75.68629 32.32688,73 50,73 C67.67312,73 82,75.68629 82,79 C82,82.31371 67.67312,85 50,85 C32.32688,85 18,82.31371 18,79 Z" fill="none" opacity="0.7" stroke="#5A9983" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 C42,64 23,65 19,74 C23,87 42,87 50,81 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 Q34,82 22,74" fill="none" opacity="0.6" stroke="#DAE8CB" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 C58,64 77,65 81,74 C77,87 58,87 50,81 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 Q66,82 78,74" fill="none" opacity="0.6" stroke="#DAE8CB" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 C38,72 42,59 50,56 C58,59 62,72 50,81 Z" fill="#75B9A1" opacity="1" stroke="#A7CBB5" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M23,56 C14,32 29,20 46,25 C61,13 83,28 79,47 L80,72 Q74,79 71,69 L68,52 L58,57 L58,73 L47,73 L46,58 Q35,64 30,61 L30,73 L21,73 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M27,37 C11,30 14,57 30,54 Q40,47 27,37 Z" fill="#25483F" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M75,43 Q88,44 82,64 Q80,67 78,61" fill="none" opacity="1" stroke="#DAE8CB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M38,34 Q45,28 52,34 L49,45 L40,45 Z" fill="none" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M67.5,36 C67.5,35.171572499999996 68.1715725,34.5 69,34.5 C69.8284275,34.5 70.5,35.171572499999996 70.5,36 C70.5,36.828427500000004 69.8284275,37.5 69,37.5 C68.1715725,37.5 67.5,36.828427500000004 67.5,36 Z" fill="#DAE8CB" opacity="1" />
+</svg>

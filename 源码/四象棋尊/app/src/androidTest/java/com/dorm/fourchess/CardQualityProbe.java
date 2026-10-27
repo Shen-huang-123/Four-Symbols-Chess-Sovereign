@@ -26,6 +26,7 @@ public final class CardQualityProbe extends Instrumentation {
     private void run()throws Exception{
         verifyEffects();
         verifyRevealPhases();
+        verifyVisualRegistry();
         int[] totals=new int[3];for(int id=1;id<=30;id++){SkillCardTheme t=SkillCardTheme.forSkill(id);check(t!=null,"all skill IDs have a shared quality theme "+id);totals[t.pattern]++;}
         check(totals[0]==6&&totals[1]==10&&totals[2]==14,"mapping retains original six legendary ten rare fourteen common skills");check(SkillCardTheme.forSkill(29)==SkillCardTheme.COMMON&&SkillCardTheme.label(29).contains("整活"),"weak entertainment identity retained");
         for(SkillCardTheme t:new SkillCardTheme[]{SkillCardTheme.LEGENDARY,SkillCardTheme.RARE,SkillCardTheme.COMMON})for(int bg:new int[]{t.deep,t.middle,t.light}){check(contrast(t.title,bg)>=4.5,"title contrast >=4.5 "+t.key);check(contrast(t.body,bg)>=4.5,"description contrast >=4.5 "+t.key);}
@@ -47,8 +48,8 @@ public final class CardQualityProbe extends Instrumentation {
         for(int id=1;id<=30;id++){
             String copy=SkillCardCopy.summary(id);check(!copy.contains("…")&&!copy.isEmpty(),"semantic summary without truncation "+id);
             for(int width:new int[]{146,192,320}){android.text.StaticLayout lines=copyPainter.summary(copy,width*density,32*density,11*density,SkillCardTheme.forSkill(id).body);check(lines.getLineCount()<=2&&lines.getText().toString().equals(copy),"summary fully visible in at most two lines "+id+"/"+width);check(lines.getPaint().getTextSize()>=7.5*density,"summary readable at real narrow-card width "+id+"/"+width);}
-            Bitmap glyph=Bitmap.createBitmap(192,192,Bitmap.Config.ARGB_8888);new SkillEmblemPainter().draw(new Canvas(glyph),new RectF(8,8,184,184),id,SkillCardTheme.COMMON,false);int[] pixels=new int[192*192];glyph.getPixels(pixels,0,192,0,0,192,192);check(glyphHashes.add(java.util.Arrays.hashCode(pixels)),"unique semantic seal even with identical quality frame "+id);check(glyph.getPixel(0,0)==0&&glyph.getPixel(191,191)==0,"emblem stays inside drawing bounds "+id);glyph.recycle();
-            int col=(id-1)%5,row=(id-1)/5;RectF cell=new RectF((col*120+16)*density,(row*112+9)*density,(col*120+104)*density,(row*112+97)*density);new SkillEmblemPainter().draw(gallery,cell,id,SkillCardTheme.forSkill(id),false);
+            Bitmap glyph=Bitmap.createBitmap(192,192,Bitmap.Config.ARGB_8888);new SkillEmblemPainter(getTargetContext()).draw(new Canvas(glyph),new RectF(8,8,184,184),id,SkillCardTheme.COMMON,false);int[] pixels=new int[192*192];glyph.getPixels(pixels,0,192,0,0,192,192);check(glyphHashes.add(java.util.Arrays.hashCode(pixels)),"unique semantic seal even with identical quality frame "+id);check(glyph.getPixel(0,0)==0&&glyph.getPixel(191,191)==0,"emblem stays inside drawing bounds "+id);glyph.recycle();
+            int col=(id-1)%5,row=(id-1)/5;RectF cell=new RectF((col*120+16)*density,(row*112+9)*density,(col*120+104)*density,(row*112+97)*density);new SkillEmblemPainter(getTargetContext()).draw(gallery,cell,id,SkillCardTheme.forSkill(id),false);
             android.graphics.Paint label=new android.graphics.Paint(3);label.setColor(0xffede3cc);label.setTextSize(11*density);label.setTextAlign(android.graphics.Paint.Align.CENTER);gallery.drawText(SkillRules.name(id),cell.centerX(),(row*112+108)*density,label);
         }
         try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-seals.png"))){atlas.compress(Bitmap.CompressFormat.PNG,100,out);}atlas.recycle();
@@ -56,6 +57,23 @@ public final class CardQualityProbe extends Instrumentation {
         SkillDrawView draw=new SkillDrawView(getTargetContext(),new int[]{6,7,1,29},new int[]{3,2,1,0});float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(420*d),h=Math.round(390*d);draw.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));draw.layout(0,0,w,h);draw.revealAll(false);
         check(draw.allRevealed(),"skip preserves fully revealed card presentation");String node=draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();check(node.contains("传说")&&node.contains("剩余3次")&&node.contains("天遁"),"revealed quality name and actual charges accessible");check(draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(2).getContentDescription().toString().contains("稀有"),"rare presentation uses shared label");
         Bitmap b=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);draw.draw(new Canvas(b));try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-reveal.png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
+    }
+    private void verifyVisualRegistry()throws Exception{
+        java.util.HashSet<Integer> resources=new java.util.HashSet<>();java.util.HashSet<String> replacements=new java.util.HashSet<>();
+        for(int id=1;id<=SkillRules.COUNT;id++){
+            SkillCardVisual visual=SkillCardVisual.of(id);
+            check(visual.skillId==id&&visual.theme()==SkillCardTheme.forSkill(id),"art registry retains real ID and quality "+id);
+            check(resources.add(visual.artworkResource)&&getTargetContext().getDrawable(visual.artworkResource)!=null,"dedicated loadable illustration per skill "+id);
+            check(replacements.add(visual.illustrationOverride),"independent transparent illustration replacement slot "+id);
+        }
+        check(SkillCardVisual.of(9).background==SkillCardVisual.Pattern.STRIKE&&SkillCardVisual.of(15).background==SkillCardVisual.Pattern.BRONZE&&SkillCardVisual.of(29).background==SkillCardVisual.Pattern.INK&&SkillCardVisual.of(1).background==SkillCardVisual.Pattern.WIND,"semantic attack defence support movement patterns mapped");
+        java.util.HashSet<Integer> hashes=new java.util.HashSet<>();
+        for(int id:new int[]{1,9,15,29}){
+            Bitmap pattern=Bitmap.createBitmap(200,260,Bitmap.Config.ARGB_8888);new SkillCardPatternPainter().draw(new Canvas(pattern),new RectF(0,0,200,260),SkillCardVisual.of(id),SkillCardTheme.COMMON);
+            int[] pixels=new int[200*260];pattern.getPixels(pixels,0,200,0,0,200,260);boolean clean=true;int count=0;
+            for(int y=0;y<260;y++)for(int x=0;x<200;x++){int alpha=Color.alpha(pixels[y*200+x]);if(alpha>0){count++;if(y>=141||alpha>21)clean=false;}}
+            check(count>10&&clean,"semantic emboss stays below12 percent and outside reading panel "+id);check(hashes.add(java.util.Arrays.hashCode(pixels)),"four families have distinct emboss artwork "+id);pattern.recycle();
+        }
     }
     private void verifyRevealPhases()throws Exception{
         float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(360*d),h=Math.round(490*d);

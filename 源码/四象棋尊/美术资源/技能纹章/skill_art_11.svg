@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>斗转</title>
+  <path d="M13,74 C13,67.8696365 29.565455,62.9 50,62.9 C70.434545,62.9 87,67.8696365 87,74 C87,80.1303635 70.434545,85.1 50,85.1 C29.565455,85.1 13,80.1303635 13,74 Z" fill="none" opacity="0.65" stroke="#A7CBDD" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M85.60,72.50 L88.40,72.50 M87.00,71.80 L87.00,76.00" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M78.53,79.02 L81.33,79.02 M79.93,78.32 L79.93,82.52" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M60.03,83.06 L62.83,83.06 M61.43,82.36 L61.43,86.56" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M37.17,83.06 L39.97,83.06 M38.57,82.36 L38.57,86.56" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M18.67,79.02 L21.47,79.02 M20.07,78.32 L20.07,82.52" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M11.60,72.50 L14.40,72.50 M13.00,71.80 L13.00,76.00" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M18.67,65.98 L21.47,65.98 M20.07,65.28 L20.07,69.48" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M37.17,61.94 L39.97,61.94 M38.57,61.24 L38.57,65.44" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M60.03,61.94 L62.83,61.94 M61.43,61.24 L61.43,65.44" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M78.53,65.98 L81.33,65.98 M79.93,65.28 L79.93,69.48" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M11,66 C11,62.354919 17.715725,59.4 26,59.4 C34.284275,59.4 41,62.354919 41,66 C41,69.645081 34.284275,72.6 26,72.6 C17.715725,72.6 11,69.645081 11,66 Z" fill="#223D52" opacity="1" stroke="#5F9BAA" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M11,61 L11,66 C11,73 41,73 41,66 L41,61 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M11,61 C11,54.8696365 17.715725,49.9 26,49.9 C34.284275,49.9 41,54.8696365 41,61 C41,67.1303635 34.284275,72.1 26,72.1 C17.715725,72.1 11,67.1303635 11,61 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M14.299999999999999,60 C14.299999999999999,55.5264915 19.538265499999998,51.9 26,51.9 C32.4617345,51.9 37.7,55.5264915 37.7,60 C37.7,64.47350850000001 32.4617345,68.1 26,68.1 C19.538265499999998,68.1 14.299999999999999,64.47350850000001 14.299999999999999,60 Z" fill="#223D52" opacity="1" stroke="#A7CBDD" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M16.25,58 C23.0,53 27.5,53 35.0,58" fill="#DBECEA" opacity="0.2" />
+  <path d="M26,56 L29,61 L26,66 L23,61 Z" fill="#DBECEA" opacity="1" />
+  <path d="M71,24 L87,39 L75,57 L59,40 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M71,28 L73,50 L83,39 Z" fill="#DBECEA" opacity="0.5" />
+  <path d="M16,42 C11,15 54,8 68,20 M84,60 C90,89 44,92 31,78" fill="none" opacity="1" stroke="#75B5BE" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M41,13 L41.6,14.4 L43,15 L41.6,15.6 L41,17 L40.4,15.6 L39,15 L40.4,14.4 Z" fill="#DBECEA" opacity="0.85" />
+  <path d="M63,83 L63.6,84.4 L65,85 L63.6,85.6 L63,87 L62.4,85.6 L61,85 L62.4,84.4 Z" fill="#DBECEA" opacity="0.85" />
+  <path d="M16,18.6 L16.42,19.58 L17.4,20 L16.42,20.42 L16,21.4 L15.58,20.42 L14.6,20 L15.58,19.58 Z" fill="#DBECEA" opacity="0.85" />
+</svg>

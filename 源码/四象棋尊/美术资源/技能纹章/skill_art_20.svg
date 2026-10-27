@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>唤马</title>
+  <path d="M18,79 C18,75.68629 32.32688,73 50,73 C67.67312,73 82,75.68629 82,79 C82,82.31371 67.67312,85 50,85 C32.32688,85 18,82.31371 18,79 Z" fill="none" opacity="0.7" stroke="#5F9BAA" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 C42,64 23,65 19,74 C23,87 42,87 50,81 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 Q34,82 22,74" fill="none" opacity="0.6" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 C58,64 77,65 81,74 C77,87 58,87 50,81 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 Q66,82 78,74" fill="none" opacity="0.6" stroke="#DBECEA" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,81 C38,72 42,59 50,56 C58,59 62,72 50,81 Z" fill="#75B5BE" opacity="1" stroke="#A7CBDD" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M30,68 C25,53 33,38 42,30 L39,18 L49,23 L58,15 L60,29 L73,42 L69,52 L57,48 Q49,57 63,68 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M35,65 C30,48 44,40 48,29 L53,25 C49,44 42,47 45,60 Z" fill="#223D52" opacity="1" />
+  <path d="M55.4,35 C55.4,34.116344 56.116344,33.4 57,33.4 C57.883656,33.4 58.6,34.116344 58.6,35 C58.6,35.883656 57.883656,36.6 57,36.6 C56.116344,36.6 55.4,35.883656 55.4,35 Z" fill="#DBECEA" opacity="1" />
+  <path d="M39,28 Q24,37 23,50 M35,36 Q19,45 21,58" fill="none" opacity="1" stroke="#75B5BE" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M77,16 L77.6,17.4 L79,18 L77.6,18.6 L77,20 L76.4,18.6 L75,18 L76.4,17.4 Z" fill="#DBECEA" opacity="0.85" />
+  <path d="M21,28.4 L21.48,29.52 L22.6,30 L21.48,30.48 L21,31.6 L20.52,30.48 L19.4,30 L20.52,29.52 Z" fill="#DBECEA" opacity="0.85" />
+  <path d="M16,18.6 L16.42,19.58 L17.4,20 L16.42,20.42 L16,21.4 L15.58,20.42 L14.6,20 L15.58,19.58 Z" fill="#DBECEA" opacity="0.85" />
+</svg>

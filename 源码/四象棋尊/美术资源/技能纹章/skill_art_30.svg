@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>驱离</title>
+  <path d="M23.75,84 C41.0,56 66.5,83 74.75,59 C71.0,88 41.0,72 23.75,84 Z" fill="#75B5BE" opacity="0.6" />
+  <path d="M27.5,83 C44.0,65 61.25,85 73.25,63" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M12,51 C12,34.983734999999996 16.924865,22 23,22 C29.075135,22 34,34.983734999999996 34,51 C34,67.016265 29.075135,80 23,80 C16.924865,80 12,67.016265 12,51 Z" fill="none" opacity="1" stroke="#A7CBDD" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M17,51 C17,40.506585 19.68629,32 23,32 C26.31371,32 29,40.506585 29,51 C29,61.493415 26.31371,70 23,70 C19.68629,70 17,61.493415 17,51 Z" fill="#223D52" opacity="1" stroke="#5F9BAA" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M33,22 C52,30 53,71 33,79 M43,18 C68,31 68,69 43,83" fill="none" opacity="1" stroke="#75B5BE" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M61,52 C61,48.354919 67.71572499999999,45.4 76,45.4 C84.28427500000001,45.4 91,48.354919 91,52 C91,55.645081 84.28427500000001,58.6 76,58.6 C67.71572499999999,58.6 61,55.645081 61,52 Z" fill="#223D52" opacity="1" stroke="#5F9BAA" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M61,47 L61,52 C61,59 91,59 91,52 L91,47 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M61,47 C61,40.8696365 67.71572499999999,35.9 76,35.9 C84.28427500000001,35.9 91,40.8696365 91,47 C91,53.1303635 84.28427500000001,58.1 76,58.1 C67.71572499999999,58.1 61,53.1303635 61,47 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M64.3,46 C64.3,41.5264915 69.5382655,37.9 76,37.9 C82.4617345,37.9 87.7,41.5264915 87.7,46 C87.7,50.4735085 82.4617345,54.1 76,54.1 C69.5382655,54.1 64.3,50.4735085 64.3,46 Z" fill="#223D52" opacity="1" stroke="#A7CBDD" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M66.25,44 C73.0,39 77.5,39 85.0,44" fill="#DBECEA" opacity="0.2" />
+  <path d="M76,42 L79,47 L76,52 L73,47 Z" fill="#DBECEA" opacity="1" />
+  <path d="M86,24 L93,19 M85,69 L93,76 M58,46 L66,46 M59,53 L65,52" fill="none" opacity="1" stroke="#DBECEA" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M45,15 L45.6,16.4 L47,17 L45.6,17.6 L45,19 L44.4,17.6 L43,17 L44.4,16.4 Z" fill="#DBECEA" opacity="0.85" />
+  <path d="M16,18.6 L16.42,19.58 L17.4,20 L16.42,20.42 L16,21.4 L15.58,20.42 L14.6,20 L15.58,19.58 Z" fill="#DBECEA" opacity="0.85" />
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>飞跃</title>
+  <path d="M14.75,70 C36.6,42 68.9,69 79.35,45 C74.6,74 36.6,58 14.75,70 Z" fill="#75B5BE" opacity="0.6" />
+  <path d="M19.5,69 C40.4,51 62.25,71 77.45,49" fill="none" opacity="0.7" stroke="#DBECEA" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M26,81 C16,71 30,63 36,69 C35,50 60,53 61,67 C77,59 84,80 70,82 Z" fill="#223D52" opacity="0.85" stroke="#5F9BAA" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M33,76 C29,68 42,66 42,75 C42,79 48,79 55,78" fill="none" opacity="0.75" stroke="#A7CBDD" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M31,68 C26,53 34,38 43,30 L40,18 L50,23 L59,15 L61,29 L74,42 L70,52 L58,48 Q50,57 64,68 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M36,65 C31,48 45,40 49,29 L54,25 C50,44 43,47 46,60 Z" fill="#223D52" opacity="1" />
+  <path d="M56.4,35 C56.4,34.116344 57.116344,33.4 58,33.4 C58.883656,33.4 59.6,34.116344 59.6,35 C59.6,35.883656 58.883656,36.6 58,36.6 C57.116344,36.6 56.4,35.883656 56.4,35 Z" fill="#DBECEA" opacity="1" />
+  <path d="M40,28 Q25,37 24,50 M36,36 Q20,45 22,58" fill="none" opacity="1" stroke="#75B5BE" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M19,68 C5,37 37,8 73,13" fill="none" opacity="1" stroke="#75B5BE" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M66,9 L76,13 L65,20 Z" fill="#A7CBDD" opacity="1" />
+  <path d="M81,21 L81.6,22.4 L83,23 L81.6,23.6 L81,25 L80.4,23.6 L79,23 L80.4,22.4 Z" fill="#DBECEA" opacity="0.85" />
+  <path d="M16,18.6 L16.42,19.58 L17.4,20 L16.42,20.42 L16,21.4 L15.58,20.42 L14.6,20 L15.58,19.58 Z" fill="#DBECEA" opacity="0.85" />
+</svg>

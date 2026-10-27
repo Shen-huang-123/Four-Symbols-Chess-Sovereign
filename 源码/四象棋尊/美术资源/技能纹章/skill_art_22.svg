@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>鸣炮</title>
+  <path d="M18,79 C18,75.68629 32.32688,73 50,73 C67.67312,73 82,75.68629 82,79 C82,82.31371 67.67312,85 50,85 C32.32688,85 18,82.31371 18,79 Z" fill="none" opacity="0.7" stroke="#5F9BAA" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M24,48 L66,31 L76,47 L34,65 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M62,39 C62,32.924865 65.58172,28 70,28 C74.41828,28 78,32.924865 78,39 C78,45.075135 74.41828,50 70,50 C65.58172,50 62,45.075135 62,39 Z" fill="#223D52" opacity="1" stroke="#A7CBDD" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M66,39 C66,35.68629 67.79086,33 70,33 C72.20914,33 74,35.68629 74,39 C74,42.31371 72.20914,45 70,45 C67.79086,45 66,42.31371 66,39 Z" fill="#5F9BAA" opacity="1" />
+  <path d="M24,69 C24,62.924865 28.924865,58 35,58 C41.075135,58 46,62.924865 46,69 C46,75.075135 41.075135,80 35,80 C28.924865,80 24,75.075135 24,69 Z" fill="#223D52" opacity="1" stroke="#A7CBDD" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M31,69 C31,66.79086 32.79086,65 35,65 C37.20914,65 39,66.79086 39,69 C39,71.20914 37.20914,73 35,73 C32.79086,73 31,71.20914 31,69 Z" fill="#5F9BAA" opacity="1" stroke="#A7CBDD" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M33,60 L64,54 L69,66 L39,75 Z" fill="#223D52" opacity="1" stroke="#A7CBDD" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M76,35 Q89,24 86,12 Q98,22 90,42 Q88,30 76,35 Z" fill="#75B5BE" opacity="1" />
+  <path d="M69.8,21.5 C66.8,18.5 71.0,16.1 72.8,17.9 C72.5,12.2 80.0,13.100000000000001 80.3,17.3 C85.1,14.9 87.2,21.2 83.0,21.8 Z" fill="#223D52" opacity="0.85" stroke="#5F9BAA" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M71.9,20 C70.7,17.6 74.6,17.0 74.6,19.7 C74.6,20.9 76.4,20.9 78.5,20.6" fill="none" opacity="0.75" stroke="#A7CBDD" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M55,18 L55.6,19.4 L57,20 L55.6,20.6 L55,22 L54.4,20.6 L53,20 L54.4,19.4 Z" fill="#DBECEA" opacity="0.85" />
+  <path d="M16,18.6 L16.42,19.58 L17.4,20 L16.42,20.42 L16,21.4 L15.58,20.42 L14.6,20 L15.58,19.58 Z" fill="#DBECEA" opacity="0.85" />
+</svg>

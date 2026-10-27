@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>解咒</title>
+  <path d="M18,79 C18,75.68629 32.32688,73 50,73 C67.67312,73 82,75.68629 82,79 C82,82.31371 67.67312,85 50,85 C32.32688,85 18,82.31371 18,79 Z" fill="none" opacity="0.7" stroke="#5A9983" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M37,17 L66,21 L62,73 L50,84 L33,72 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M41,22 L61,25 L58,68 L50,76 L39,67 Z" fill="#25483F" opacity="1" />
+  <path d="M44,31 L57,33 M50,26 L48,60 L43,66 M42,43 L56,45 M44,52 L53,50 L55,58" fill="none" opacity="1" stroke="#DAE8CB" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M36,20 Q25,7 21,24 M64,24 Q79,12 81,31" fill="none" opacity="0.8" stroke="#75B9A1" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M26,48 L43,43 L53,53 L72,44" fill="none" opacity="1" stroke="#25483F" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M25,47 L43,42 L53,52 L73,43" fill="none" opacity="1" stroke="#DAE8CB" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M23,42 L18,35 L20,46 Z" fill="#5A9983" opacity="1" />
+  <path d="M75,51 L83,58 L81,48 Z" fill="#75B9A1" opacity="1" />
+  <path d="M15,82 C38,54 72,81 83,57 C78,86 38,70 15,82 Z" fill="#75B9A1" opacity="0.6" />
+  <path d="M20,81 C42,63 65,83 81,61" fill="none" opacity="0.7" stroke="#DAE8CB" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M19,47 L19.6,48.4 L21,49 L19.6,49.6 L19,51 L18.4,49.6 L17,49 L18.4,48.4 Z" fill="#DAE8CB" opacity="0.85" />
+  <path d="M80,41 L80.6,42.4 L82,43 L80.6,43.6 L80,45 L79.4,43.6 L78,43 L79.4,42.4 Z" fill="#DAE8CB" opacity="0.85" />
+</svg>

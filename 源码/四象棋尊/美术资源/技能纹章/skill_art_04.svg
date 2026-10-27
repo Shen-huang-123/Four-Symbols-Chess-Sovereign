@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>封印</title>
+  <path d="M23.75,84 C41.0,56 66.5,83 74.75,59 C71.0,88 41.0,72 23.75,84 Z" fill="#75B9A1" opacity="0.6" />
+  <path d="M27.5,83 C44.0,65 61.25,85 73.25,63" fill="none" opacity="0.7" stroke="#DAE8CB" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M37,17 L66,21 L62,73 L50,84 L33,72 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M41,22 L61,25 L58,68 L50,76 L39,67 Z" fill="#25483F" opacity="1" />
+  <path d="M44,31 L57,33 M50,26 L48,60 L43,66 M42,43 L56,45 M44,52 L53,50 L55,58" fill="none" opacity="1" stroke="#DAE8CB" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M36,20 Q25,7 21,24 M64,24 Q79,12 81,31" fill="none" opacity="0.8" stroke="#75B9A1" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M17,39 L78,70 M24,75 L79,36" fill="none" opacity="1" stroke="#A7CBB5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M18,38 L18.6,39.4 L20,40 L18.6,40.6 L18,42 L17.4,40.6 L16,40 L17.4,39.4 Z" fill="#DAE8CB" opacity="0.85" />
+  <path d="M78,66 L78.6,67.4 L80,68 L78.6,68.6 L78,70 L77.4,68.6 L76,68 L77.4,67.4 Z" fill="#DAE8CB" opacity="0.85" />
+</svg>

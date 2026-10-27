@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>疾行</title>
+  <path d="M14.75,70 C36.6,42 68.9,69 79.35,45 C74.6,74 36.6,58 14.75,70 Z" fill="#75B9A1" opacity="0.6" />
+  <path d="M19.5,69 C40.4,51 62.25,71 77.45,49" fill="none" opacity="0.7" stroke="#DAE8CB" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M18,63 C18,59.8409298 23.820295,57.28 31,57.28 C38.179705,57.28 44,59.8409298 44,63 C44,66.1590702 38.179705,68.72 31,68.72 C23.820295,68.72 18,66.1590702 18,63 Z" fill="#25483F" opacity="0.25" stroke="#5A9983" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M18,58 L18,63 C18,70 44,70 44,63 L44,58 Z" fill="#5A9983" opacity="0.25" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M18,58 C18,52.6870183 23.820295,48.38 31,48.38 C38.179705,48.38 44,52.6870183 44,58 C44,63.3129817 38.179705,67.62 31,67.62 C23.820295,67.62 18,63.3129817 18,58 Z" fill="#5A9983" opacity="0.25" stroke="#A7CBB5" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M20.86,57 C20.86,53.1229593 25.3998301,49.98 31,49.98 C36.6001699,49.98 41.14,53.1229593 41.14,57 C41.14,60.8770407 36.6001699,64.02 31,64.02 C25.3998301,64.02 20.86,60.8770407 20.86,57 Z" fill="#25483F" opacity="0.25" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M22.549999999999997,55 C28.4,50 32.3,50 38.8,55" fill="#DAE8CB" opacity="0.05" />
+  <path d="M31,53 L34,58 L31,63 L28,58 Z" fill="#DAE8CB" opacity="0.25" />
+  <path d="M30,58 C30,54.8409298 35.820295,52.28 43,52.28 C50.179705,52.28 56,54.8409298 56,58 C56,61.1590702 50.179705,63.72 43,63.72 C35.820295,63.72 30,61.1590702 30,58 Z" fill="#25483F" opacity="0.5" stroke="#5A9983" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M30,53 L30,58 C30,65 56,65 56,58 L56,53 Z" fill="#5A9983" opacity="0.5" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M30,53 C30,47.6870183 35.820295,43.38 43,43.38 C50.179705,43.38 56,47.6870183 56,53 C56,58.3129817 50.179705,62.62 43,62.62 C35.820295,62.62 30,58.3129817 30,53 Z" fill="#5A9983" opacity="0.5" stroke="#A7CBB5" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M32.86,52 C32.86,48.1229593 37.3998301,44.98 43,44.98 C48.6001699,44.98 53.14,48.1229593 53.14,52 C53.14,55.8770407 48.6001699,59.02 43,59.02 C37.3998301,59.02 32.86,55.8770407 32.86,52 Z" fill="#25483F" opacity="0.5" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M34.55,50 C40.4,45 44.3,45 50.8,50" fill="#DAE8CB" opacity="0.1" />
+  <path d="M43,48 L46,53 L43,58 L40,53 Z" fill="#DAE8CB" opacity="0.5" />
+  <path d="M15,44 C38,16 72,43 83,19 C78,48 38,32 15,44 Z" fill="#75B9A1" opacity="0.6" />
+  <path d="M20,43 C42,25 65,45 81,23" fill="none" opacity="0.7" stroke="#DAE8CB" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M44,52 C44,48.354919 50.715725,45.4 59,45.4 C67.28427500000001,45.4 74,48.354919 74,52 C74,55.645081 67.28427500000001,58.6 59,58.6 C50.715725,58.6 44,55.645081 44,52 Z" fill="#25483F" opacity="1" stroke="#5A9983" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M44,47 L44,52 C44,59 74,59 74,52 L74,47 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M44,47 C44,40.8696365 50.715725,35.9 59,35.9 C67.28427500000001,35.9 74,40.8696365 74,47 C74,53.1303635 67.28427500000001,58.1 59,58.1 C50.715725,58.1 44,53.1303635 44,47 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M47.3,46 C47.3,41.5264915 52.5382655,37.9 59,37.9 C65.4617345,37.9 70.7,41.5264915 70.7,46 C70.7,50.4735085 65.4617345,54.1 59,54.1 C52.5382655,54.1 47.3,50.4735085 47.3,46 Z" fill="#25483F" opacity="1" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M49.25,44 C56.0,39 60.5,39 68.0,44" fill="#DAE8CB" opacity="0.2" />
+  <path d="M59,42 L62,47 L59,52 L56,47 Z" fill="#DAE8CB" opacity="1" />
+  <path d="M16,59 C39,87 73,60 84,84 C79,55 39,71 16,59 Z" fill="#75B9A1" opacity="0.6" />
+  <path d="M21,60 C43,78 66,58 82,80" fill="none" opacity="0.7" stroke="#DAE8CB" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M82,26 L82.6,27.4 L84,28 L82.6,28.6 L82,30 L81.4,28.6 L80,28 L81.4,27.4 Z" fill="#DAE8CB" opacity="0.85" />
+</svg>

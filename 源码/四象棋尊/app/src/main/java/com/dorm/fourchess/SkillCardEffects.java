@@ -20,6 +20,11 @@ final class SkillCardEffects {
         c.save();c.clipRect(field);c.translate(field.centerX(),field.centerY());c.scale(size/2,size/2);
         p.setShader(null);p.setStyle(Paint.Style.STROKE);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeWidth(.018f);
         p.setColor(GameDesign.alpha(t.edge,Math.round(envelope*(selection?145:205))));
+        SkillCardVisual.Effect effect=SkillCardVisual.of(id).effect;
+        if(effect==SkillCardVisual.Effect.TRAIL){Path wind=new Path();wind.moveTo(-.8f,.48f-progress*.3f);wind.cubicTo(-.3f,-.2f,.4f,.5f-progress*.6f,.82f,-.32f);c.drawPath(wind,p);}
+        else if(effect==SkillCardVisual.Effect.IMPACT){c.drawLine(-.65f+progress*.3f,.7f,.5f+progress*.2f,-.7f,p);}
+        else if(effect==SkillCardVisual.Effect.GUARD){Path shield=new Path();shield.moveTo(-.59f,-.4f);shield.lineTo(0,-.69f);shield.lineTo(.59f,-.4f);shield.lineTo(.46f,.38f);shield.lineTo(0,.7f);shield.lineTo(-.46f,.38f);shield.close();c.drawPath(shield,p);}
+        else if(effect==SkillCardVisual.Effect.SPIRIT){c.drawOval(-.7f,.44f-progress*.14f,.7f,.65f+progress*.14f,p);}
         float radius=.57f+.22f*progress;
         orbit.set(-radius,-radius,radius,radius);
         if(t.pattern==2){

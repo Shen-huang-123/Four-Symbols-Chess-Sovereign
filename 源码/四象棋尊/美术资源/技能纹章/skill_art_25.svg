@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>寒潮</title>
+  <path d="M23.75,84 C41.0,56 66.5,83 74.75,59 C71.0,88 41.0,72 23.75,84 Z" fill="#BA6E53" opacity="0.6" />
+  <path d="M27.5,83 C44.0,65 61.25,85 73.25,63" fill="none" opacity="0.7" stroke="#F5E1AC" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M62,48 L81,51 L88,48 L81,45 Z" fill="#B47D43" opacity="1" stroke="#E4BE78" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M73.0,55.0 L79.0,48.0 L73.0,41.0" fill="none" opacity="1" stroke="#F5E1AC" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M56,58.3923 L62.9019,76.3468 L69,80.909 L68.0981,73.3468 Z" fill="#B47D43" opacity="1" stroke="#E4BE78" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M55.43782217350893,71.41858428704208 L64.5,73.11473670974871 L67.56217782649107,64.41858428704208" fill="none" opacity="1" stroke="#F5E1AC" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M44,58.3923 L31.9019,73.3468 L31,80.909 L37.0981,76.3468 Z" fill="#B47D43" opacity="1" stroke="#E4BE78" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M32.437822173508934,64.4185842870421 L35.50000000000001,73.11473670974873 L44.56217782649108,71.4185842870421" fill="none" opacity="1" stroke="#F5E1AC" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M38,48 L19,45 L12,48 L19,51 Z" fill="#B47D43" opacity="1" stroke="#E4BE78" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M27.0,41.0 L21.0,48.0 L27.0,55.0" fill="none" opacity="1" stroke="#F5E1AC" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M44,37.6077 L37.0981,19.6532 L31,15.091 L31.9019,22.6532 Z" fill="#B47D43" opacity="1" stroke="#E4BE78" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M44.56217782649105,24.581415712957913 L35.499999999999986,22.885263290251284 L32.43782217350892,31.58141571295792" fill="none" opacity="1" stroke="#F5E1AC" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M56,37.6077 L68.0981,22.6532 L69,15.091 L62.9019,19.6532 Z" fill="#B47D43" opacity="1" stroke="#E4BE78" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M67.56217782649107,31.581415712957913 L64.5,22.88526329025128 L55.43782217350893,24.581415712957913" fill="none" opacity="1" stroke="#F5E1AC" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,34 L62,41 L62,55 L50,62 L38,55 L38,41 Z" fill="#47302F" opacity="1" stroke="#E4BE78" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M50,40 L52.4,45.6 L58,48 L52.4,50.4 L50,56 L47.6,50.4 L42,48 L47.6,45.6 Z" fill="#F5E1AC" opacity="0.85" />
+  <path d="M13,16 L13.6,17.4 L15,18 L13.6,18.6 L13,20 L12.4,18.6 L11,18 L12.4,17.4 Z" fill="#F5E1AC" opacity="0.85" />
+  <path d="M87,77.3 L87.51,78.49 L88.7,79 L87.51,79.51 L87,80.7 L86.49,79.51 L85.3,79 L86.49,78.49 Z" fill="#F5E1AC" opacity="0.85" />
+</svg>

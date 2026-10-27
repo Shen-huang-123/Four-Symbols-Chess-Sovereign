@@ -6,9 +6,10 @@ import android.text.*;
 /** Collectible manuscript composition, with semantic vector artwork and grade-specific engraving. */
 final class SkillCardPainter {
     private final TextPaint p=new TextPaint(Paint.ANTI_ALIAS_FLAG);
-    private final SkillEmblemPainter emblem=new SkillEmblemPainter();
+    private final SkillEmblemPainter emblem;
+    private final SkillCardPatternPainter patterns=new SkillCardPatternPainter();
     private final float density,scaled;
-    SkillCardPainter(android.content.Context context){density=context.getResources().getDisplayMetrics().density;scaled=context.getResources().getDisplayMetrics().scaledDensity;}
+    SkillCardPainter(android.content.Context context){emblem=new SkillEmblemPainter(context);density=context.getResources().getDisplayMetrics().density;scaled=context.getResources().getDisplayMetrics().scaledDensity;}
     private float dp(float n){return n*density;}
     RectF emblemBounds(RectF r){
         float pad=Math.min(dp(10),r.width()*.055f),h=r.height();
@@ -37,17 +38,22 @@ final class SkillCardPainter {
         path.moveTo(r.left+cut,r.top);path.lineTo(r.right-cut,r.top);path.lineTo(r.right,r.top+cut);path.lineTo(r.right,r.bottom-cut);path.lineTo(r.right-cut,r.bottom);path.lineTo(r.left+cut,r.bottom);path.lineTo(r.left,r.bottom-cut);path.lineTo(r.left,r.top+cut);path.close();return path;
     }
     void draw(Canvas c,RectF r,int id,int remaining,boolean selected,boolean disabled,String reason,boolean compact,float shine){
-        SkillCardTheme t=SkillCardTheme.forSkill(id);float pad=Math.min(dp(10),r.width()*.055f),h=r.height(),w=r.width();Path outline=frame(r,t);
+        draw(c,r,id,remaining,selected,disabled,reason,compact,shine,1,1);
+    }
+    void draw(Canvas c,RectF r,int id,int remaining,boolean selected,boolean disabled,String reason,boolean compact,float shine,float artworkOpacity,float textOpacity){
+        SkillCardTheme t=SkillCardVisual.of(id).theme();float pad=Math.min(dp(10),r.width()*.055f),h=r.height(),w=r.width();Path outline=frame(r,t);
         p.setStyle(Paint.Style.FILL);p.setShader(null);p.setColor(0x20081016);c.save();c.translate(0,dp(1));c.drawPath(outline,p);c.restore();
         p.setColor(muted(t.middle,disabled));c.drawPath(outline,p);
         c.save();c.clipPath(outline);
         // Bound pages and a quiet reading panel replace the previous edge-to-edge spotlight gradients.
         p.setColor(GameDesign.alpha(muted(t.deep,disabled),90));c.drawRect(r.left,r.top+h*.54f,r.right,r.bottom,p);
         p.setColor(GameDesign.alpha(t.edge,18));c.drawRect(r.left,r.top,r.left+dp(3),r.bottom,p);
-        fibres(c,r,t);if(!compact)ornament(c,r,t);p.setColor(GameDesign.alpha(t.edge,35));p.setStrokeWidth(dp(.5f));c.drawLine(r.left+pad,r.top+h*.54f,r.right-pad,r.top+h*.54f,p);
+        fibres(c,r,t);if(!compact)patterns.draw(c,r,SkillCardVisual.of(id),t);p.setColor(GameDesign.alpha(t.edge,35));p.setStrokeWidth(dp(.5f));c.drawLine(r.left+pad,r.top+h*.54f,r.right-pad,r.top+h*.54f,p);
         c.restore();
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(selected?1.0f:.65f));p.setColor(disabled?0xff667777:selected?t.title:GameDesign.alpha(t.edge,190));c.drawPath(outline,p);
         corners(c,r,t,disabled);p.setStyle(Paint.Style.FILL);
+        if(!compact){int artLayer=c.saveLayerAlpha(r,Math.round(Math.max(0,Math.min(1,artworkOpacity))*255));emblem.draw(c,emblemBounds(r),id,t,disabled);c.restoreToCount(artLayer);}
+        int information=c.saveLayerAlpha(r,Math.round(Math.max(0,Math.min(1,textOpacity))*255));
         int title=disabled?0xffbec8c4:t.title,body=disabled?0xffa9b7b4:t.body;
         float badgeSize=Math.min(10*scaled,h*.15f),badgeH=Math.min(dp(20),h*.22f),badgeY=r.top+pad+badgeH/2;
         if(!compact){p.setColor(muted(t.badgeInk,disabled));c.drawRect(r.left+pad-dp(3),badgeY-badgeH*.6f,r.left+pad+badgeSize*2.6f,badgeY+badgeH*.6f,p);}
@@ -58,9 +64,6 @@ final class SkillCardPainter {
         text(c,"×"+remaining,countLeft+countW/2,badgeY,badgeSize,countW-dp(3),title,Paint.Align.CENTER);
         float titleSize=Math.min((compact?15:17)*scaled,Math.min(h*(compact?.23f:.12f),w*.17f));
         float titleY=r.top+h*(compact?.46f:.61f);
-        if(!compact){
-            emblem.draw(c,emblemBounds(r),id,t,disabled);
-        }
         text(c,SkillRules.name(id),r.centerX(),titleY,titleSize,w-pad*2,title,Paint.Align.CENTER);
         float descTop=titleY+titleSize*.65f,descBottom=r.bottom-(compact?dp(4):Math.max(11*scaled+dp(7),h*.13f));
         String copy=compact?SkillCardTheme.brief(id):SkillCardCopy.summary(id);
@@ -69,14 +72,7 @@ final class SkillCardPainter {
         c.save();c.translate(r.left+pad,descTop+Math.max(0,(descBottom-descTop-lines.getHeight())*.25f));lines.draw(c);c.restore();
         if(!compact){String rule=disabled&&reason!=null&&!reason.isEmpty()?reason:"整活".equals(SkillRules.tier(id))?"整活秘术 · 十回合换牌":"耗1次行动 · 十回合换牌";
             text(c,rule,r.centerX(),r.bottom-Math.max(6*scaled+dp(3),h*.055f),Math.min(9*scaled,h*.07f),w-pad*2,GameDesign.alpha(body,210),Paint.Align.CENTER);}
-    }
-    private void ornament(Canvas c,RectF r,SkillCardTheme t){
-        c.save();c.translate(r.centerX(),r.top+r.height()*.30f);float unit=r.width()*.45f;c.scale(unit,unit);
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(.007f);p.setColor(GameDesign.alpha(t.edge,17));
-        if(t.pattern==0){for(int side:new int[]{-1,1}){Path cloud=new Path();cloud.moveTo(side*.65f,-.27f);cloud.cubicTo(side*1.07f,-.66f,side*1.02f,.08f,side*.7f,.02f);cloud.cubicTo(side*.5f,-.09f,side*.7f,.46f,side*1.1f,.32f);c.drawPath(cloud,p);}}
-        else if(t.pattern==1){Path stars=new Path();stars.moveTo(-1,-.2f);stars.lineTo(-.78f,.22f);stars.lineTo(-.96f,.5f);stars.moveTo(.8f,-.46f);stars.lineTo(1,-.16f);stars.lineTo(.86f,.22f);c.drawPath(stars,p);for(int side:new int[]{-1,1})c.drawCircle(side*.9f,-.16f,.022f,p);}
-        else{for(int side:new int[]{-1,1}){Path bamboo=new Path();bamboo.moveTo(side*.9f,.5f);bamboo.quadTo(side*.63f,-.03f,side*.94f,-.5f);bamboo.moveTo(side*.82f,.12f);bamboo.quadTo(side*.57f,-.06f,side*.57f,-.21f);bamboo.moveTo(side*.83f,-.15f);bamboo.quadTo(side*1.07f,-.27f,side*1.03f,-.39f);c.drawPath(bamboo,p);}}
-        c.restore();p.setStyle(Paint.Style.FILL);
+        c.restoreToCount(information);
     }
     private void fibres(Canvas c,RectF r,SkillCardTheme t){
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(.35f));p.setColor(GameDesign.alpha(t.body,5));

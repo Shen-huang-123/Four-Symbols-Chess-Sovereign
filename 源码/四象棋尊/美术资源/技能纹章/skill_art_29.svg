@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>摸鱼</title>
+  <path d="M18,79 C18,75.68629 32.32688,73 50,73 C67.67312,73 82,75.68629 82,79 C82,82.31371 67.67312,85 50,85 C32.32688,85 18,82.31371 18,79 Z" fill="none" opacity="0.7" stroke="#5A9983" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M15,84 C15,81.238575 29.32688,79 47,79 C64.67312,79 79,81.238575 79,84 C79,86.761425 64.67312,89 47,89 C29.32688,89 15,86.761425 15,84 Z" fill="none" opacity="0.55" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M26,84 C26,82.34314499999999 35.402015,81 47,81 C58.597985,81 68,82.34314499999999 68,84 C68,85.65685500000001 58.597985,87 47,87 C35.402015,87 26,85.65685500000001 26,84 Z" fill="none" opacity="0.7" stroke="#5A9983" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M28,67 C18,46 42,22 68,24 C81,26 79,38 65,46 C49,53 41,59 28,67 Z" fill="#5A9983" opacity="1" stroke="#A7CBB5" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M28,66 C44,39 60,35 75,29 C70,45 49,48 42,59 Z" fill="#DAE8CB" opacity="0.65" />
+  <path d="M30,62 C17,55 8,59 11,76 L23,72 L26,86 C38,81 39,71 30,62 Z" fill="#75B9A1" opacity="1" stroke="#A7CBB5" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M48,39 Q31,23 36,18 Q52,21 58,32 Z" fill="#25483F" opacity="1" stroke="#A7CBB5" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M51,48 Q65,55 56,61 L41,57 Z" fill="#75B9A1" opacity="1" stroke="#A7CBB5" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M37,44 Q39,48 42,44" fill="none" opacity="0.7" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M44,38 Q46,42 49,38" fill="none" opacity="0.7" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M51,33 Q53,37 56,33" fill="none" opacity="0.7" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M35,51 Q37,55 40,51" fill="none" opacity="0.7" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M44,46 Q46,50 49,46" fill="none" opacity="0.7" stroke="#A7CBB5" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M67.9,30 C67.9,28.8402015 68.8402015,27.9 70,27.9 C71.1597985,27.9 72.1,28.8402015 72.1,30 C72.1,31.1597985 71.1597985,32.1 70,32.1 C68.8402015,32.1 67.9,31.1597985 67.9,30 Z" fill="#25483F" opacity="1" />
+  <path d="M68.9,29.5 C68.9,29.168629 69.168629,28.9 69.5,28.9 C69.831371,28.9 70.1,29.168629 70.1,29.5 C70.1,29.831371 69.831371,30.1 69.5,30.1 C69.168629,30.1 68.9,29.831371 68.9,29.5 Z" fill="#DAE8CB" opacity="1" />
+  <path d="M77,34 Q86,36 88,29 M15,65 L25,67 M18,74 L28,70" fill="none" opacity="1" stroke="#A7CBB5" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M19.5,89 C40.2,61 70.8,88 80.7,64 C76.2,93 40.2,77 19.5,89 Z" fill="#75B9A1" opacity="0.6" />
+  <path d="M24.0,88 C43.8,70 64.5,90 78.9,68" fill="none" opacity="0.7" stroke="#DAE8CB" stroke-width="0.7" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M80,54.5 L80.45,55.55 L81.5,56 L80.45,56.45 L80,57.5 L79.55,56.45 L78.5,56 L79.55,55.55 Z" fill="#DAE8CB" opacity="0.85" />
+</svg>
