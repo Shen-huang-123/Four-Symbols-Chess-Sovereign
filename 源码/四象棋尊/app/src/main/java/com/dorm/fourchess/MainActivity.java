@@ -21,6 +21,9 @@ import android.widget.ScrollView;
 
 public class MainActivity extends Activity implements NetworkManager.Callback {
     private FourChessView board;
+    private PlayerArchive archives;private ArchiveCloud archiveCloud;private MatchCareer career;private ArchiveCenter archiveCenter;private Button archiveEntry;
+    private String[] pendingBindings={"","","",""};private String localCareerId="";private org.json.JSONObject lastCareerMetadata;
+
     private FrameLayout screen;
     private LinearLayout gameUi;
     private ModeSelectView modePage;
@@ -55,7 +58,8 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         if(android.os.Build.VERSION.SDK_INT>=29){getWindow().setNavigationBarContrastEnforced(false);getWindow().setStatusBarContrastEnforced(false);}
         immersive();
         getWindow().setStatusBarColor(ink); getWindow().setNavigationBarColor(ink);
-        buildUi(); board.setStatusListener(text -> {status.setText(compactStatus(text));if(clockTurn!=board.currentTurn()){clockTurn=board.currentTurn();turnSeconds=0;if(matchActive&&network==null)screen.post(this::maybeShowSkillDraw);}updateHud();});
+        archives=new PlayerArchive(this);archiveCloud=new ArchiveCloud(this,archives);career=new MatchCareer(this,archives,this::careerNotice);
+        buildUi(); board.setStatusListener(text -> {status.setText(compactStatus(text));if(clockTurn!=board.currentTurn()){clockTurn=board.currentTurn();turnSeconds=0;if(matchActive&&network==null)screen.post(this::maybeShowSkillDraw);}updateHud();if(matchActive)career.observe(board,network!=null);});
         board.setMoveObserver(this::recordMove);clockHandler.post(clockTick);showModePage();
     }
 
@@ -91,6 +95,8 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
             public void onHost(){showNamesDialog(true);}
             public void onJoin(){joinDialog();}
         });screen.addView(modePage,new FrameLayout.LayoutParams(-1,-1));
+        archiveEntry=new Button(this);archiveEntry.setElevation(0);archiveEntry.setStateListAnimator(null);archiveEntry.setText("档案");archiveEntry.setTextSize(11);archiveEntry.setTextColor(GameDesign.GOLD_BRIGHT);archiveEntry.setContentDescription("棋士档案、账号、成长与好友");archiveEntry.setBackground(frame(GameDesign.PANEL,GameDesign.EDGE,false));FrameLayout.LayoutParams entry=new FrameLayout.LayoutParams(dp(56),dp(44),Gravity.TOP|Gravity.RIGHT);entry.setMargins(0,dp(4),dp(4),0);screen.addView(archiveEntry,entry);archiveEntry.setOnClickListener(v->openArchive());
+
         screen.setOnApplyWindowInsetsListener((view,insets)->{applySafeInsets(insets);return insets;});setContentView(screen);screen.requestApplyInsets();
     }
 
@@ -131,7 +137,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private android.graphics.drawable.Drawable panelBackground(){return frame(GameDesign.PANEL,GameDesign.EDGE,true);}
     private BattleSkin.Frame frame(int fill,int edge,boolean ornament){return new BattleSkin.Frame(fill,edge,getResources().getDisplayMetrics().density,ornament);}
 
-    private void showModePage(){if(allianceAnnouncement!=null)allianceAnnouncement.clear();modePage.onEnter();gameUi.setVisibility(android.view.View.INVISIBLE);modePage.setVisibility(android.view.View.VISIBLE);modePage.bringToFront();modePage.invalidate();screen.invalidate();}
+    private void showModePage(){if(archiveEntry!=null)archiveEntry.setVisibility(View.VISIBLE);if(allianceAnnouncement!=null)allianceAnnouncement.clear();modePage.onEnter();gameUi.setVisibility(android.view.View.INVISIBLE);modePage.setVisibility(android.view.View.VISIBLE);modePage.bringToFront();if(archiveEntry!=null&&archiveCenter==null)archiveEntry.bringToFront();modePage.invalidate();screen.invalidate();}
     private void recordMove(String entry){displayedMoves.add(0,entry);moveTimes.add(0,turnSeconds);renderMoves();}
     private void clearMoves(){displayedMoves.clear();moveTimes.clear();turnSeconds=0;clockTurn=board.currentTurn();refreshClock();renderMoves();}
     private void showUndoOptions(){
@@ -171,8 +177,8 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         }
         moveLog.setText(result.length()==0?EMPTY_HISTORY:result);if(dialogMoves!=null)dialogMoves.setText(moveLog.getText());if(historyScroll!=null)historyScroll.post(()->historyScroll.scrollTo(0,0));
     }
-    private void hideModePage(){modePage.setVisibility(android.view.View.GONE);gameUi.setVisibility(android.view.View.VISIBLE);screen.invalidate();updateHud();}
-    @Override public void onBackPressed(){if(modePage!=null&&modePage.getVisibility()==android.view.View.VISIBLE){if(matchActive)hideModePage();else super.onBackPressed();}else showExitConfirm();}
+    private void hideModePage(){if(archiveEntry!=null)archiveEntry.setVisibility(View.GONE);modePage.setVisibility(android.view.View.GONE);gameUi.setVisibility(android.view.View.VISIBLE);screen.invalidate();updateHud();}
+    @Override public void onBackPressed(){if(archiveCenter!=null){screen.removeView(archiveCenter);archiveCenter=null;if(modePage.getVisibility()==View.VISIBLE)archiveEntry.setVisibility(View.VISIBLE);applyCareerOutfit();return;}if(modePage!=null&&modePage.getVisibility()==android.view.View.VISIBLE){if(matchActive)hideModePage();else super.onBackPressed();}else showExitConfirm();}
     @Override public void onWindowFocusChanged(boolean focused){super.onWindowFocusChanged(focused);if(focused){immersive();if(allianceAnnouncement!=null)allianceAnnouncement.resumeIfReady();}}
     private void immersive(){getWindow().getDecorView().setSystemUiVisibility(android.view.View.SYSTEM_UI_FLAG_FULLSCREEN|android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION|android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE);}
 
@@ -213,11 +219,14 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         entryDialog=new AlertDialog.Builder(this).setTitle(title).setView(scroll).setPositiveButton(confirm,(dialog,which)->accepted.run()).setNegativeButton("取消",null).create();
         GameDialogStyle.title(entryDialog,title);entryDialog.setOnDismissListener(dialog->{entryDialog=null;screen.post(this::maybeShowSkillDraw);});entryDialog.show();GameDialogStyle.apply(entryDialog,content);
     }
-    private void startMatch(String[] names){allianceAnnouncement.clear();if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();java.util.Arrays.fill(handRevealed,false);closeNetwork();board.setSkillMode(modePage.usesSkills());board.newGame();clearMoves();board.setLocalPlayer(-1);playerStrip.setPlayerNames(names);matchActive=true;hideModePage();screen.post(()->{if(network==null)maybeShowSkillDraw();});}
+    private void startMatch(String[] names){career.stop();allianceAnnouncement.clear();if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();java.util.Arrays.fill(handRevealed,false);closeNetwork();board.setSkillMode(modePage.usesSkills());board.newGame();clearMoves();board.setLocalPlayer(-1);playerStrip.setPlayerNames(names);career.begin(pendingBindings);localCareerId=pendingBindings[0];pendingBindings=new String[]{"","","",""};applyCareerOutfit();matchActive=true;hideModePage();screen.post(()->{if(network==null)maybeShowSkillDraw();});}
     private void showNamesDialog(boolean hostMode){
         LinearLayout content=entryContent();EditText[] names=new EditText[hostMode?1:4];String[] sides={"南 · 红方昵称","西 · 绿方昵称","北 · 蓝方昵称","东 · 金方昵称"};
         for(int i=0;i<names.length;i++){String label=hostMode?"我的昵称（最多12个字）":sides[i]+"（最多12个字）";TextView heading=text(label,12,0xff736450);heading.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);content.addView(heading,new LinearLayout.LayoutParams(-1,dp(28)));names[i]=nameInput(label,playerPrefs().getString(hostMode?"nickname":"local_"+i,hostMode?"棋友":PlayerNames.DEFAULTS[i]));content.addView(names[i],new LinearLayout.LayoutParams(-1,dp(48)));}
+        final java.util.ArrayList<org.json.JSONObject> localArchives=archives.list();final android.widget.Spinner[] slots=new android.widget.Spinner[names.length];
+        for(int seat=0;seat<names.length;seat++){final int index=seat;TextView label=text("绑定"+(hostMode?"本人":sides[seat])+"档案（游客不计战绩）",11,GameDesign.SECONDARY);content.addView(label);android.widget.Spinner spinner=new android.widget.Spinner(this);slots[seat]=spinner;String[] options=new String[localArchives.size()+1];options[0]="临时游客 · 不入档";int selected=0;for(int i=0;i<localArchives.size();i++){org.json.JSONObject d=localArchives.get(i);options[i+1]=CareerRules.object(d,"profile").optString("nickname")+(d.optBoolean("guest")?"（游客）":" · LV."+d.optInt("level",1));if(seat==0&&d.optString("id").equals(archives.selected()))selected=i+1;}spinner.setAdapter(new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,options));spinner.setSelection(selected);spinner.setContentDescription("座位"+seat+"绑定档案");content.addView(spinner,new LinearLayout.LayoutParams(-1,dp(48)));final boolean[] initialized={false};spinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){public void onNothingSelected(android.widget.AdapterView<?> a){}public void onItemSelected(android.widget.AdapterView<?> a,View v,int pos,long id){if(!initialized[0]){initialized[0]=true;if(playerPrefs().contains(hostMode?"nickname":"local_"+index))return;}if(pos>0)names[index].setText(CareerRules.object(localArchives.get(pos-1),"profile").optString("nickname"));}});}
         presentEntry((modePage.usesSkills()?"四象秘术 · ":"普通对局 · ")+(hostMode?"创建房间":"四位棋友"),content,hostMode?"创建房间":"开始对局",()->{
+            String[] bindings={"","","",""};java.util.HashSet<String> used=new java.util.HashSet<>();for(int seat=0;seat<slots.length;seat++){int pos=slots[seat].getSelectedItemPosition();if(pos>0){org.json.JSONObject d=localArchives.get(pos-1);if(!d.optBoolean("guest")){bindings[seat]=d.optString("id");if(!used.add(bindings[seat])){toast("同一正式档案不能绑定多个座位");return;}}}}pendingBindings=bindings;
             android.content.SharedPreferences.Editor saved=playerPrefs().edit();String[] values=new String[4];
             if(hostMode){String nickname=PlayerNames.clean(names[0].getText().toString(),"棋友");saved.putString("nickname",nickname).apply();values=new String[]{nickname,"待加入","待加入","待加入"};startMatch(values);host();}
             else{for(int i=0;i<4;i++){values[i]=PlayerNames.clean(names[i].getText().toString(),PlayerNames.DEFAULTS[i]);saved.putString("local_"+i,values[i]);}saved.apply();startMatch(values);networkStatus.setText(board.isSkillMode()?"四象秘术 · 每人随机4张，每张1～3次，每10回合换牌":"普通对局 · 四人轮流操作");}
@@ -226,7 +235,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private NetworkManager newNetwork(String nickname){
         receivedNetworkState=false;
         final int session=++networkSession;
-        return new NetworkManager(this,new NetworkManager.Callback(){
+        NetworkManager manager=new NetworkManager(this,new NetworkManager.Callback(){
             private void dispatch(Runnable action){runOnUiThread(()->{if(session==networkSession&&network!=null)action.run();});}
             public void onNetworkStatus(String status){dispatch(()->MainActivity.this.onNetworkStatus(status));}
             public void onAssigned(int owner){dispatch(()->MainActivity.this.onAssigned(owner));}
@@ -234,17 +243,22 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
             public void onHostMove(int owner,int sx,int sy,int tx,int ty){dispatch(()->MainActivity.this.onHostMove(owner,sx,sy,tx,ty));}
             public void onHostSkill(int owner,int skill,int sx,int sy,int tx,int ty){dispatch(()->MainActivity.this.onHostSkill(owner,skill,sx,sy,tx,ty));}
             public void onHostDiplomacy(int owner,int action,int target){dispatch(()->MainActivity.this.onHostDiplomacy(owner,action,target));}
+            public void onCareer(org.json.JSONObject data){dispatch(()->MainActivity.this.onCareer(data));}
+            public void onCareerRequest(){dispatch(()->{if(hosting&&network!=null)network.broadcastCareer();});}
             public void onNames(String[] names){dispatch(()->playerStrip.setPlayerNames(names));}
             public void onConnectionClosed(String reason){dispatch(()->connectionLost(reason));}
         },nickname);
+        try{if(!localCareerId.isEmpty()){org.json.JSONObject d=archives.read(localCareerId);if(!d.optBoolean("guest"))manager.setCareerIdentity(PlayerArchive.card(d));}}catch(Exception e){toast("未能读取公开名片");}return manager;
     }
     private void host(){hosting=true;network=newNetwork(playerPrefs().getString("nickname","棋友"));board.setLocalPlayer(0);board.setMoveRequester((o,sx,sy,tx,ty)->{if(network!=null)network.hostMove(o,sx,sy,tx,ty);});board.setSkillRequester((o,id,sx,sy,tx,ty)->{if(network!=null)network.hostSkill(o,id,sx,sy,tx,ty);});networkStatus.setText("正在创建房间…");network.host(board);screen.post(this::maybeShowSkillDraw);}
     private void joinDialog(){
         LinearLayout content=entryContent();EditText nickname=nameInput("我的昵称（最多12个字）",playerPrefs().getString("nickname","棋友"));content.addView(nickname,new LinearLayout.LayoutParams(-1,dp(48)));
         EditText address=new EditText(this);address.setSingleLine(true);address.setHint("房主地址，例如 192.168.1.8");address.setContentDescription("房主地址");address.setInputType(InputType.TYPE_CLASS_PHONE);address.setText(playerPrefs().getString("last_host",""));content.addView(address,new LinearLayout.LayoutParams(-1,dp(48)));
         TextView hint=text("同一 Wi-Fi / 热点，玩法以房主为准",11,0xff736450);content.addView(hint,new LinearLayout.LayoutParams(-1,dp(36)));
+        android.widget.CheckBox bindProfile=new android.widget.CheckBox(this);bindProfile.setTextColor(GameDesign.TEXT);bindProfile.setText("以游客身份加入（不计正式战绩）");bindProfile.setEnabled(false);try{org.json.JSONObject d=archives.current();if(d!=null&&!d.optBoolean("guest")){bindProfile.setEnabled(true);bindProfile.setChecked(true);bindProfile.setText("绑定档案："+CareerRules.object(d,"profile").optString("nickname")+" · 记录本次战绩");}}catch(Exception ignored){}content.addView(bindProfile);
         presentEntry("加入房间 · 昵称与地址",content,"加入房间",()->{
             String ip=address.getText().toString().trim();if(ip.isEmpty()){toast("请填写房主地址");return;}
+            try{org.json.JSONObject profile=archives.current();if(bindProfile.isChecked()&&profile!=null&&!profile.optBoolean("guest"))pendingBindings[0]=profile.getString("id");}catch(Exception e){toast("档案读取失败，按游客加入");}
             String name=PlayerNames.clean(nickname.getText().toString(),"棋友");playerPrefs().edit().putString("nickname",name).putString("last_host",ip).apply();startMatch(new String[]{"房主","待分配","待分配","待分配"});hosting=false;network=newNetwork(name);board.setLocalPlayer(9);board.setMoveRequester((o,sx,sy,tx,ty)->{if(network!=null)network.clientMove(o,sx,sy,tx,ty);});board.setSkillRequester((o,id,sx,sy,tx,ty)->{if(network!=null)network.clientSkill(o,id,sx,sy,tx,ty);});networkStatus.setText("正在连接 "+ip+"…");network.join(ip);
         });
         final Button enter=entryDialog.getButton(AlertDialog.BUTTON_POSITIVE);enter.setEnabled(!address.getText().toString().trim().isEmpty());address.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int start,int count,int after){}public void onTextChanged(CharSequence s,int start,int before,int count){enter.setEnabled(!s.toString().trim().isEmpty());}public void afterTextChanged(android.text.Editable text){}});
@@ -272,7 +286,13 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         dialog[0]=new AlertDialog.Builder(this).setAdapter(adapter,(d,index)->select.choose(index)).setNegativeButton("返回棋局",null).create();return dialog[0];
     }
     private void showMatchMenu(){
-        AlertDialog menu=diplomacyChoices(new String[]{"规则说明","结盟 · 邀请 / 接受 / 撕盟","投降 · 选择归降对象"},item->{if(item==0)showRules();else chooseDiplomacyActor(item==2);});presentDiplomacy(menu,"结盟 / 投降");
+        AlertDialog menu=diplomacyChoices(new String[]{"规则说明","结盟 · 邀请 / 接受 / 撕盟","投降 · 选择归降对象","添加本房间棋友"},item->{if(item==0)showRules();else if(item==3)addRoomFriend();else chooseDiplomacyActor(item==2);});presentDiplomacy(menu,"结盟 / 投降");
+    }
+    private void addRoomFriend(){
+        if(network==null||lastCareerMetadata==null||localCareerId.isEmpty()){toast("需在局域网对局中绑定正式档案后添加棋友");return;}
+        org.json.JSONArray players=lastCareerMetadata.optJSONArray("players");java.util.ArrayList<org.json.JSONObject> cards=new java.util.ArrayList<>();java.util.ArrayList<String> names=new java.util.ArrayList<>();if(players!=null)for(int i=0;i<players.length();i++){org.json.JSONObject card=players.optJSONObject(i);if(card!=null&&!card.optString("id").isEmpty()&&!localCareerId.equals(card.optString("id"))){cards.add(card);names.add(card.optString("nickname")+" · LV."+card.optInt("level",1));}}
+        if(cards.isEmpty()){toast("当前房间暂无可添加的正式档案棋友");return;}
+        new AlertDialog.Builder(this).setTitle("添加本房间棋友").setItems(names.toArray(new String[0]),(dialog,index)->{try{archives.addFriend(localCareerId,cards.get(index));toast("已添加棋友，可在档案中查看与备注");}catch(Exception e){toast(e.getMessage());}}).setNegativeButton("取消",null).show();
     }
     private void chooseDiplomacyActor(boolean surrender){
         if(!matchActive||board.liveCount()<2){toast("本局已结束");return;}
@@ -331,6 +351,7 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
         allianceAnnouncement.reconcile(board.allianceMask());allianceAnnouncement.enqueue(actor,target,playerStrip.playerName(actor),playerStrip.playerName(target));
     }
     private void exitToLobby(){
+        career.stop();
         allianceAnnouncement.clear();
         if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();if(skillDialog!=null)skillDialog.dismiss();if(historyDialog!=null)historyDialog.dismiss();if(entryDialog!=null)entryDialog.dismiss();if(connectionDialog!=null)connectionDialog.dismiss();closeNetwork();matchActive=false;board.newGame();board.setLocalPlayer(-1);clearMoves();showModePage();
     }
@@ -421,12 +442,16 @@ public class MainActivity extends Activity implements NetworkManager.Callback {
     private void closeNetwork(){networkSession++;NetworkManager previous=network;network=null;hosting=false;if(previous!=null)previous.close();board.setMoveRequester(null);board.setSkillRequester(null);}
     private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_SHORT).show();}
     @Override public void onNetworkStatus(String s){runOnUiThread(()->networkStatus.setText(s));}
+    @Override public void onCareer(org.json.JSONObject data){runOnUiThread(()->{if(network==null||!matchActive)return;lastCareerMetadata=data;career.network(data,board.localSeat(),localCareerId);career.observe(board,true);});}
+    private void openArchive(){if(archiveCenter!=null)return;archiveEntry.setVisibility(View.GONE);archiveCenter=new ArchiveCenter(this,archives,archiveCloud,()->{screen.removeView(archiveCenter);archiveCenter=null;if(modePage.getVisibility()==View.VISIBLE)archiveEntry.setVisibility(View.VISIBLE);applyCareerOutfit();});screen.addView(archiveCenter,new FrameLayout.LayoutParams(-1,-1));archiveCenter.bringToFront();}
+    private void applyCareerOutfit(){try{org.json.JSONObject d=archives.current();if(d!=null)board.applyOutfit(CareerRules.object(d,"outfit"));}catch(Exception e){toast("装扮档案读取失败，沿用当前皮肤");}}
+    private void careerNotice(String value){if(isFinishing()||isDestroyed())return;TextView notice=text(value,13,GameDesign.GOLD_BRIGHT);notice.setPadding(dp(14),dp(12),dp(14),dp(12));notice.setBackground(frame(GameDesign.PANEL,GameDesign.EDGE,true));FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-2,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL);p.setMargins(dp(10),dp(12),dp(10),0);screen.addView(notice,p);notice.setAlpha(0);notice.animate().alpha(1).setDuration(160).start();notice.announceForAccessibility(value);screen.postDelayed(()->notice.animate().alpha(0).setDuration(180).withEndAction(()->screen.removeView(notice)).start(),3300);}
     @Override public void onAssigned(int owner){runOnUiThread(()->{board.setLocalPlayer(owner);networkStatus.setText("已入座 · "+board.ownerName(owner));});}
     @Override public void onState(String state){runOnUiThread(()->{int oldDiplomacy=board.diplomacySerial(),oldAlliances=board.allianceMask();String before=board.exportState();board.importState(state);String after=board.exportState();if(!before.equals(after)){try{String[] header=after.split("\\|",2)[0].split(",");int sx=Integer.parseInt(header[1]),sy=Integer.parseInt(header[2]),tx=Integer.parseInt(header[3]),ty=Integer.parseInt(header[4]);if(board.diplomacySerial()!=oldDiplomacy&&board.diplomacySerial()>0){recordMove(board.diplomacyLog());if(network!=null&&board.localSeat()>=0&&board.localSeat()<4&&!board.allianceLabel(board.localSeat()).isEmpty())toast("盟约状态已更新，可在结盟/投降中查看");}else if(board.isSkillMode()&&board.lastSkill()>0){recordMove(board.skillLog());}else if(sx>=0){recordMove("联机落子 "+(char)('A'+sx)+(19-sy)+" → "+(char)('A'+tx)+(19-ty));}else clearMoves();}catch(RuntimeException ignored){}}if(!before.equals(after)&&receivedNetworkState){int actor=board.lastDiplomacyActor(),target=board.lastDiplomacyTarget();if((oldAlliances&DiplomacyState.pair(actor,target))==0)presentAlliance(board.lastDiplomacyKind(),actor,target);}if(after.equals(state))receivedNetworkState=true;screen.post(this::maybeShowSkillDraw);});}
     @Override public void onHostMove(int owner,int sx,int sy,int tx,int ty){runOnUiThread(()->{if(board.tryNetworkMove(owner,sx,sy,tx,ty)&&network!=null)network.broadcast(board.exportState());});}
     @Override public void onHostSkill(int owner,int skill,int sx,int sy,int tx,int ty){runOnUiThread(()->{if(board.trySkill(owner,skill,sx,sy,tx,ty)&&network!=null)network.broadcast(board.exportState());});}
     @Override public void onHostDiplomacy(int owner,int action,int target){runOnUiThread(()->{if(board.tryDiplomacy(owner,action,target)){presentAlliance(action,owner,target);if(network!=null)network.broadcast(board.exportState());}});}
-    @Override public void onDestroy(){if(allianceAnnouncement!=null)allianceAnnouncement.clear();if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();clockHandler.removeCallbacks(clockTick);closeNetwork();super.onDestroy();}
+    @Override public void onDestroy(){if(archiveCloud!=null)archiveCloud.close();if(career!=null)career.close();if(allianceAnnouncement!=null)allianceAnnouncement.clear();if(diplomacyDialog!=null)diplomacyDialog.dismiss();if(skillCardDialog!=null)skillCardDialog.dismiss();if(drawDialog!=null)drawDialog.dismiss();clockHandler.removeCallbacks(clockTick);closeNetwork();super.onDestroy();}
     private final Runnable clockTick=new Runnable(){@Override public void run(){if(matchActive){turnSeconds++;refreshClock();}clockHandler.postDelayed(this,1000);}};
     private int dp(int n){return(int)(n*getResources().getDisplayMetrics().density+.5f);}
 }

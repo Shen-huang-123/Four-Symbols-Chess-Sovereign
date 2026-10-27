@@ -61,6 +61,23 @@ public class FourChessView extends View {
     void setMoveObserver(MoveObserver o){moveObserver=o;}
     void setSoundEnabled(boolean on){soundEnabled=on;sounds.setEnabled(on);if(on)sounds.play(GameSound.SELECT);}
     int currentTurn(){return turn;}
+    int careerWinner(){if(liveCount()!=1)return -1;for(int i=0;i<4;i++)if(alive[i])return i;return -1;}
+    /** Read-only statistics reconstructed from the exact undo history, excluding diplomacy transfers. */
+    int[][] careerTotals(){
+        int[][] totals=new int[4][2];
+        for(int n=0;n<history.size();n++){
+            Snapshot before=history.get(n),after=n+1<history.size()?history.get(n+1):null;
+            DiplomacyState post=after==null?diplomacy:after.diplomacy;if(post.serial!=before.diplomacy.serial)continue;
+            int skill=after==null?lastSkill:after.skill,actor=skill>0?(after==null?lastActor:after.actor):before.turn;
+            if(actor<0||actor>3)continue;if(skill>0)totals[actor][1]++;
+            int tx=after==null?lastTx:after.tx,ty=after==null?lastTy:after.ty;List<Piece> next=after==null?pieces:after.pieces;
+            for(Piece victim:before.pieces)if(victim.x==tx&&victim.y==ty&&victim.owner!=actor){boolean remains=false;for(Piece q:next)if(q.owner==victim.owner&&q.type==victim.type&&q.x==victim.x&&q.y==victim.y)remains=true;
+                // Swap/displacement skills move the target rather than capture it.
+                if(!remains&&(skill==0||skill!=2&&skill!=10&&skill!=11&&skill!=12&&skill!=28))totals[actor][0]++;break;}
+        }return totals;
+    }
+    private String boardSkin="ivory",pieceSkin="ivory",dropSkin="quiet";
+    void applyOutfit(org.json.JSONObject outfit){boardSkin=outfit.optString("board","ivory");pieceSkin=outfit.optString("piece","ivory");dropSkin=outfit.optString("effect","quiet");invalidate();}
     boolean isPlayerAlive(int owner){return alive[owner];}
     void setLocalPlayer(int player){localPlayer=player;selected=null;moves.clear();invalidate();announce();}
     String ownerName(int owner){return names[owner];}
@@ -108,10 +125,11 @@ public class FourChessView extends View {
         if(!compactUi)drawBoardScenery(c);
         drawPosition(c);
         if(!compactUi){drawSizeToggle(c);drawPetals(c);}
-        drawVictorySeal(c);if(inspecting)drawLoupe(c);
+        if("ink".equals(dropSkin)&&movingDrop()){p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(cell*.035f);p.setColor(0x66518582);float t=(System.currentTimeMillis()-moveAnimationStart)/560f;c.drawCircle(ox+lastTx*cellX,oy+lastTy*cellY,cell*(.3f+t*.65f),p);p.setStyle(Paint.Style.FILL);}drawVictorySeal(c);if(inspecting)drawLoupe(c);
         long now=System.currentTimeMillis();boolean moving=motionEnabled()&&now-moveAnimationStart<560;
         if(isShown()&&hasWindowFocus()&&(moving||now<rejectUntil||(!compactUi&&motionEnabled())))postInvalidateDelayed(moving?16:now<rejectUntil?32:100);
     }
+    private boolean movingDrop(){return motionEnabled()&&lastTx>=0&&System.currentTimeMillis()-moveAnimationStart<560;}
     private void drawPosition(Canvas c){
         drawBoardSurface(c);
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(1f,cell*.027f));p.setColor(GameDesign.GRID);
@@ -182,7 +200,7 @@ public class FourChessView extends View {
         float l=ox-cellX*.45f,r=ox+18.45f*cellX,t=oy-cellY*.45f,b=oy+18.45f*cellY;
         float x5=ox+4.55f*cellX,x14=ox+13.45f*cellX,y5=oy+4.55f*cellY,y14=oy+13.45f*cellY;
         Path cross=new Path();cross.moveTo(x5,t);cross.lineTo(x14,t);cross.lineTo(x14,y5);cross.lineTo(r,y5);cross.lineTo(r,y14);cross.lineTo(x14,y14);cross.lineTo(x14,b);cross.lineTo(x5,b);cross.lineTo(x5,y14);cross.lineTo(l,y14);cross.lineTo(l,y5);cross.lineTo(x5,y5);cross.close();
-        c.save();c.translate(0,cell*.08f);p.setColor(0x88202a2e);c.drawPath(cross,p);c.restore();p.setShader(new LinearGradient(0,t,0,b,GameDesign.IVORY,GameDesign.IVORY_SHADE,Shader.TileMode.CLAMP));p.setAlpha(255);c.drawPath(cross,p);p.setShader(null);
+        c.save();c.translate(0,cell*.08f);p.setColor(0x88202a2e);c.drawPath(cross,p);c.restore();p.setShader(new LinearGradient(0,t,0,b,"jade".equals(boardSkin)?0xffe4eddf:GameDesign.IVORY,"jade".equals(boardSkin)?0xffcfddca:GameDesign.IVORY_SHADE,Shader.TileMode.CLAMP));p.setAlpha(255);c.drawPath(cross,p);p.setShader(null);
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(cell*.07f);p.setColor(0xff66503b);c.drawPath(cross,p);p.setStrokeWidth(cell*.022f);p.setColor(0xffac9463);c.drawPath(cross,p);p.setStyle(Paint.Style.FILL);
         float band=Math.max(2,cell*.12f);p.setColor(0xff365f78);c.drawRect(x5,t,x14,t+band,p);p.setColor(0xff376c50);c.drawRect(l,y5,l+band,y14,p);p.setColor(0xffa87527);c.drawRect(r-band,y5,r,y14,p);p.setColor(0xffb22f2a);c.drawRect(x5,b-band,x14,b,p);
         c.save();c.clipPath(cross);p.setStrokeWidth(Math.max(1,cell*.016f));p.setColor(0x0b5f3d28);for(int i=0;i<10;i++){float yy=oy+(i*61%180)*cellY/10f;c.drawLine(l,yy,r,yy+cellY*.10f,p);}c.restore();drawBoardOrnaments(c);
@@ -195,7 +213,7 @@ public class FourChessView extends View {
         float radius=pieceDiameter()/2f;
         p.setStyle(Paint.Style.FILL);p.setColor(0x38221810);c.drawCircle(x+cell*.025f,y+cell*.045f,radius,p);
         p.setColor(0xffb8a385);c.drawCircle(x,y+cell*.025f,radius,p);
-        p.setShader(new LinearGradient(x,y-radius,x,y+radius,0xfff6eedc,0xffe8dbc1,Shader.TileMode.CLAMP));c.drawCircle(x,y,radius,p);p.setShader(null);
+        p.setShader(new LinearGradient(x,y-radius,x,y+radius,"jade".equals(pieceSkin)?0xffedf5ea:0xfff6eedc,"jade".equals(pieceSkin)?0xffc8d9c4:0xffe8dbc1,Shader.TileMode.CLAMP));c.drawCircle(x,y,radius,p);p.setShader(null);
         p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(cell*.03f);p.setColor(colors[q.owner]);c.drawCircle(x,y,radius*.90f,p);
         if(q==selected||q==skillSource)feedback.selection(c,x,y,cell,radius);
         p.setStyle(Paint.Style.FILL);p.setTextAlign(Paint.Align.LEFT);p.setTypeface(GameDesign.PIECE);p.setFakeBoldText(false);p.setTextSize(cell*(largePieces?.65f:.552f));p.setColor(colors[q.owner]);

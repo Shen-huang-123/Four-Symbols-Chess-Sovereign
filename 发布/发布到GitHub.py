@@ -17,7 +17,7 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "Shen-huang-123/Four-Symbols-Chess-Sovereign"
 BASE = "https://api.github.com/repos/" + REPO
-LATEST = "v5.7"
+LATEST = "v5.8"
 ORIGINAL = "98063f1c1304c2ffedee94f3558814c4d4db3bed"
 HEADERS = {}
 

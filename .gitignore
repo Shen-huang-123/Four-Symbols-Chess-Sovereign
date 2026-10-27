@@ -41,3 +41,10 @@ __pycache__/
 !源码/四象棋尊/验证/VerifyDiplomacy.ps1
 
 !源码/四象棋尊/验证/VerifyAllianceUi.ps1
+
+# Cloud deployment outputs
+**/.aws-sam/
+**/.venv/
+samconfig.toml
+
+!源码/四象棋尊/验证/VerifyCareer.ps1

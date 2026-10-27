@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Four Symbols Chess private JSON archive API (no SQL)
+Parameters:
+  ArchiveRepository:
+    Type: String
+    Description: Private GitHub repository, owner/repository
+  ArchiveBranch:
+    Type: String
+    Default: main
+  ArchiveToken:
+    Type: String
+    NoEcho: true
+    Description: Fine-grained GitHub token, only archive repository contents read/write
+  SessionKey:
+    Type: String
+    NoEcho: true
+    MinLength: 32
+    Description: Random server-only session signing key
+Resources:
+  ArchiveApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 10
+        ThrottlingRateLimit: 2
+  ArchiveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures: [x86_64]
+      MemorySize: 512
+      Timeout: 28
+      ReservedConcurrentExecutions: 2
+      Environment:
+        Variables:
+          ARCHIVE_REPOSITORY: !Ref ArchiveRepository
+          ARCHIVE_BRANCH: !Ref ArchiveBranch
+          GITHUB_ARCHIVE_TOKEN: !Ref ArchiveToken
+          SESSION_SIGNING_KEY: !Ref SessionKey
+      Events:
+        Requests:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ArchiveApi
+            Path: /v1/{proxy+}
+            Method: ANY
+Outputs:
+  Endpoint:
+    Value: !Sub https://${ArchiveApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}
