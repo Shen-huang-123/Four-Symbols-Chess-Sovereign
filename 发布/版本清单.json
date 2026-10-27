@@ -818,7 +818,7 @@
   {
     "tag": "v5.7",
     "title": "四象棋尊 v5.7 · 翻牌流畅度修复",
-    "apk": "安装包/历史版本/四象棋尊-v5.7.apk",
+    "apk": "安装包/最新版/四象棋尊-v5.7.apk",
     "size": 6288337,
     "sha256": "7e5b6e097428d1f2a7422fb65df48f72b4358f349cd16b46d562428a0ef85ced",
     "manifest": {
@@ -830,21 +830,5 @@
     "notes": "发布/说明/v5.7.md",
     "checksum": "发布/说明/SHA256SUMS-v5.7.txt",
     "download_name": "Four-Symbols-Chess-Sovereign-v5.7.apk"
-  },
-  {
-    "tag": "v5.8",
-    "title": "四象棋尊 v5.8 · 棋士档案与云存档接口",
-    "apk": "安装包/最新版/四象棋尊-v5.8.apk",
-    "size": 6525969,
-    "sha256": "3f6f3260959bd2fa1e2aed4b53c8313d787b4c86383d32b27fe2bc2505cef89a",
-    "manifest": {
-      "versionCode": 58,
-      "package": "com.dorm.fourchess",
-      "versionName": "5.8.0"
-    },
-    "source": "完整源码",
-    "notes": "发布/说明/v5.8.md",
-    "checksum": "发布/说明/SHA256SUMS-v5.8.txt",
-    "download_name": "Four-Symbols-Chess-Sovereign-v5.8.apk"
   }
 ]

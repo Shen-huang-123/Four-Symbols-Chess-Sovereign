@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <application android:theme="@style/AppTheme" android:label="四象棋尊" android:icon="@drawable/app_icon_art" android:roundIcon="@drawable/app_icon_art" android:allowBackup="false" android:supportsRtl="true">
+    <application android:theme="@style/AppTheme" android:label="四象棋尊" android:icon="@drawable/app_icon_art" android:roundIcon="@drawable/app_icon_art" android:allowBackup="true" android:supportsRtl="true">
         <activity android:name=".MainActivity" android:screenOrientation="fullSensor" android:resizeableActivity="true" android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
