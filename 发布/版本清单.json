@@ -754,7 +754,7 @@
   {
     "tag": "v5.3",
     "title": "四象棋尊 v5.3 · 结盟双头像动画与盟印",
-    "apk": "安装包/最新版/四象棋尊-v5.3.apk",
+    "apk": "安装包/历史版本/四象棋尊-v5.3.apk",
     "size": 6362157,
     "sha256": "132e12d5709d5a2c7a87b1e1a5cf441f0649ca4a180c3f260e04f06ff3617c44",
     "manifest": {
@@ -766,5 +766,21 @@
     "notes": "发布/说明/v5.3.md",
     "checksum": "发布/说明/SHA256SUMS-v5.3.txt",
     "download_name": "Four-Symbols-Chess-Sovereign-v5.3.apk"
+  },
+  {
+    "tag": "v5.4",
+    "title": "四象棋尊 v5.4 · 四象封印秘卷与三段揭晓",
+    "apk": "安装包/最新版/四象棋尊-v5.4.apk",
+    "size": 6368434,
+    "sha256": "5bb119187a37378520703f57ee04300e13355cc6668f49649411fc43e8308e42",
+    "manifest": {
+      "versionCode": 54,
+      "package": "com.dorm.fourchess",
+      "versionName": "5.4.0"
+    },
+    "source": "完整源码",
+    "notes": "发布/说明/v5.4.md",
+    "checksum": "发布/说明/SHA256SUMS-v5.4.txt",
+    "download_name": "Four-Symbols-Chess-Sovereign-v5.4.apk"
   }
 ]

@@ -25,10 +25,18 @@ public final class CardQualityProbe extends Instrumentation {
     }
     private void run()throws Exception{
         verifyEffects();
+        verifyRevealPhases();
         int[] totals=new int[3];for(int id=1;id<=30;id++){SkillCardTheme t=SkillCardTheme.forSkill(id);check(t!=null,"all skill IDs have a shared quality theme "+id);totals[t.pattern]++;}
         check(totals[0]==6&&totals[1]==10&&totals[2]==14,"mapping retains original six legendary ten rare fourteen common skills");check(SkillCardTheme.forSkill(29)==SkillCardTheme.COMMON&&SkillCardTheme.label(29).contains("整活"),"weak entertainment identity retained");
         for(SkillCardTheme t:new SkillCardTheme[]{SkillCardTheme.LEGENDARY,SkillCardTheme.RARE,SkillCardTheme.COMMON})for(int bg:new int[]{t.deep,t.middle,t.light}){check(contrast(t.title,bg)>=4.5,"title contrast >=4.5 "+t.key);check(contrast(t.body,bg)>=4.5,"description contrast >=4.5 "+t.key);}
         SkillCardPainter copyPainter=new SkillCardPainter(getTargetContext());float density=getTargetContext().getResources().getDisplayMetrics().density;
+        for(int width:new int[]{146,192,320}){
+            float w=width*density,h=copyPainter.minimumCardHeight(w);RectF r=new RectF(0,0,w,h),art=copyPainter.emblemBounds(r);
+            check(art.width()/w>=.45f&&art.width()/w<=.55f,"readable manuscript reserves 45-55 percent width for totem "+width);
+            for(int id=1;id<=30;id++){android.text.StaticLayout lines=copyPainter.summary(SkillCardCopy.summary(id),w-Math.min(10*density,w*.055f)*2,h*.26f-12*density,11*getTargetContext().getResources().getDisplayMetrics().scaledDensity,SkillCardTheme.forSkill(id).body);check(lines.getLineCount()<=2&&lines.getPaint().getTextSize()>=9*density,"actual card summary remains complete and legible "+id+"/"+width);}
+        }
+        check(SkillDrawView.REVEAL_MS>=500&&SkillDrawView.REVEAL_MS<=800,"three-stage reveal duration within requested range");
+        check(360+SkillCardEffects.duration(6,false)<=800,"highest quality reveal settles within 800ms");
         for(int id=1;id<=30;id++)for(int width:new int[]{146,192,320}){
             String copy=SkillRules.DETAILS[id-1];android.text.StaticLayout lines=copyPainter.description(copy,width*density,36*density,11*density,SkillCardTheme.forSkill(id).body);
             check(lines.getText().toString().equals(copy)&&lines.getLineEnd(lines.getLineCount()-1)==copy.length(),"complete unabridged description "+id+"/"+width);
@@ -44,10 +52,27 @@ public final class CardQualityProbe extends Instrumentation {
             android.graphics.Paint label=new android.graphics.Paint(3);label.setColor(0xffede3cc);label.setTextSize(11*density);label.setTextAlign(android.graphics.Paint.Align.CENTER);gallery.drawText(SkillRules.name(id),cell.centerX(),(row*112+108)*density,label);
         }
         try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-seals.png"))){atlas.compress(Bitmap.CompressFormat.PNG,100,out);}atlas.recycle();
-        renderSheet(420,420,false,"quality-full.png");renderSheet(360,130,true,"quality-compact.png");
+        renderSheet(420,580,false,"quality-full.png");renderSheet(360,130,true,"quality-compact.png");
         SkillDrawView draw=new SkillDrawView(getTargetContext(),new int[]{6,7,1,29},new int[]{3,2,1,0});float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(420*d),h=Math.round(390*d);draw.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));draw.layout(0,0,w,h);draw.revealAll(false);
         check(draw.allRevealed(),"skip preserves fully revealed card presentation");String node=draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();check(node.contains("传说")&&node.contains("剩余3次")&&node.contains("天遁"),"revealed quality name and actual charges accessible");check(draw.getAccessibilityNodeProvider().createAccessibilityNodeInfo(2).getContentDescription().toString().contains("稀有"),"rare presentation uses shared label");
         Bitmap b=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);draw.draw(new Canvas(b));try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-reveal.png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();
+    }
+    private void verifyRevealPhases()throws Exception{
+        float d=getTargetContext().getResources().getDisplayMetrics().density;int w=Math.round(360*d),h=Math.round(490*d);
+        SkillDrawView v=new SkillDrawView(getTargetContext(),new int[]{9,30,16,2},new int[]{3,2,1,2});
+        v.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));v.layout(0,0,w,h);
+        java.lang.reflect.Field flipField=SkillDrawView.class.getDeclaredField("flips");flipField.setAccessible(true);long[] flips=(long[])flipField.get(v);
+        final int[] completed={0};v.setListener(new SkillDrawView.Listener(){public void onCard(int id,boolean visible){}public void onComplete(){completed[0]++;}});
+        java.util.HashSet<Integer> hashes=new java.util.HashSet<>();Bitmap atlas=Bitmap.createBitmap(w*3,h,Bitmap.Config.ARGB_8888);Canvas out=new Canvas(atlas);
+        for(int i=0;i<3;i++){
+            flips[0]=SystemClock.uptimeMillis()-new int[]{90,400,650}[i];Bitmap frame=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);v.draw(new Canvas(frame));
+            int[] pixels=new int[w*h];frame.getPixels(pixels,0,w,0,0,w,h);check(hashes.add(java.util.Arrays.hashCode(pixels)),"opening flip and quality-settle frames differ "+i);
+            String accessible=v.getAccessibilityNodeProvider().createAccessibilityNodeInfo(1).getContentDescription().toString();
+            check(i==0?accessible.contains("点击揭晓")&&!accessible.contains("传说"):accessible.contains("穿云")&&accessible.contains("剩余3次"),"sealed identity concealed until face turns "+i);
+            out.drawBitmap(frame,i*w,0,null);frame.recycle();
+        }
+        v.revealAll(false);check(v.allRevealed()&&completed[0]==1,"skip during active flip immediately completes exactly once");v.revealAll(false);check(completed[0]==1,"repeated skip never duplicates completion callback");
+        try(FileOutputStream file=new FileOutputStream(new File(getTargetContext().getFilesDir(),"quality-phases.png"))){atlas.compress(Bitmap.CompressFormat.PNG,100,file);}atlas.recycle();
     }
     private void verifyEffects()throws Exception{
         SkillCardEffects fx=new SkillCardEffects();SkillCardPainter painter=new SkillCardPainter(getTargetContext());

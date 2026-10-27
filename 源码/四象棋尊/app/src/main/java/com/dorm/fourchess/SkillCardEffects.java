@@ -8,7 +8,7 @@ final class SkillCardEffects {
     private final RectF orbit=new RectF();
     static int duration(int id,boolean selection){
         int grade=SkillCardTheme.forSkill(id).pattern;
-        return selection?(grade==0?950:grade==1?650:400):(grade==0?1450:grade==1?1000:650);
+        return selection?(grade==0?420:grade==1?340:260):(grade==0?420:grade==1?340:260);
     }
     static boolean active(int id,long elapsed,boolean selection){return elapsed>=0&&elapsed<duration(id,selection);}
     void draw(Canvas c,RectF field,int id,long elapsed,boolean selection){
@@ -52,6 +52,9 @@ final class SkillCardEffects {
                 float x=(float)Math.cos(a)*r,y=(float)Math.sin(a)*r;
                 c.drawLine(x,y,x-(float)Math.cos(a-.3)*.06f*envelope,y-(float)Math.sin(a-.3)*.06f*envelope,p);
             }
+            p.setStyle(Paint.Style.FILL);p.setColor(GameDesign.alpha(0xffc15f54,Math.round(180*envelope)));
+            for(int i=0;i<6;i++){double a=i*Math.PI/3+.2;float r=.35f+progress*.52f;c.drawCircle((float)Math.cos(a)*r,(float)Math.sin(a)*r,.018f*envelope,p);}
+            p.setColor(GameDesign.alpha(t.title,Math.round(95*envelope)));p.setStrokeWidth(.035f);c.drawLine(-.65f+progress*.9f,.65f,-.15f+progress*.9f,-.65f,p);
         }
         c.restore();
     }
